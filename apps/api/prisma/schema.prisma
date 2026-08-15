@@ -1,0 +1,411 @@
+// Modèle physique de données (MPD) de Probo.
+//
+// Ce fichier est dérivé du MCD Merise versionné dans docs/conception/.
+// Il en diffère volontairement sur trois points, documentés dans
+// docs/conception/ecarts-mcd-mpd.md :
+//   - DocumentTexte est une scission de performance, pas une entité
+//     conceptuelle : au MCD, le texte extrait est une propriété de Document.
+//   - etablissementId est dénormalisé jusqu'aux tables profondes pour que
+//     tout filtre de cloisonnement tienne en une clause.
+//   - Les index, horodatages techniques et empreintes n'existent qu'ici.
+//
+// Règle de travail : le MCD se met à jour dans la même séance que la
+// migration Prisma, jamais après.
+
+generator client {
+  provider = "prisma-client"
+  output   = "../src/generated/prisma"
+
+  // NestJS compile en CommonJS. Sans cette ligne, Prisma 7 génère un client
+  // ESM qui utilise import.meta et casse aussi bien Jest que le runtime.
+  moduleFormat = "cjs"
+  runtime      = "nodejs"
+
+  // Sans cela, les imports relatifs du client généré portent une extension
+  // .js que la résolution CommonJS de Jest ne sait pas rattacher aux .ts.
+  importFileExtension = ""
+}
+
+// Prisma 7 : l'URL de connexion ne vit plus ici. Les commandes de migration
+// la lisent dans prisma.config.ts, et le client la reçoit via un adaptateur
+// (voir src/prisma/prisma.service.ts).
+datasource db {
+  provider = "postgresql"
+}
+
+// ---------------------------------------------------------------------------
+// Locataire et accès
+// ---------------------------------------------------------------------------
+
+model Etablissement {
+  id        String   @id @default(uuid()) @db.Uuid
+  nom       String
+  siret     String?  @db.VarChar(14)
+  actif     Boolean  @default(true)
+  creeLe    DateTime @default(now()) @map("cree_le")
+  modifieLe DateTime @updatedAt @map("modifie_le")
+
+  utilisateurs     Utilisateur[]
+  campagnes        Campagne[]
+  connexionsDrive  ConnexionDrive[]
+  candidatures     Candidature[]
+  documents        Document[]
+  entreesJournal   JournalAudit[]
+
+  @@map("etablissement")
+}
+
+enum RoleUtilisateur {
+  ADMIN
+  CHARGE_ADMISSION
+
+  @@map("role_utilisateur")
+}
+
+model Utilisateur {
+  id              String          @id @default(uuid()) @db.Uuid
+  etablissementId String          @map("etablissement_id") @db.Uuid
+  email           String          @unique
+  motDePasseHash  String          @map("mot_de_passe_hash")
+  nom             String
+  role            RoleUtilisateur @default(CHARGE_ADMISSION)
+  actif           Boolean         @default(true)
+  derniereConnexionLe DateTime?   @map("derniere_connexion_le")
+  creeLe          DateTime        @default(now()) @map("cree_le")
+  modifieLe       DateTime        @updatedAt @map("modifie_le")
+
+  etablissement  Etablissement  @relation(fields: [etablissementId], references: [id], onDelete: Cascade)
+  lotsImportes   LotImport[]
+  entreesJournal JournalAudit[]
+
+  @@index([etablissementId])
+  @@map("utilisateur")
+}
+
+/// Dossier Drive explicitement enregistré par un établissement.
+///
+/// RG-07 — On n'importe jamais depuis un folderId reçu dans une requête.
+/// Le compte de service voit tous les dossiers qu'on lui a partagés, tous
+/// établissements confondus : accepter un identifiant fourni par le client
+/// ouvrirait une référence directe non sécurisée entre locataires.
+model ConnexionDrive {
+  id                  String    @id @default(uuid()) @db.Uuid
+  etablissementId     String    @map("etablissement_id") @db.Uuid
+  libelle             String
+  folderId            String    @map("folder_id")
+  actif               Boolean   @default(true)
+  derniereUtilisation DateTime? @map("derniere_utilisation")
+  creeLe              DateTime  @default(now()) @map("cree_le")
+
+  etablissement Etablissement @relation(fields: [etablissementId], references: [id], onDelete: Cascade)
+  lotsImportes  LotImport[]
+
+  @@unique([etablissementId, folderId])
+  @@map("connexion_drive")
+}
+
+// ---------------------------------------------------------------------------
+// Campagne
+// ---------------------------------------------------------------------------
+
+enum StatutCampagne {
+  BROUILLON
+  ACTIVE
+  CLOTUREE
+  ARCHIVEE
+
+  @@map("statut_campagne")
+}
+
+enum TypeDocument {
+  CV
+  LETTRE_MOTIVATION
+  LETTRE_RECOMMANDATION
+  PORTFOLIO
+  AUTRE
+
+  @@map("type_document")
+}
+
+model Campagne {
+  id              String         @id @default(uuid()) @db.Uuid
+  etablissementId String         @map("etablissement_id") @db.Uuid
+  nom             String
+  description     String?
+  statut          StatutCampagne @default(BROUILLON)
+
+  /// Types de documents attendus. Un type détecté hors de cette liste rend
+  /// le document atypique (RG-02).
+  typesAttendus TypeDocument[] @map("types_attendus")
+
+  /// Confiance minimale du niveau 1 pour qu'une classification soit retenue (RG-01).
+  seuilConfianceN1 Int @default(70) @map("seuil_confiance_n1")
+
+  /// Pondération des trois sous-scores du niveau 2 (RG-05).
+  poidsAdequation     Float @default(0.5) @map("poids_adequation")
+  poidsClarte         Float @default(0.25) @map("poids_clarte")
+  poidsQualiteFormelle Float @default(0.25) @map("poids_qualite_formelle")
+
+  dateOuverture DateTime? @map("date_ouverture")
+  dateCloture   DateTime? @map("date_cloture")
+  creeLe        DateTime  @default(now()) @map("cree_le")
+  modifieLe     DateTime  @updatedAt @map("modifie_le")
+
+  etablissement Etablissement @relation(fields: [etablissementId], references: [id], onDelete: Cascade)
+  criteres      Critere[]
+  lotsImportes  LotImport[]
+  candidatures  Candidature[]
+
+  @@index([etablissementId, statut])
+  @@map("campagne")
+}
+
+enum TypeCritere {
+  MOT_CLE
+  NIVEAU_REQUIS
+  LANGUE
+
+  @@map("type_critere")
+}
+
+model Critere {
+  id         String      @id @default(uuid()) @db.Uuid
+  campagneId String      @map("campagne_id") @db.Uuid
+  type       TypeCritere
+  libelle    String
+  valeur     String
+  poids      Float       @default(1)
+
+  campagne Campagne @relation(fields: [campagneId], references: [id], onDelete: Cascade)
+
+  @@index([campagneId])
+  @@map("critere")
+}
+
+// ---------------------------------------------------------------------------
+// Ingestion
+// ---------------------------------------------------------------------------
+
+enum SourceImport {
+  ZIP
+  GOOGLE_DRIVE
+
+  @@map("source_import")
+}
+
+enum StatutLotImport {
+  EN_ATTENTE
+  EN_COURS
+  TERMINE
+  ERREUR
+
+  @@map("statut_lot_import")
+}
+
+model LotImport {
+  id               String          @id @default(uuid()) @db.Uuid
+  campagneId       String          @map("campagne_id") @db.Uuid
+  utilisateurId    String?         @map("utilisateur_id") @db.Uuid
+  connexionDriveId String?         @map("connexion_drive_id") @db.Uuid
+  source           SourceImport
+  statut           StatutLotImport @default(EN_ATTENTE)
+  nbFichiers       Int             @default(0) @map("nb_fichiers")
+  nbFichiersRejetes Int            @default(0) @map("nb_fichiers_rejetes")
+  messageErreur    String?         @map("message_erreur")
+  creeLe           DateTime        @default(now()) @map("cree_le")
+  termineLe        DateTime?       @map("termine_le")
+
+  campagne       Campagne        @relation(fields: [campagneId], references: [id], onDelete: Cascade)
+  utilisateur    Utilisateur?    @relation(fields: [utilisateurId], references: [id], onDelete: SetNull)
+  connexionDrive ConnexionDrive? @relation(fields: [connexionDriveId], references: [id], onDelete: SetNull)
+  documents      Document[]
+
+  @@index([campagneId])
+  @@map("lot_import")
+}
+
+// ---------------------------------------------------------------------------
+// Candidature et documents
+// ---------------------------------------------------------------------------
+
+enum StatutCandidature {
+  EN_ATTENTE
+  EN_COURS
+  ANALYSEE
+  ERREUR
+
+  @@map("statut_candidature")
+}
+
+model Candidature {
+  id              String            @id @default(uuid()) @db.Uuid
+  campagneId      String            @map("campagne_id") @db.Uuid
+  etablissementId String            @map("etablissement_id") @db.Uuid
+  nomCandidat     String            @map("nom_candidat")
+  emailCandidat   String?           @map("email_candidat")
+  identifiantExterne String?        @map("identifiant_externe")
+  statut          StatutCandidature @default(EN_ATTENTE)
+
+  /// Moyenne des scores des documents non atypiques (RG-06).
+  /// `null` signifie « rien à évaluer », et surtout pas zéro.
+  scoreGlobal Float? @map("score_global")
+
+  nbDocumentsAtypiques Int @default(0) @map("nb_documents_atypiques")
+
+  /// Le rang n'est jamais stocké : il se calcule par fonction fenêtre à la
+  /// lecture. Un rang matérialisé s'invalide à chaque document analysé.
+
+  /// Échéance de purge RGPD. Indexée pour le balayage quotidien.
+  datePurgePrevue DateTime @map("date_purge_prevue")
+
+  creeLe    DateTime @default(now()) @map("cree_le")
+  modifieLe DateTime @updatedAt @map("modifie_le")
+
+  campagne      Campagne      @relation(fields: [campagneId], references: [id], onDelete: Cascade)
+  etablissement Etablissement @relation(fields: [etablissementId], references: [id], onDelete: Cascade)
+  documents     Document[]
+
+  @@index([campagneId, scoreGlobal(sort: Desc)])
+  @@index([datePurgePrevue])
+  @@index([etablissementId])
+  @@map("candidature")
+}
+
+enum MethodeExtraction {
+  NATIVE
+  OCR
+  ECHEC
+
+  @@map("methode_extraction")
+}
+
+enum StatutDocument {
+  EN_ATTENTE
+  EXTRACTION
+  ANALYSE_NIVEAU_1
+  ANALYSE_NIVEAU_2
+  TERMINE
+  ERREUR
+
+  @@map("statut_document")
+}
+
+model Document {
+  id              String  @id @default(uuid()) @db.Uuid
+  candidatureId   String  @map("candidature_id") @db.Uuid
+  lotImportId     String  @map("lot_import_id") @db.Uuid
+  etablissementId String  @map("etablissement_id") @db.Uuid
+
+  nomFichierOrigine String @map("nom_fichier_origine")
+  cleStockage       String @map("cle_stockage")
+
+  /// Empreinte du contenu : détecte le même fichier déposé deux fois.
+  hashSha256 String @map("hash_sha256") @db.Char(64)
+
+  tailleOctets Int    @map("taille_octets")
+  mimeType     String @map("mime_type")
+
+  methodeExtraction MethodeExtraction? @map("methode_extraction")
+  statut            StatutDocument     @default(EN_ATTENTE)
+  messageErreur     String?            @map("message_erreur")
+
+  creeLe    DateTime @default(now()) @map("cree_le")
+  modifieLe DateTime @updatedAt @map("modifie_le")
+
+  candidature   Candidature      @relation(fields: [candidatureId], references: [id], onDelete: Cascade)
+  lotImport     LotImport        @relation(fields: [lotImportId], references: [id], onDelete: Cascade)
+  etablissement Etablissement    @relation(fields: [etablissementId], references: [id], onDelete: Cascade)
+  texte         DocumentTexte?
+  analyse       AnalyseDocument?
+
+  @@index([candidatureId])
+  @@index([hashSha256])
+  @@index([statut])
+  @@map("document")
+}
+
+/// Scission de performance : le texte extrait pèse des dizaines de
+/// kilo-octets et n'a rien à faire dans les requêtes de liste.
+/// Au MCD, c'est une simple propriété de Document.
+model DocumentTexte {
+  documentId String   @id @map("document_id") @db.Uuid
+  contenu    String
+  nbCaracteres Int    @map("nb_caracteres")
+  creeLe     DateTime @default(now()) @map("cree_le")
+
+  document Document @relation(fields: [documentId], references: [id], onDelete: Cascade)
+
+  @@map("document_texte")
+}
+
+enum MotifAtypique {
+  CONFIANCE_INSUFFISANTE
+  TYPE_INATTENDU
+  ILLISIBLE
+
+  @@map("motif_atypique")
+}
+
+model AnalyseDocument {
+  documentId String @id @map("document_id") @db.Uuid
+
+  // --- Niveau 1 : vérification de la nature ---
+  typeDetecte    TypeDocument?  @map("type_detecte")
+  confianceN1    Int?           @map("confiance_n1")
+  estAtypique    Boolean        @default(false) @map("est_atypique")
+  motifAtypique  MotifAtypique? @map("motif_atypique")
+  justificationN1 String?       @map("justification_n1")
+
+  // --- Niveau 2 : adéquation à la campagne (RG-04 : documents retenus seulement) ---
+  scoreAdequation      Int? @map("score_adequation")
+  scoreClarte          Int? @map("score_clarte")
+  scoreQualiteFormelle Int? @map("score_qualite_formelle")
+
+  justificationAdequation      String? @map("justification_adequation")
+  justificationClarte          String? @map("justification_clarte")
+  justificationQualiteFormelle String? @map("justification_qualite_formelle")
+
+  /// Moyenne pondérée des trois sous-scores (RG-05).
+  scoreDocument Float? @map("score_document")
+
+  // --- Traçabilité : sans elle, impossible d'expliquer pourquoi le même
+  //     document a obtenu deux scores différents à deux semaines d'écart.
+  modeleN1      String? @map("modele_n1")
+  modeleN2      String? @map("modele_n2")
+  versionPrompt String  @map("version_prompt")
+  tokensN1      Int?    @map("tokens_n1")
+  tokensN2      Int?    @map("tokens_n2")
+  dureeMs       Int?    @map("duree_ms")
+
+  analyseeLe DateTime @default(now()) @map("analysee_le")
+
+  document Document @relation(fields: [documentId], references: [id], onDelete: Cascade)
+
+  @@index([estAtypique])
+  @@map("analyse_document")
+}
+
+// ---------------------------------------------------------------------------
+// Journal d'audit
+// ---------------------------------------------------------------------------
+
+/// Rattaché à l'établissement, jamais à la candidature : la purge RGPD des
+/// candidatures à 90 jours laisse donc la piste d'audit intacte.
+model JournalAudit {
+  id              String   @id @default(uuid()) @db.Uuid
+  etablissementId String   @map("etablissement_id") @db.Uuid
+  utilisateurId   String?  @map("utilisateur_id") @db.Uuid
+  action          String
+  entiteType      String   @map("entite_type")
+  entiteId        String?  @map("entite_id")
+  adresseIp       String?  @map("adresse_ip")
+  userAgent       String?  @map("user_agent")
+  details         Json?
+  horodatage      DateTime @default(now())
+
+  etablissement Etablissement @relation(fields: [etablissementId], references: [id], onDelete: Cascade)
+  utilisateur   Utilisateur?  @relation(fields: [utilisateurId], references: [id], onDelete: SetNull)
+
+  @@index([etablissementId, horodatage(sort: Desc)])
+  @@map("journal_audit")
+}
