@@ -1,6 +1,6 @@
 # Règles de gestion
 
-Ces règles sont **implémentées et testées** dans [`packages/shared/src/regles-gestion.ts`](../../packages/shared/src/regles-gestion.ts), et vérifiées par [`regles-gestion.test.ts`](../../packages/shared/src/regles-gestion.test.ts).
+Ces règles sont **implémentées et testées** dans [`packages/shared/src/business-rules.ts`](../../packages/shared/src/business-rules.ts), et vérifiées par [`business-rules.test.ts`](../../packages/shared/src/business-rules.test.ts).
 
 Ce document n'est pas une paraphrase du code : il porte l'énoncé métier et sa justification. Le code porte l'implémentation. Les deux se répondent par l'identifiant `RG-xx`, qui figure aussi dans les noms de tests — de sorte qu'une règle documentée, une règle implémentée et une règle testée soient traçables entre elles.
 
@@ -14,7 +14,7 @@ Ce document n'est pas une paraphrase du code : il porte l'énoncé métier et sa
 
 **Pourquoi.** Une classification incertaine n'est pas une information exploitable. Scorer un document dont on ignore la nature reviendrait à comparer un CV à une lettre de motivation sur les mêmes critères.
 
-**Paramètre.** `campagne.seuilConfianceN1`, entier de 0 à 100, par défaut **70**.
+**Paramètre.** `campaign.confidenceThreshold`, entier de 0 à 100, par défaut **70**.
 
 **Cas limite tranché.** Une confiance **égale** au seuil est acceptée. Le seuil est un minimum atteignable, pas une barre à dépasser.
 
@@ -106,7 +106,7 @@ _US-13, US-14 · testé_
 
 **Pourquoi.** Le compte de service a accès à tous les dossiers qui lui ont été partagés, **tous établissements confondus**. Accepter un identifiant fourni par le client permettrait à l'établissement A de lire le dossier de candidatures de l'établissement B en devinant ou en interceptant son identifiant. C'est une référence directe non sécurisée, catégorie _Broken Access Control_ de l'OWASP Top 10.
 
-**Contre-mesure.** L'entité `ConnexionDrive` matérialise l'autorisation. L'API n'accepte qu'un identifiant de connexion, dont l'appartenance à l'établissement de l'appelant est vérifiée avant tout accès à Drive.
+**Contre-mesure.** L'entité `DriveConnection` matérialise l'autorisation. L'API n'accepte qu'un identifiant de connexion, dont l'appartenance à l'établissement de l'appelant est vérifiée avant tout accès à Drive.
 
 **Portée de la règle.** Elle est structurelle, pas seulement applicative : elle contraint le modèle de données. C'est la raison d'être de l'entité.
 

@@ -5,8 +5,8 @@ import { App } from 'supertest/types';
 import { AppModule } from './../src/app.module';
 
 /**
- * Test de bout en bout : nécessite Postgres et Redis démarrés
- * (`npm run infra:up`). Exécuté par `npm run test:e2e`, pas par `npm test`.
+ * End-to-end test: requires PostgreSQL and Redis to be up (`npm run infra:up`).
+ * Run through `npm run test:e2e`, not through `npm test`.
  */
 describe('AppController (e2e)', () => {
   let app: INestApplication<App>;
@@ -21,12 +21,12 @@ describe('AppController (e2e)', () => {
     await app.init();
   });
 
-  it('GET /api/sante répond ok quand l’infrastructure est là', () => {
+  it('GET /api/health reports ok when the infrastructure is up', () => {
     return request(app.getHttpServer())
-      .get('/api/sante')
+      .get('/api/health')
       .expect(200)
       .expect((res) => {
-        expect(res.body).toMatchObject({ statut: 'ok', baseDeDonnees: 'ok' });
+        expect(res.body).toMatchObject({ status: 'ok', database: 'ok' });
       });
   });
 

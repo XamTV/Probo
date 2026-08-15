@@ -251,7 +251,7 @@ _Périmètre : M-12_
 | ----------------- | ---------------------- | ----------------------------------------------------------------------------------- |
 | Périmètre         | `M-xx`, `S-xx`, `C-xx` | [`perimetre.md`](perimetre.md)                                                      |
 | User story        | `US-xx`                | ce document                                                                         |
-| Règle de gestion  | `RG-xx`                | [`regles-gestion.md`](regles-gestion.md) et `packages/shared/src/regles-gestion.ts` |
+| Règle de gestion  | `RG-xx`                | [`regles-gestion.md`](regles-gestion.md) et `packages/shared/src/business-rules.ts` |
 | Cas d'utilisation | `CU-xx`                | [`cas-utilisation.md`](cas-utilisation.md)                                          |
 | Recette           | `REC-xx`               | `docs/tests/cahier-de-recettes.md`                                                  |
 

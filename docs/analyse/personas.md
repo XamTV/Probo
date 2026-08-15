@@ -61,7 +61,7 @@ Candidate à une formation. Dépose son dossier sur le site de l'école et ne sa
 | Droit d'accès et à l'explication | Les justifications de chaque score sont stockées et restituables ; le score n'est jamais un chiffre nu |
 | Traçabilité                      | Journal d'audit conservé indépendamment de la purge des candidatures                                   |
 
-**Le risque à écarter.** Si Sofia conteste un refus, l'établissement doit pouvoir expliquer ce qui a été analysé. Un score sans justification, ou une analyse dont on ignore avec quel prompt elle a été produite, est indéfendable — d'où le stockage de `version_prompt` sur chaque analyse.
+**Le risque à écarter.** Si Sofia conteste un refus, l'établissement doit pouvoir expliquer ce qui a été analysé. Un score sans justification, ou une analyse dont on ignore avec quel prompt elle a été produite, est indéfendable — d'où le stockage de `prompt_version` sur chaque analyse.
 
 ---
 

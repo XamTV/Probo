@@ -1,41 +1,41 @@
 import { z } from 'zod';
 
-/** Nature d'un document, telle que déterminée par l'analyse de niveau 1. */
-export const TypeDocument = z.enum([
-  'CV',
-  'LETTRE_MOTIVATION',
-  'LETTRE_RECOMMANDATION',
+/** Nature of a document, as determined by level 1 analysis. */
+export const DocumentType = z.enum([
+  'RESUME',
+  'COVER_LETTER',
+  'RECOMMENDATION_LETTER',
   'PORTFOLIO',
-  'AUTRE',
+  'OTHER',
 ]);
-export type TypeDocument = z.infer<typeof TypeDocument>;
+export type DocumentType = z.infer<typeof DocumentType>;
 
-/** Raison pour laquelle un document est écarté du calcul de score. */
-export const MotifAtypique = z.enum([
-  /** La confiance du niveau 1 est sous le seuil de la campagne. */
-  'CONFIANCE_INSUFFISANTE',
-  /** Le type détecté ne figure pas parmi les types attendus par la campagne. */
-  'TYPE_INATTENDU',
-  /** Aucun texte exploitable n'a pu être extrait du fichier. */
-  'ILLISIBLE',
+/** Why a document is excluded from score computation. */
+export const AtypicalReason = z.enum([
+  /** Level 1 confidence is below the campaign threshold. */
+  'LOW_CONFIDENCE',
+  /** The detected type is not among the campaign's expected types. */
+  'UNEXPECTED_TYPE',
+  /** No usable text could be extracted from the file. */
+  'UNREADABLE',
 ]);
-export type MotifAtypique = z.infer<typeof MotifAtypique>;
+export type AtypicalReason = z.infer<typeof AtypicalReason>;
 
-/** Comment le texte du document a été obtenu. */
-export const MethodeExtraction = z.enum(['NATIVE', 'OCR', 'ECHEC']);
-export type MethodeExtraction = z.infer<typeof MethodeExtraction>;
+/** How the document text was obtained. */
+export const ExtractionMethod = z.enum(['NATIVE', 'OCR', 'FAILED']);
+export type ExtractionMethod = z.infer<typeof ExtractionMethod>;
 
-/** Machine à états du traitement d'un document. */
-export const StatutDocument = z.enum([
-  'EN_ATTENTE',
-  'EXTRACTION',
-  'ANALYSE_NIVEAU_1',
-  'ANALYSE_NIVEAU_2',
-  'TERMINE',
-  'ERREUR',
+/** Document processing state machine. */
+export const DocumentStatus = z.enum([
+  'PENDING',
+  'EXTRACTING',
+  'LEVEL_1_ANALYSIS',
+  'LEVEL_2_ANALYSIS',
+  'COMPLETED',
+  'FAILED',
 ]);
-export type StatutDocument = z.infer<typeof StatutDocument>;
+export type DocumentStatus = z.infer<typeof DocumentStatus>;
 
-/** Origine d'un lot de documents. */
-export const SourceImport = z.enum(['ZIP', 'GOOGLE_DRIVE']);
-export type SourceImport = z.infer<typeof SourceImport>;
+/** Where a batch of documents came from. */
+export const ImportSource = z.enum(['ZIP', 'GOOGLE_DRIVE']);
+export type ImportSource = z.infer<typeof ImportSource>;

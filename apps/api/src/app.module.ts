@@ -9,7 +9,7 @@ import { PrismaModule } from './prisma/prisma.module';
   imports: [
     ConfigModule.forRoot({
       isGlobal: true,
-      // Le monorepo n'a qu'un seul .env, à la racine.
+      // The monorepo has a single .env, at the root.
       envFilePath: resolve(__dirname, '../../../.env'),
     }),
     PrismaModule,

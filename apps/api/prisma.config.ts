@@ -1,9 +1,9 @@
-import { config as chargerEnv } from 'dotenv';
+import { config as loadEnv } from 'dotenv';
 import { defineConfig } from 'prisma/config';
 import { resolve } from 'node:path';
 
-// Le monorepo n'a qu'un seul fichier .env, à la racine.
-chargerEnv({ path: resolve(__dirname, '../../.env'), quiet: true });
+// The monorepo has a single .env file, at the root.
+loadEnv({ path: resolve(__dirname, '../../.env'), quiet: true });
 
 export default defineConfig({
   schema: 'prisma/schema.prisma',

@@ -1,6 +1,6 @@
 import { Component, signal } from '@angular/core';
 import { RouterOutlet } from '@angular/router';
-import { TypeDocument } from '@probo/shared';
+import { DOCUMENT_TYPE_LABELS_FR, DocumentType } from '@probo/shared';
 
 @Component({
   selector: 'app-root',
@@ -9,9 +9,16 @@ import { TypeDocument } from '@probo/shared';
   styleUrl: './app.css',
 })
 export class App {
-  protected readonly titre = signal('Probo');
-  protected readonly baseline = signal('La preuve, document par document.');
+  protected readonly productName = signal('Probo');
+  protected readonly tagline = signal('La preuve, document par document.');
 
-  /** Vient du package partagé : une seule définition pour le front et l'API. */
-  protected readonly typesDocument = TypeDocument.options;
+  /**
+   * Comes from the shared package: one definition for the front end and the
+   * API. Values are English, labels are French — the UI never shows a raw
+   * enum value.
+   */
+  protected readonly documentTypes = DocumentType.options.map((value) => ({
+    value,
+    label: DOCUMENT_TYPE_LABELS_FR[value],
+  }));
 }

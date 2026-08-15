@@ -8,22 +8,23 @@ describe('App', () => {
     }).compileComponents();
   });
 
-  it('monte le composant racine', () => {
+  it('mounts the root component', () => {
     const fixture = TestBed.createComponent(App);
     expect(fixture.componentInstance).toBeTruthy();
   });
 
-  it('affiche le nom du produit', async () => {
+  it('renders the product name', async () => {
     const fixture = TestBed.createComponent(App);
     await fixture.whenStable();
-    const rendu = fixture.nativeElement as HTMLElement;
-    expect(rendu.querySelector('h1')?.textContent).toContain('Probo');
+    const rendered = fixture.nativeElement as HTMLElement;
+    expect(rendered.querySelector('h1')?.textContent).toContain('Probo');
   });
 
-  it('affiche les types de documents issus du package partagé', async () => {
+  it('renders French labels for the shared document types', async () => {
     const fixture = TestBed.createComponent(App);
     await fixture.whenStable();
-    const rendu = fixture.nativeElement as HTMLElement;
-    expect(rendu.textContent).toContain('LETTRE_MOTIVATION');
+    const rendered = fixture.nativeElement as HTMLElement;
+    expect(rendered.textContent).toContain('Lettre de motivation');
+    expect(rendered.textContent).toContain('COVER_LETTER');
   });
 });

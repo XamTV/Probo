@@ -18,20 +18,20 @@ describe('AppController', () => {
     appController = app.get<AppController>(AppController);
   });
 
-  describe('GET /api/sante', () => {
-    it('renvoie ok quand la base répond', async () => {
-      await expect(appController.sante()).resolves.toMatchObject({
-        statut: 'ok',
-        baseDeDonnees: 'ok',
+  describe('GET /api/health', () => {
+    it('reports ok when the database answers', async () => {
+      await expect(appController.health()).resolves.toMatchObject({
+        status: 'ok',
+        database: 'ok',
       });
     });
 
-    it('renvoie degrade quand la base est injoignable', async () => {
-      prisma.$queryRaw.mockRejectedValue(new Error('connexion refusée'));
+    it('reports degraded when the database is unreachable', async () => {
+      prisma.$queryRaw.mockRejectedValue(new Error('connection refused'));
 
-      await expect(appController.sante()).resolves.toMatchObject({
-        statut: 'degrade',
-        baseDeDonnees: 'injoignable',
+      await expect(appController.health()).resolves.toMatchObject({
+        status: 'degraded',
+        database: 'unreachable',
       });
     });
   });

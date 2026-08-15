@@ -1,3 +1,4 @@
 export * from './enums.js';
-export * from './analyse.js';
-export * from './regles-gestion.js';
+export * from './analysis.js';
+export * from './business-rules.js';
+export * from './labels-fr.js';
