@@ -1,0 +1,47 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  qualite:
+    name: Qualité, tests et build
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version-file: .nvmrc
+          cache: npm
+
+      - name: Installer les dépendances
+        run: npm ci
+
+      # Les contrats partagés doivent être construits avant que l'API et le
+      # front puissent les typer.
+      - name: Construire les contrats partagés
+        run: npm run build -w @probo/shared
+
+      - name: Valider le schéma Prisma
+        run: npx prisma validate
+        working-directory: apps/api
+
+      - name: Vérifier le formatage
+        run: npm run format:check
+
+      - name: Lint
+        run: npm run lint
+
+      - name: Tests
+        run: npm test
+
+      - name: Build
+        run: npm run build

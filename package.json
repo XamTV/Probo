@@ -1,0 +1,32 @@
+{
+  "name": "probo",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Analyse en masse de candidatures : vérification de la nature des documents, puis scoring d'adéquation.",
+  "license": "UNLICENSED",
+  "engines": {
+    "node": ">=22"
+  },
+  "workspaces": [
+    "apps/*",
+    "packages/*"
+  ],
+  "scripts": {
+    "dev": "concurrently -n api,web -c blue,magenta \"npm run dev -w @probo/api\" \"npm run start -w @probo/web\"",
+    "build": "npm run build -w @probo/shared && npm run build -w @probo/api && npm run build -w @probo/web",
+    "pretest": "npm run build -w @probo/shared",
+    "test": "npm run test --workspaces --if-present",
+    "lint": "npm run lint --workspaces --if-present",
+    "format": "prettier --write .",
+    "format:check": "prettier --check .",
+    "infra:up": "docker compose up -d",
+    "infra:down": "docker compose down",
+    "infra:logs": "docker compose logs -f",
+    "db:migrate": "npm run db:migrate -w @probo/api",
+    "db:studio": "npm run db:studio -w @probo/api"
+  },
+  "devDependencies": {
+    "concurrently": "^9.1.2",
+    "prettier": "^3.4.2"
+  }
+}

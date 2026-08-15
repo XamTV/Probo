@@ -1,0 +1,40 @@
+# Dépendances
+node_modules/
+
+# Builds
+dist/
+build/
+.angular/
+*.tsbuildinfo
+
+# Client Prisma généré — régénéré au postinstall, jamais committé
+apps/api/src/generated/
+
+# Environnement — ne jamais committer de secrets
+.env
+.env.*
+!.env.example
+
+# Clé du compte de service Google : jamais dans le dépôt
+credentials/
+*-service-account*.json
+
+# Stockage local des documents candidats (données personnelles)
+storage/
+
+# Tests
+coverage/
+.nyc_output/
+test-results/
+playwright-report/
+
+# Logs
+*.log
+npm-debug.log*
+
+# OS / éditeurs
+.DS_Store
+Thumbs.db
+.idea/
+.vscode/*
+!.vscode/extensions.json
