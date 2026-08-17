@@ -48,7 +48,15 @@ souvent plusieurs heures d'affilée.
 
 ## Langue et vocabulaire
 
-Toute l'interface est en français. Emploie exactement ces termes :
+L'interface est bilingue français / anglais, le français étant la langue par
+défaut. Conçois les maquettes en français, mais prévois qu'un libellé anglais
+peut être 20 à 30 % plus court ou plus long : évite les largeurs fixes calées
+sur la longueur exacte d'un mot français.
+
+Un sélecteur de langue doit trouver sa place, discret, accessible depuis
+n'importe quel écran.
+
+Emploie exactement ces termes en français :
 campagne, candidature, document, atypique, score, adéquation, clarté,
 qualité formelle, niveau 1, niveau 2, lot d'import.
 

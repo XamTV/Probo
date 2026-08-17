@@ -1,0 +1,47 @@
+{
+  "app": {
+    "name": "Probo",
+    "tagline": "La preuve, document par document."
+  },
+  "language": {
+    "label": "Langue",
+    "fr": "Français",
+    "en": "English"
+  },
+  "documentType": {
+    "RESUME": "CV",
+    "COVER_LETTER": "Lettre de motivation",
+    "RECOMMENDATION_LETTER": "Lettre de recommandation",
+    "PORTFOLIO": "Portfolio",
+    "OTHER": "Autre"
+  },
+  "atypicalReason": {
+    "LOW_CONFIDENCE": "Nature du document incertaine",
+    "UNEXPECTED_TYPE": "Type non attendu pour cette campagne",
+    "UNREADABLE": "Document illisible"
+  },
+  "documentStatus": {
+    "PENDING": "En attente",
+    "EXTRACTING": "Extraction du texte",
+    "LEVEL_1_ANALYSIS": "Vérification de la nature",
+    "LEVEL_2_ANALYSIS": "Évaluation de l'adéquation",
+    "COMPLETED": "Analysé",
+    "FAILED": "Erreur"
+  },
+  "importSource": {
+    "ZIP": "Archive ZIP",
+    "GOOGLE_DRIVE": "Google Drive"
+  },
+  "score": {
+    "relevance": "Adéquation",
+    "clarity": "Clarté",
+    "formalQuality": "Qualité formelle",
+    "overall": "Score global",
+    "notEvaluable": "Non évaluable"
+  },
+  "foundation": {
+    "eyebrow": "Socle technique",
+    "sharedContracts": "Contrats partagés",
+    "description": "Le front consomme @probo/shared, qui porte les schémas Zod et les règles de gestion. Le code est en anglais, l'interface est traduite : aucune valeur brute n'atteint jamais un écran."
+  }
+}

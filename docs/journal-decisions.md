@@ -102,3 +102,24 @@ Format : contexte, options envisagées, décision, conséquences.
 **Raison.** Une installation locale de PostgreSQL occupait déjà 5432 sur la machine de développement. Docker publiait bien le conteneur, mais `localhost` résolvait vers l'instance hôte — avec un `P1010: User was denied access on the database` parfaitement trompeur, puisque les identifiants étaient corrects.
 
 **Conséquences.** Documenté dans `.env.example` et dans le README, parce que c'est le genre de piège qui coûte une soirée.
+
+---
+
+## 2026-08-17 — Interface bilingue via Transloco
+
+**Contexte.** Une table de libellés français, `labels-fr.ts`, servait de frontière entre le code anglais et l'interface française. Demande d'aller vers une vraie internationalisation français / anglais.
+
+**Options.** (a) i18n natif d'Angular, avec `@angular/localize` et extraction XLIFF. (b) Transloco. (c) ngx-translate.
+
+**Décision.** Transloco.
+
+**Raison.** L'i18n natif d'Angular est un mécanisme de compilation : un bundle par langue, servis sous des préfixes d'URL distincts, et changer de langue impose de recharger la page. Surtout, il est conçu pour du texte statique de gabarit et se prête mal aux **clés dynamiques** — or nos libellés les plus nombreux sont exactement cela, `documentType.COVER_LETTER` construit à partir d'une valeur d'énumération. Le contourner demanderait un `switch` par énumération. Transloco résout une clé calculée nativement et bascule de langue sans rechargement.
+
+**Conséquences.**
+
+- Les traductions vivent dans `packages/shared/src/i18n/`, pas dans les assets du front, parce que l'export PDF est généré côté serveur et consommera les mêmes chaînes. Un libellé n'est écrit qu'une fois.
+- Un chargeur Transloco sur mesure lit le package partagé au lieu de récupérer du JSON en HTTP. Les deux locales sont donc embarquées dans le bundle : quelques kilo-octets à deux langues, un aller-retour HTTP et une étape de copie d'assets en moins. À revoir au-delà de quatre ou cinq langues.
+- `LocaleService` porte l'ordre de résolution — choix explicite, préférence navigateur, français — la persistance, et la mise à jour de l'attribut `lang` du document, que le RGAA exige.
+- Le remplacement de `labels-fr.ts` est intégral : plus aucune chaîne d'interface ne vit dans le code.
+
+**Réserve à assumer devant le jury.** Aucun utilisateur actuel n'a besoin de l'anglais : la cible est constituée d'équipes d'admission françaises. Le coût réel est que chaque texte doit être écrit deux fois, pour toujours. Ce qui le justifie : la séparation stricte du texte et du code, et la possibilité d'exporter le produit hors de France sans reprise.

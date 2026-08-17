@@ -95,7 +95,19 @@ packages/shared Schémas Zod, types métier et règles de gestion
 docs/           Conception, cadrage, décisions techniques
 ```
 
-`packages/shared` est le contrat commun : une seule définition des types de documents, des schémas de sortie du modèle, et des règles de gestion — consommée par l'API comme par le front.
+`packages/shared` est le contrat commun : une seule définition des types de documents, des schémas de sortie du modèle, des règles de gestion et des traductions — consommée par l'API comme par le front.
+
+### Internationalisation
+
+L'interface est disponible en français et en anglais. Les fichiers de traduction vivent dans [`packages/shared/src/i18n/`](packages/shared/src/i18n/) plutôt que dans les assets du front, pour une raison précise : **l'export PDF est généré côté serveur**. Si les libellés n'existaient que dans le front, chacun serait écrit deux fois et les deux versions divergeraient.
+
+Trois conséquences :
+
+- Les valeurs d'énumération sont traduites par leur clé — `documentType.COVER_LETTER` — donc ajouter un type de document ne demande de toucher aucun composant.
+- Le choix de langue est résolu dans cet ordre : choix explicite de l'utilisateur, puis préférence du navigateur, puis français. Il est conservé en `localStorage`.
+- L'attribut `lang` du document suit la langue active. Ce n'est pas cosmétique : les lecteurs d'écran en tirent leur prononciation, et le RGAA exige que la langue de la page soit déclarée.
+
+Les deux locales sont embarquées dans le bundle plutôt que chargées à la demande. À deux locales cela coûte quelques kilo-octets et évite un aller-retour HTTP ; à revoir au-delà de quatre ou cinq langues.
 
 ---
 
@@ -113,6 +125,7 @@ docs/           Conception, cadrage, décisions techniques
 | IA               | Mistral AI                                     |
 | Export PDF       | pdfmake                                        |
 | Authentification | Argon2 · JWT en cookie httpOnly                |
+| i18n             | Transloco — français et anglais                |
 | Tests            | Vitest (front, shared) · Jest (API)            |
 | Infrastructure   | Docker · GitHub Actions · VPS Scaleway         |
 
@@ -141,7 +154,7 @@ Institution ─┬─ User
                                                       └─ DocumentAnalysis
 ```
 
-> **Langues.** Le code, la base et l'API sont en anglais ; l'interface et le dossier professionnel sont en français. La table de correspondance vit dans [`packages/shared/src/labels-fr.ts`](packages/shared/src/labels-fr.ts) — seule frontière entre les deux, partagée par le front et par l'export PDF. Les identifiants de règles `RG-xx` restent identiques des deux côtés : ce sont des clés de traçabilité, pas de la prose.
+> **Langues.** Le code, la base et l'API sont en anglais ; le dossier professionnel est en français. L'interface est **bilingue français / anglais** via [Transloco](#internationalisation). Les identifiants de règles `RG-xx` restent identiques des deux côtés : ce sont des clés de traçabilité, pas de la prose.
 
 Le modèle physique vit dans [`apps/api/prisma/schema.prisma`](apps/api/prisma/schema.prisma). Le MCD Merise correspondant sera établi après les maquettes — voir [docs/README.md](docs/README.md) pour la chaîne de dépendance des livrables de conception.
 

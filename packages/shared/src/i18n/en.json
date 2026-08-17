@@ -1,0 +1,47 @@
+{
+  "app": {
+    "name": "Probo",
+    "tagline": "Evidence, one document at a time."
+  },
+  "language": {
+    "label": "Language",
+    "fr": "Français",
+    "en": "English"
+  },
+  "documentType": {
+    "RESUME": "Resume",
+    "COVER_LETTER": "Cover letter",
+    "RECOMMENDATION_LETTER": "Recommendation letter",
+    "PORTFOLIO": "Portfolio",
+    "OTHER": "Other"
+  },
+  "atypicalReason": {
+    "LOW_CONFIDENCE": "Document nature uncertain",
+    "UNEXPECTED_TYPE": "Type not expected for this campaign",
+    "UNREADABLE": "Unreadable document"
+  },
+  "documentStatus": {
+    "PENDING": "Pending",
+    "EXTRACTING": "Extracting text",
+    "LEVEL_1_ANALYSIS": "Verifying nature",
+    "LEVEL_2_ANALYSIS": "Assessing relevance",
+    "COMPLETED": "Analysed",
+    "FAILED": "Failed"
+  },
+  "importSource": {
+    "ZIP": "ZIP archive",
+    "GOOGLE_DRIVE": "Google Drive"
+  },
+  "score": {
+    "relevance": "Relevance",
+    "clarity": "Clarity",
+    "formalQuality": "Formal quality",
+    "overall": "Overall score",
+    "notEvaluable": "Not evaluable"
+  },
+  "foundation": {
+    "eyebrow": "Technical foundation",
+    "sharedContracts": "Shared contracts",
+    "description": "The front end consumes @probo/shared, which carries the Zod schemas and the business rules. The code is in English, the interface is translated: no raw value ever reaches a screen."
+  }
+}
