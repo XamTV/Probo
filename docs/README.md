@@ -12,29 +12,29 @@ Deux raisons de ne pas y revenir plus tôt. D'abord, chaque entité doit pouvoir
 
 ## État des livrables
 
-| Livrable                                          | État                                             |
-| ------------------------------------------------- | ------------------------------------------------ |
-| `journal-decisions.md`                            | Écrit, tenu au fil de l'eau                      |
-| `analyse/cahier-des-charges.md`                   | Écrit                                            |
-| `analyse/perimetre.md`                            | Écrit — MoSCoW, avec les refus actés             |
-| `analyse/personas.md`                             | Écrit — Claire, Marc, Sofia                      |
-| `analyse/user-stories.md`                         | Écrit — 21 US, 6 épopées, critères d'acceptation |
-| `analyse/regles-gestion.md`                       | Écrit — RG-01 à RG-07, dont 6 sous test          |
-| `analyse/cas-utilisation.md`                      | Écrit — 14 CU, 2 scénarios détaillés             |
-| `maquettage/prompt-claude-design.md`              | Écrit — prompt autoportant                       |
-| **`maquettage/` — maquettes, charte, RGAA**       | **À produire — étape en cours**                  |
-| `conception/mcd.*`, `mld.md`, `ecarts-mcd-mpd.md` | À reconstruire **après** les maquettes           |
-| `conception/dictionnaire-donnees.md`              | À dériver de `schema.prisma`                     |
-| `conception/diagramme-classes.md`                 | À produire                                       |
-| `conception/diagramme-sequence-analyse.md`        | À produire — meilleur atout de soutenance        |
-| `conception/diagramme-deploiement.md`             | À produire                                       |
-| `securite/plan-securisation.md`                   | À produire — OWASP Top 10 point par point        |
-| `securite/rgpd.md`                                | À produire                                       |
-| `tests/plan-de-tests.md`                          | À produire                                       |
-| `tests/cahier-de-recettes.md`                     | À produire — dérivé des critères d'acceptation   |
-| `tests/jeu-essai/`                                | À constituer — 40 documents réels annotés        |
-| `veille/methode-et-sources.md`                    | À produire                                       |
-| `veille/veille-anglophone.md`                     | À produire                                       |
+| Livrable                                          | État                                           |
+| ------------------------------------------------- | ---------------------------------------------- |
+| `journal-decisions.md`                            | Écrit, tenu au fil de l'eau                    |
+| `analyse/cahier-des-charges.md`                   | Écrit                                          |
+| `analyse/perimetre.md`                            | Écrit — MoSCoW, refus actés et reports datés   |
+| `analyse/personas.md`                             | Écrit — Claire, Marc, Sofia                    |
+| `analyse/user-stories.md`                         | Écrit — 21 US dont 2 reportées, 6 épopées      |
+| `analyse/regles-gestion.md`                       | Écrit — RG-01 à RG-07, dont 6 sous test        |
+| `analyse/cas-utilisation.md`                      | Écrit — 14 CU dont 1 reporté, 2 scénarios      |
+| `maquettage/prompt-claude-design.md`              | Écrit — prompt autoportant                     |
+| **`maquettage/` — maquettes, charte, RGAA**       | **À produire — étape en cours**                |
+| `conception/mcd.*`, `mld.md`, `ecarts-mcd-mpd.md` | À reconstruire **après** les maquettes         |
+| `conception/dictionnaire-donnees.md`              | À dériver de `schema.prisma`                   |
+| `conception/diagramme-classes.md`                 | À produire                                     |
+| `conception/diagramme-sequence-analyse.md`        | À produire — meilleur atout de soutenance      |
+| `conception/diagramme-deploiement.md`             | À produire                                     |
+| `securite/plan-securisation.md`                   | À produire — OWASP Top 10 point par point      |
+| `securite/rgpd.md`                                | À produire                                     |
+| `tests/plan-de-tests.md`                          | À produire                                     |
+| `tests/cahier-de-recettes.md`                     | À produire — dérivé des critères d'acceptation |
+| `tests/jeu-essai/`                                | À constituer — 40 documents réels annotés      |
+| `veille/methode-et-sources.md`                    | À produire                                     |
+| `veille/veille-anglophone.md`                     | À produire                                     |
 
 ## Deux règles de travail
 
@@ -46,4 +46,6 @@ Deux raisons de ne pas y revenir plus tôt. D'abord, chaque entité doit pouvoir
 
 La compétence visée est la **compréhension** de documentation technique en anglais, pas la production. Écrire le code en anglais n'y répond pas, et un README traduit sera soupçonné d'être passé à la machine.
 
-Le gisement le plus solide de ce projet est la recherche sur les scopes Google Drive — `drive.file` contre `drive.readonly`, le mur de vérification, le mécanisme des comptes de service. Cette documentation n'existe qu'en anglais, et sa lecture a directement changé une décision d'architecture. Viennent ensuite l'API Mistral et son mode JSON structuré, l'OWASP Top 10, et la documentation NestJS.
+Le gisement le plus solide de ce projet reste la recherche sur les scopes Google Drive — `drive.file` contre `drive.readonly`, le mur de vérification, le mécanisme des comptes de service. Cette documentation n'existe qu'en anglais, et sa lecture a changé **deux** décisions successives : d'abord le choix du compte de service plutôt qu'OAuth, puis, une fois le coût complet de la fonctionnalité mesuré, l'abandon de l'import Drive lui-même. C'est le meilleur cas à présenter en soutenance, parce qu'il montre une lecture technique qui débouche sur un arbitrage de périmètre et non sur une ligne de code.
+
+Vient ensuite la sécurité de la décompression d'archives — _zip slip_, liens symboliques, _zip bomb_ — dont la littérature de référence est anglophone (Snyk, OWASP) et qui fonde directement RG-07. Puis l'API Mistral et son mode JSON structuré, l'OWASP Top 10, et la documentation NestJS.

@@ -1,8 +1,8 @@
 // Physical data model (MPD) for Probo.
 //
-// Code, database and API are written in English; the user interface and the
-// project report are in French. French labels live in
-// packages/shared/src/labels-fr.ts, the single boundary between the two.
+// Code, database and API are written in English; the user interface is
+// bilingual and the project report is in French. Translations live in
+// packages/shared/src/i18n/, keyed by enum value.
 //
 // This schema will be derived from the Merise conceptual model once the
 // mockups are done — see docs/README.md for the dependency chain of the
@@ -45,12 +45,11 @@ model Institution {
   createdAt DateTime @default(now()) @map("created_at")
   updatedAt DateTime @updatedAt @map("updated_at")
 
-  users            User[]
-  campaigns        Campaign[]
-  driveConnections DriveConnection[]
-  applications     Application[]
-  documents        Document[]
-  auditEntries     AuditEntry[]
+  users        User[]
+  campaigns    Campaign[]
+  applications Application[]
+  documents    Document[]
+  auditEntries AuditEntry[]
 
   @@map("institution")
 }
@@ -80,28 +79,6 @@ model User {
 
   @@index([institutionId])
   @@map("user")
-}
-
-/// A Drive folder an institution has explicitly registered.
-///
-/// RG-07 — An import never starts from a folder id received in a request.
-/// The service account can read every folder shared with it, across all
-/// institutions; accepting a client-supplied id would open an insecure direct
-/// object reference between tenants.
-model DriveConnection {
-  id            String    @id @default(uuid()) @db.Uuid
-  institutionId String    @map("institution_id") @db.Uuid
-  label         String
-  folderId      String    @map("folder_id")
-  isActive      Boolean   @default(true) @map("is_active")
-  lastUsedAt    DateTime? @map("last_used_at")
-  createdAt     DateTime  @default(now()) @map("created_at")
-
-  institution   Institution   @relation(fields: [institutionId], references: [id], onDelete: Cascade)
-  importBatches ImportBatch[]
-
-  @@unique([institutionId, folderId])
-  @@map("drive_connection")
 }
 
 // ---------------------------------------------------------------------------
@@ -186,13 +163,6 @@ model Criterion {
 // Ingestion
 // ---------------------------------------------------------------------------
 
-enum ImportSource {
-  ZIP
-  GOOGLE_DRIVE
-
-  @@map("import_source")
-}
-
 enum ImportBatchStatus {
   PENDING
   RUNNING
@@ -202,23 +172,32 @@ enum ImportBatchStatus {
   @@map("import_batch_status")
 }
 
+/// A single ZIP upload, and the outcome of unpacking it.
+///
+/// The archive itself is the only ingestion channel (see the 2026-08-25 entry
+/// in docs/journal-decisions.md), so no source column is carried: it could only
+/// ever hold one value.
 model ImportBatch {
-  id                String            @id @default(uuid()) @db.Uuid
-  campaignId        String            @map("campaign_id") @db.Uuid
-  userId            String?           @map("user_id") @db.Uuid
-  driveConnectionId String?           @map("drive_connection_id") @db.Uuid
-  source            ImportSource
-  status            ImportBatchStatus @default(PENDING)
-  fileCount         Int               @default(0) @map("file_count")
-  rejectedFileCount Int               @default(0) @map("rejected_file_count")
-  errorMessage      String?           @map("error_message")
-  createdAt         DateTime          @default(now()) @map("created_at")
-  completedAt       DateTime?         @map("completed_at")
+  id         String  @id @default(uuid()) @db.Uuid
+  campaignId String  @map("campaign_id") @db.Uuid
+  userId     String? @map("user_id") @db.Uuid
 
-  campaign        Campaign         @relation(fields: [campaignId], references: [id], onDelete: Cascade)
-  user            User?            @relation(fields: [userId], references: [id], onDelete: SetNull)
-  driveConnection DriveConnection? @relation(fields: [driveConnectionId], references: [id], onDelete: SetNull)
-  documents       Document[]
+  /// Name of the uploaded archive, kept for the audit trail.
+  archiveName String @map("archive_name")
+
+  status    ImportBatchStatus @default(PENDING)
+  fileCount Int               @default(0) @map("file_count")
+
+  /// Entries refused while unpacking — unsafe path, forbidden type, or a
+  /// per-file or per-archive limit exceeded (RG-07).
+  rejectedFileCount Int       @default(0) @map("rejected_file_count")
+  errorMessage      String?   @map("error_message")
+  createdAt         DateTime  @default(now()) @map("created_at")
+  completedAt       DateTime? @map("completed_at")
+
+  campaign  Campaign   @relation(fields: [campaignId], references: [id], onDelete: Cascade)
+  user      User?      @relation(fields: [userId], references: [id], onDelete: SetNull)
+  documents Document[]
 
   @@index([campaignId])
   @@map("import_batch")

@@ -34,11 +34,11 @@ Responsable des admissions dans une école de commerce privée de 600 étudiants
 
 Responsable du service scolarité ou du système d'information, selon la taille de l'établissement. Ouvre Probo trois ou quatre fois par campagne.
 
-**Ses tâches.** Créer les comptes de son équipe, ouvrir une campagne et définir ses critères, connecter le dossier Drive, exporter le classement final pour la commission d'admission.
+**Ses tâches.** Créer les comptes de son équipe, ouvrir une campagne et définir ses critères, exporter le classement final pour la commission d'admission.
 
 **Sa préoccupation dominante : la conformité.** Il doit pouvoir répondre à son responsable RGPD sur trois points — où sont hébergées les données, combien de temps elles sont conservées, et qui y a accédé. Il a besoin que ces réponses soient accessibles sans passer par un support technique.
 
-**Sa contrainte.** Sa DSI refuse en général de connecter un compte Google à une application tierce. En revanche, partager un dossier avec une adresse précise est un geste qu'il fait toutes les semaines. **C'est ce qui justifie le choix du compte de service plutôt qu'OAuth.**
+**Sa contrainte.** Sa DSI refuse en général de connecter un compte Google à une application tierce, et instruit toute demande de connexion à un service tiers avec plusieurs semaines de délai. **C'est ce qui justifie de s'en tenir au dépôt d'archive** : un fichier qu'on téléverse ne demande l'autorisation de personne, et ne crée aucun lien permanent entre le système d'information de l'école et Probo. Un argument de vente autant qu'une simplification technique.
 
 **Ce qui le rassure.** Un hébergement européen, une durée de conservation affichée, un journal d'audit consultable, et la possibilité de révoquer un accès lui-même sans demander à personne.
 

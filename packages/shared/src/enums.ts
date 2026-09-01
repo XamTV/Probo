@@ -35,7 +35,3 @@ export const DocumentStatus = z.enum([
   'FAILED',
 ]);
 export type DocumentStatus = z.infer<typeof DocumentStatus>;
-
-/** Where a batch of documents came from. */
-export const ImportSource = z.enum(['ZIP', 'GOOGLE_DRIVE']);
-export type ImportSource = z.infer<typeof ImportSource>;

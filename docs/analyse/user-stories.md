@@ -85,27 +85,35 @@ _Périmètre : M-03_
 - Le dépôt accepte le glisser-déposer et la sélection de fichier
 - Un sous-dossier par candidat est interprété comme une candidature ; à défaut, le regroupement se fait sur le préfixe du nom de fichier
 - Les fichiers dépassant la taille maximale, hors types autorisés, ou en surnombre sont rejetés et **listés à l'écran** — jamais ignorés en silence
-- Une entrée d'archive contenant un chemin remontant (`../`) est rejetée sans être écrite sur disque
-- Une archive dont la taille décompressée dépasse le plafond est interrompue
+- Une entrée d'archive dont le chemin résolu sort du répertoire de destination est rejetée sans être écrite sur disque (RG-07)
+- Une entrée qui n'est pas un fichier régulier — lien symbolique en particulier — est rejetée (RG-07)
+- Une archive dont le rapport de décompression dépasse le plafond est interrompue en cours d'extraction, sans attendre la fin (RG-07)
+- Un rejet n'interrompt pas l'import : le lot se poursuit et le compte des entrées refusées est affiché
 - L'écran affiche l'avancement document par document
 
-### US-08 · Enregistrer un dossier Google Drive
+> **L'archive ZIP est le seul canal d'ingestion** depuis le 31/08/2026. Cette US n'est donc plus un chemin parmi deux : elle est la porte d'entrée unique du produit, et RG-07 en est la serrure.
+
+### US-08 · Enregistrer un dossier Google Drive — hors périmètre v1
+
+> **Reportée après le titre le 31/08/2026**, avec M-14. Conservée telle quelle : l'analyse est faite, elle n'est pas à refaire, et une US barrée documente mieux un arbitrage qu'une US effacée. Ni elle ni US-09 n'entrent dans le décompte des US livrées.
 
 **En tant que** Marc, **je veux** enregistrer un dossier Drive **afin que** mon équipe importe sans manipuler de fichiers.
-_Périmètre : M-14_
+_Périmètre : M-14 — reporté_
 
 - L'écran affiche l'adresse du compte de service à qui partager le dossier
 - L'enregistrement demande un libellé et l'identifiant du dossier, puis vérifie immédiatement l'accès en lecture
 - Un accès refusé affiche la marche à suivre, pas une erreur technique
 - Une connexion est désactivable à tout moment
 
-### US-09 · Importer depuis un dossier Drive enregistré
+### US-09 · Importer depuis un dossier Drive enregistré — hors périmètre v1
+
+> **Reportée après le titre le 31/08/2026**, avec M-14.
 
 **En tant que** Claire, **je veux** lancer un import depuis un dossier connu **afin d'**éviter le téléchargement puis le rechargement des fichiers.
-_Périmètre : M-14_
+_Périmètre : M-14 — reporté_
 
 - Le choix se fait parmi les connexions enregistrées et actives de l'établissement
-- **L'import ne part jamais d'un identifiant de dossier fourni dans la requête** (RG-07)
+- **L'import ne part jamais d'un identifiant de dossier fourni dans la requête** — règle de cloisonnement à réintroduire sous un nouvel identifiant si la v2 se fait ; l'ancienne RG-07 porte désormais la décompression défensive
 - Les sous-dossiers sont parcourus récursivement, un sous-dossier valant une candidature
 - Les documents Google natifs sont exportés en PDF
 - Les mêmes garde-fous que l'import ZIP s'appliquent

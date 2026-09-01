@@ -68,6 +68,8 @@ Format : contexte, options envisagées, décision, conséquences.
 
 **Source.** Documentation Google Identity sur la classification des scopes — lecture à verser à la veille anglophone.
 
+> **Suite, 31/08/2026.** Cette décision est devenue sans objet : l'import Drive est sorti du périmètre v1 (voir l'entrée du 31/08). L'entrée est conservée telle quelle — elle est datée, elle a été juste au moment où elle a été prise, et c'est l'analyse qu'elle contient qui a permis de mesurer le coût réel de la fonctionnalité. La mention de RG-07 ci-dessus renvoie à l'**ancienne** RG-07 ; ce numéro porte désormais la décompression défensive.
+
 ---
 
 ## 2026-08-15 — Prisma 7 et ses contraintes
@@ -123,3 +125,38 @@ Format : contexte, options envisagées, décision, conséquences.
 - Le remplacement de `labels-fr.ts` est intégral : plus aucune chaîne d'interface ne vit dans le code.
 
 **Réserve à assumer devant le jury.** Aucun utilisateur actuel n'a besoin de l'anglais : la cible est constituée d'équipes d'admission françaises. Le coût réel est que chaque texte doit être écrit deux fois, pour toujours. Ce qui le justifie : la séparation stricte du texte et du code, et la possibilité d'exporter le produit hors de France sans reprise.
+
+---
+
+## 2026-08-31 — L'archive ZIP comme unique canal d'ingestion
+
+**Contexte.** Le périmètre portait deux chemins d'import : l'archive ZIP (M-03) et le dossier Google Drive par compte de service (M-14), ce dernier ayant déjà fait l'objet de deux entrées de ce journal et d'une règle de gestion dédiée.
+
+**Options.** (a) Conserver les deux canaux. (b) Ne garder que le ZIP, l'import Drive étant reporté après le titre.
+
+**Décision.** ZIP seul. M-14 sort du périmètre v1 et rejoint une nouvelle table de reports datés dans `analyse/perimetre.md`.
+
+**Raison.** Le besoin utilisateur derrière M-14 était « ne pas manipuler de fichiers ». Or un dossier Drive se télécharge en archive ZIP en deux clics, depuis l'interface que Claire utilise déjà tous les jours : M-03 couvre le besoin, moins confortablement, mais entièrement.
+
+Ce qui a fait pencher la balance est le coût **complet** du second canal, qui n'est pas l'appel d'API :
+
+- une entité `DriveConnection` et son écran d'administration ;
+- le cloisonnement multi-locataire à démontrer sur un chemin de plus — c'était toute la raison d'être de l'ancienne RG-07 ;
+- l'export des Google Docs natifs, format que le reste de la chaîne ne sait pas traiter ;
+- une clé de compte de service à protéger, faire tourner et documenter en production ;
+- un mode de panne supplémentaire, entièrement hors de notre contrôle : quota, partage révoqué, dossier déplacé.
+
+Rapporté à une marge de vingt heures sur 277, ce n'est pas finançable sans prendre sur le durcissement ou sur le jeu d'essai — c'est-à-dire sur ce qui est évalué.
+
+**Le raisonnement s'inverse aussi côté client.** L'entrée du 15/08 justifiait le compte de service par la contrainte de Marc : sa DSI refuse de connecter un compte Google à une application tierce. Le même argument, poussé d'un cran, dit que **ne demander aucune connexion du tout** est encore plus simple à faire accepter. Le dépôt d'archive ne crée aucun lien permanent entre le système d'information de l'école et Probo. C'est un argument de vente autant qu'une simplification technique.
+
+**Conséquences.**
+
+- **Schéma.** Suppression de `DriveConnection`, de `ImportBatch.driveConnectionId`, du champ `source` et de l'énumération `ImportSource` — migration `20260831101741_zip_only_ingestion`. Le champ `source` n'est pas conservé « au cas où » : une colonne qui ne peut porter qu'une valeur ne renseigne rien, et la réintroduire en v2 coûte une ligne de migration. Même principe que pour Redis en août : le dépôt ne revendique pas ce qui n'existe pas. `ImportBatch.archiveName` la remplace et porte une information réelle pour la piste d'audit.
+- **RG-07 est réécrite, pas supprimée.** Elle portait l'origine d'un import Drive ; elle porte désormais la décompression défensive — confinement du chemin résolu, rejet des entrées non régulières, liste blanche de types, plafonds de taille et de rapport de décompression. Le numéro est stable parce qu'il est cité dans le dossier, et le volet sécurité de la soutenance y gagne : la règle devient **testable**, ce que l'ancienne n'était pas.
+- **La surface d'attaque de l'ingestion se concentre au lieu de se réduire.** C'est le point à ne pas maquiller devant le jury. Un canal unique, entièrement alimenté par un fichier que l'utilisateur contrôle, mérite plus d'attention que deux canaux tièdes : d'où le durcissement de RG-07 et les nouveaux plafonds `INGESTION_*`.
+- **US-08, US-09 et CU-11 sont conservées, marquées hors périmètre v1.** L'analyse est faite et reste valable ; une US barrée documente un arbitrage, une US effacée le dissimule.
+- **`M-14` n'est pas réattribué.** `M-15` reste `M-15`, sans quoi les user stories qui le citent désigneraient silencieusement l'export PDF.
+- **La veille anglophone n'y perd rien, au contraire.** La recherche sur les scopes Google a désormais motivé deux décisions successives — le compte de service, puis l'abandon. Une lecture technique qui débouche sur un arbitrage de périmètre est un meilleur exemple qu'une lecture qui débouche sur une ligne de code.
+
+**Ce qu'il faut assumer.** M-14 était classé « doit être fait », avec la mention « facteur d'adoption réel ». Le retirer est un recul de périmètre, pas une optimisation. Il est daté, motivé et tracé plutôt que dilué — mais c'est bien un renoncement, et il sera présenté comme tel.

@@ -6,13 +6,13 @@ Vue UML des interactions entre acteurs et système. Chaque cas se rattache aux u
 
 ## Acteurs
 
-| Acteur                 | Nature              | Rôle                                                                                                |
-| ---------------------- | ------------------- | --------------------------------------------------------------------------------------------------- |
-| **Chargé d'admission** | Principal, humain   | Importe des lots et exploite les classements                                                        |
-| **Administrateur**     | Principal, humain   | Configure l'établissement, les campagnes et les accès. Hérite de tous les cas du chargé d'admission |
-| **Mistral AI**         | Secondaire, système | Réalise la classification et le scoring                                                             |
-| **Google Drive**       | Secondaire, système | Fournit les documents d'un dossier enregistré                                                       |
-| **Planificateur**      | Secondaire, système | Déclenche la purge RGPD quotidienne                                                                 |
+| Acteur                 | Nature                  | Rôle                                                                                                |
+| ---------------------- | ----------------------- | --------------------------------------------------------------------------------------------------- |
+| **Chargé d'admission** | Principal, humain       | Importe des lots et exploite les classements                                                        |
+| **Administrateur**     | Principal, humain       | Configure l'établissement, les campagnes et les accès. Hérite de tous les cas du chargé d'admission |
+| **Mistral AI**         | Secondaire, système     | Réalise la classification et le scoring                                                             |
+| **Planificateur**      | Secondaire, système     | Déclenche la purge RGPD quotidienne                                                                 |
+| ~~**Google Drive**~~   | ~~Secondaire, système~~ | Fournissait les documents d'un dossier enregistré — **acteur retiré le 31/08/2026** avec M-14       |
 
 L'administrateur **généralise** le chargé d'admission : tout ce que le second peut faire, le premier le peut aussi.
 
@@ -51,7 +51,8 @@ L'administrateur **généralise** le chargé d'admission : tout ce que le second
       │                   │                                              │
       │  ────────────────┼──▶ ( CU-03  Configurer une campagne )         │
       │                   │                                              │
-      │  ────────────────┼──▶ ( CU-11  Enregistrer un dossier Drive )────┼──▶ Google Drive
+      │                   │   ( CU-11  Enregistrer un dossier Drive )    │
+      │                   │      retiré le 31/08/2026 — reporté v2       │
       │                   │                                              │
       │  ────────────────┼──▶ ( CU-12  Supprimer une candidature )       │
       │                   │                                              │
@@ -73,14 +74,14 @@ L'administrateur **généralise** le chargé d'admission : tout ce que le second
 | CU-01 | Se connecter                        | Chargé d'admission   | US-01               |
 | CU-02 | Gérer les comptes                   | Administrateur       | US-02               |
 | CU-03 | Configurer une campagne             | Administrateur       | US-04, US-05, US-06 |
-| CU-04 | Importer un lot                     | Chargé d'admission   | US-07, US-09        |
+| CU-04 | Importer un lot                     | Chargé d'admission   | US-07               |
 | CU-05 | Analyser un document                | Système, via Mistral | US-10, US-12        |
 | CU-06 | Signaler un document atypique       | Système              | US-11               |
 | CU-07 | Calculer le score d'une candidature | Système              | US-13               |
 | CU-08 | Consulter le classement             | Chargé d'admission   | US-14, US-15        |
 | CU-09 | Consulter le détail d'un document   | Chargé d'admission   | US-16               |
 | CU-10 | Exporter le classement              | Chargé d'admission   | US-17, US-18        |
-| CU-11 | Enregistrer un dossier Drive        | Administrateur       | US-08               |
+| CU-11 | ~~Enregistrer un dossier Drive~~    | ~~Administrateur~~   | US-08 — reporté v2  |
 | CU-12 | Supprimer une candidature           | Administrateur       | US-19               |
 | CU-13 | Consulter le journal d'audit        | Administrateur       | US-21               |
 | CU-14 | Purger les données échues           | Planificateur        | US-20               |
@@ -97,11 +98,11 @@ Le cas le plus riche, et celui qui porte le plus de règles de gestion.
 
 **Scénario nominal**
 
-1. L'utilisateur choisit une campagne et une source — archive ZIP ou connexion Drive enregistrée
-2. Le système vérifie que la source appartient à l'établissement de l'utilisateur _(RG-07 pour Drive)_
+1. L'utilisateur choisit une campagne et dépose une archive ZIP
+2. Le système vérifie que la campagne appartient à l'établissement de l'utilisateur, et que l'archive respecte les plafonds globaux — taille et rapport de décompression annoncé _(RG-07)_
 3. Le système crée un lot d'import au statut « en cours »
-4. Le système énumère les fichiers de la source
-5. Pour chaque fichier, le système contrôle taille, type MIME et sûreté du chemin
+4. Le système énumère les entrées de l'archive
+5. Pour chaque entrée, le système contrôle la sûreté du chemin résolu, la nature de l'entrée, le type MIME réel et la taille _(RG-07)_
 6. Le système regroupe les fichiers par candidat, d'après l'arborescence ou le préfixe du nom
 7. Le système enregistre chaque document et met un travail d'analyse en file _(inclut CU-05)_
 8. Le système affiche l'avancement, document par document
@@ -109,10 +110,11 @@ Le cas le plus riche, et celui qui porte le plus de règles de gestion.
 
 **Extensions**
 
-- **2a.** La connexion Drive est inactive ou n'appartient pas à l'établissement → refus, journalisé comme tentative d'accès non autorisée
+- **2a.** La campagne n'appartient pas à l'établissement de l'appelant → refus, journalisé comme tentative d'accès non autorisée
 - **5a.** Un fichier est rejeté → il est **listé à l'écran avec son motif**, le lot se poursuit
-- **5b.** Une entrée d'archive contient un chemin remontant → rejet sans écriture sur disque, incident journalisé
-- **5c.** La taille décompressée dépasse le plafond → interruption du lot, statut « erreur »
+- **5b.** Le chemin résolu d'une entrée sort du répertoire de destination → rejet sans écriture sur disque, incident journalisé _(RG-07)_
+- **5c.** Une entrée est un lien symbolique ou une entrée spéciale → rejet sans écriture, incident journalisé _(RG-07)_
+- **5d.** Le rapport de décompression dépasse le plafond en cours d'extraction → interruption immédiate du lot, statut « erreur », fichiers déjà écrits supprimés _(RG-07)_
 - **6a.** Aucun regroupement déductible → une candidature par fichier, signalée à l'utilisateur
 - **7a.** L'extraction de texte échoue → document marqué `ILLISIBLE`, **sans appel au modèle** _(RG-03)_
 
@@ -132,7 +134,7 @@ Le cas le plus riche, et celui qui porte le plus de règles de gestion.
 4. Si le document est retenu, le système soumet le texte au modèle de scoring _(RG-04)_
 5. Le système calcule le score du document _(RG-05)_
 6. Le système enregistre le résultat avec le modèle utilisé, la version de prompt et le coût en jetons
-7. Si tous les documents de la candidature sont traités, le système recalcule son score _(RG-07 → CU-07)_
+7. Si tous les documents de la candidature sont traités, le système recalcule son score _(RG-06 → CU-07)_
 
 **Extensions**
 

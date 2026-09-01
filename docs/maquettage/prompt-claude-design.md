@@ -2,7 +2,7 @@
 
 Prompt autoportant à transmettre à un outil de design. Il ne suppose aucune connaissance préalable du projet.
 
-**Comment l'utiliser.** Copier le bloc ci-dessous intégralement. Demander les écrans **un par un** plutôt que les cinq d'un coup : la qualité chute nettement au-delà de deux écrans par requête. Commencer par le classement, qui fixe le système visuel réutilisé ensuite.
+**Comment l'utiliser.** Copier le bloc ci-dessous intégralement. Demander les écrans **un par un** plutôt que les six d'un coup : la qualité chute nettement au-delà de deux écrans par requête. Commencer par le classement, qui fixe le système visuel réutilisé ensuite.
 
 **Ce qui revient ensuite dans le dossier.** Les maquettes servent de spécification visuelle _et_ de point de départ des composants Angular. Prévoir en plus une trace de wireframe basse fidélité — Excalidraw suffit — pour montrer l'étape de conception amont.
 
@@ -116,7 +116,9 @@ erreur — sont distinctes de l'accent et ne s'utilisent que pour l'état.
 À éviter absolument : dégradés, ombres portées prononcées, coins très arrondis,
 emoji comme repères de section, esthétique de tableau de bord marketing.
 
-Prévois le thème clair et le thème sombre.
+Thème clair UNIQUEMENT. Ne propose pas de variante sombre, même en complément :
+elle ne sera pas implémentée, et une maquette qui ne correspond à rien dans
+l'application est un écart à justifier plutôt qu'un livrable en plus.
 
 ## Les écrans
 
@@ -125,7 +127,8 @@ Prévois le thème clair et le thème sombre.
 L'écran où Claire passe l'essentiel de son temps.
 
 - En-tête : nom de la campagne, nombre de candidatures, nombre de documents
-  atypiques, bouton d'export
+  atypiques, et l'export — qui propose DEUX formats, CSV et PDF, sans occuper
+  deux boutons distincts dans l'en-tête
 - Barre de filtres : recherche par nom, filtre « comporte au moins un document
   atypique », plage de score
 - Tableau classé par score décroissant. Colonnes : rang, nom du candidat,
@@ -142,6 +145,13 @@ L'écran où Claire passe l'essentiel de son temps.
   statut et son score
 - Les documents atypiques sont visuellement séparés des documents retenus
 - Depuis cette liste, on ouvre le détail d'un document
+- Action de SUPPRESSION de la candidature, réservée à l'administrateur. Elle ne
+  mérite pas son propre écran : dessine-la comme une boîte de dialogue de
+  confirmation ouverte au-dessus de cet écran. Elle doit énoncer exactement ce
+  qui sera détruit — la candidature, ses documents, leurs textes et leurs
+  analyses — et qu'une trace de l'opération est conservée au journal d'audit.
+  Discrète dans la page, explicite dans la confirmation : c'est une action de
+  conformité honorant un droit à l'effacement, pas une action courante
 
 ### Écran 3 — Détail d'un document (l'écran différenciant)
 
@@ -160,13 +170,23 @@ lisible et contestable.
 
 ### Écran 4 — Import d'un lot
 
-- Choix de la source : dépôt d'une archive ZIP, ou sélection d'un dossier Google
-  Drive préalablement enregistré
-- Zone de glisser-déposer
+- L'archive ZIP est le SEUL canal d'import. Pas de sélecteur de source, pas
+  d'onglet, pas de second chemin : l'écran s'ouvre directement sur la zone de
+  dépôt
+- Zone de glisser-déposer, doublée d'un bouton de sélection de fichier
+- Sélection de la campagne de destination avant ou pendant le dépôt
 - Pendant le traitement : progression globale et progression par document
 - Les fichiers rejetés sont LISTÉS avec leur motif — trop volumineux, format non
-  accepté, illisible. Jamais ignorés en silence
-- États : avant dépôt, en cours, terminé, terminé avec rejets
+  accepté, entrée d'archive refusée pour raison de sécurité. Jamais ignorés en
+  silence
+- ATTENTION, distinction à ne pas confondre : un fichier REJETÉ n'entre jamais
+  dans le lot, il est refusé au dépôt. Un document ILLISIBLE, lui, est bien
+  importé, puis marqué atypique à l'analyse. Le premier apparaît sur cet écran,
+  le second dans le classement et sur le détail du document. Ce ne sont pas les
+  mêmes objets et ils ne se ressemblent pas visuellement
+- États : avant dépôt, en cours, terminé, terminé avec rejets, et l'archive
+  entièrement refusée (plafond global dépassé) — ce dernier cas n'affiche aucune
+  liste de fichiers, puisque rien n'a été extrait
 
 ### Écran 5 — Configuration d'une campagne
 
@@ -178,6 +198,25 @@ lisible et contestable.
   somme n'a pas besoin de valoir 100, ils sont normalisés — mais l'écran doit
   montrer le poids relatif de chacun
 - Un aperçu de l'effet des réglages serait un plus
+
+### Écran 6 — Journal d'audit
+
+Écran d'administrateur, consulté rarement mais dans un contexte tendu : un
+contrôle, une réclamation, une question du responsable RGPD. Il doit être
+exploitable par quelqu'un qui l'ouvre pour la première fois sous pression.
+
+- Tableau en lecture seule, trié par horodatage décroissant. Colonnes :
+  horodatage, utilisateur, action, type de ressource, référence de la ressource
+- AUCUNE action de modification ou de suppression n'existe sur cet écran, et
+  cela doit se voir. Pas de bouton grisé, pas de menu contextuel vide : rien.
+  L'inaltérabilité est ce qui donne sa valeur au journal
+- Filtres : plage de dates, utilisateur, type d'action
+- Une entrée peut concerner une ressource déjà supprimée — c'est le cas normal
+  après une suppression ou une purge, pas une anomalie. La référence s'affiche
+  alors sans lien cliquable, et l'écran ne doit pas donner l'impression d'une
+  donnée manquante ou corrompue
+- Affiche quelque part la durée de conservation en vigueur, exprimée en jours
+- États à dessiner : journal fourni, et résultat de filtre vide
 
 ## Livrable attendu
 

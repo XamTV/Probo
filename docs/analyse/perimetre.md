@@ -23,8 +23,9 @@ Ce document dit ce qui est dans le projet, ce qui n'y est pas, et ce qui n'y ser
 | M-11 | Cloisonnement multi-établissement                                                           | Sécurité, et prérequis de toute mise en production                         |
 | M-12 | Purge automatique à 90 jours et journal d'audit                                             | Obligation RGPD, et argument commercial                                    |
 | M-13 | Export CSV du classement                                                                    | Le format que les équipes d'admission utilisent réellement                 |
-| M-14 | Import depuis un dossier Google Drive privé, par compte de service                          | Demande explicite, et facteur d'adoption réel                              |
 | M-15 | Export PDF du classement                                                                    | Demande explicite : le document qui circule en commission                  |
+
+> **M-14 est vacant.** Il portait l'import depuis un dossier Google Drive, sorti du périmètre le 31/08/2026 — voir la table des reports ci-dessous. L'identifiant n'est pas réattribué : `M-15` reste `M-15`, sans quoi les user stories qui le citent désigneraient silencieusement une autre fonctionnalité.
 
 ## Devrait être fait — sera coupé en premier en cas de retard
 
@@ -44,17 +45,27 @@ Ce document dit ce qui est dans le projet, ce qui n'y est pas, et ce qui n'y ser
 | C-03 | Notifications par email en fin de traitement d'un lot              |
 | C-04 | Réexécution d'une analyse après changement de prompt               |
 
+## Sorti du périmètre en cours de route — reporté après le titre
+
+Cette table n'existait pas au cadrage. Elle porte ce qui était engagé puis retiré, avec la date et le motif : un périmètre qui se réduit sans laisser de trace est un périmètre qu'on ne peut pas défendre.
+
+| Réf  | Fonctionnalité                                               | Sortie le  | Motif                                                                                                                                                                                                                                                                                                                                                                                                   |
+| ---- | ------------------------------------------------------------ | ---------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| M-14 | Import depuis un dossier Google Drive, par compte de service | 31/08/2026 | Deuxième canal d'ingestion pour un besoin que M-03 couvre déjà — un dossier Drive se télécharge en ZIP en deux clics. Le coût réel n'est pas l'appel d'API mais tout ce qui l'entoure : entité de connexion, écran d'administration, cloisonnement à prouver (l'ancienne RG-07), export des Google Docs natifs, et une clé de compte de service à protéger en production. Voir le journal de décisions. |
+
+**Ce que le report change pour la v2.** Le travail d'analyse reste valable et n'est pas à refaire : US-08, US-09 et CU-11 sont conservées, marquées hors périmètre v1. La recherche sur les scopes Google — `drive.file` contre `drive.readonly`, le mur de vérification, le mécanisme des comptes de service — reste le meilleur gisement de veille anglophone du projet, et elle a désormais servi **deux** décisions plutôt qu'une.
+
 ## Ne sera pas fait — décisions actées
 
-| Fonctionnalité                                     | Raison du refus                                                                                                                                                                                                   |
-| -------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| Connexion OAuth au compte Google de l'utilisateur  | Le scope `drive.readonly` est classé _restricted_ par Google : vérification obligatoire avec audit de sécurité tiers annuel. Incompatible avec le calendrier et le budget. Le compte de service couvre le besoin. |
-| Import depuis un lien Drive public                 | Rendu inutile par le compte de service, et aucun établissement ne partage publiquement des dossiers de candidature.                                                                                               |
-| Sécurité au niveau ligne (RLS PostgreSQL)          | Le cloisonnement applicatif par `etablissement_id` suffit et se teste. Cité comme évolution, pas implémenté.                                                                                                      |
-| Facturation, abonnements, paiement                 | Hors sujet pour un projet de titre.                                                                                                                                                                               |
-| Application mobile                                 | Le produit est un outil de bureau, consulté sur grand écran.                                                                                                                                                      |
-| Analyse de documents non PDF (Word, images seules) | Les Google Docs natifs sont exportés en PDF à l'import ; le reste est marqué atypique.                                                                                                                            |
-| Détection de plagiat ou de contenu généré par IA   | Sujet distinct, techniquement incertain, et juridiquement délicat.                                                                                                                                                |
+| Fonctionnalité                                     | Raison du refus                                                                                                                                                                                                                    |
+| -------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Connexion OAuth au compte Google de l'utilisateur  | Le scope `drive.readonly` est classé _restricted_ par Google : vérification obligatoire avec audit de sécurité tiers annuel, incompatible avec le calendrier et le budget. Refus maintenu, et sans objet depuis le report de M-14. |
+| Import depuis un lien Drive public                 | Aucun établissement ne partage publiquement un dossier de candidatures. Sans objet depuis le report de M-14.                                                                                                                       |
+| Sécurité au niveau ligne (RLS PostgreSQL)          | Le cloisonnement applicatif par `etablissement_id` suffit et se teste. Cité comme évolution, pas implémenté.                                                                                                                       |
+| Facturation, abonnements, paiement                 | Hors sujet pour un projet de titre.                                                                                                                                                                                                |
+| Application mobile                                 | Le produit est un outil de bureau, consulté sur grand écran.                                                                                                                                                                       |
+| Analyse de documents non PDF (Word, images seules) | Le PDF est le format de dépôt réel des candidatures. Une entrée d'archive d'un autre type est refusée à la décompression (RG-07), sans faire échouer le lot.                                                                       |
+| Détection de plagiat ou de contenu généré par IA   | Sujet distinct, techniquement incertain, et juridiquement délicat.                                                                                                                                                                 |
 
 ---
 

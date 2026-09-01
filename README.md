@@ -12,7 +12,7 @@ Les responsables d'admission reçoivent des centaines de candidatures par campag
 
 ## La solution
 
-Probo ingère un lot de documents (ZIP ou dossier Google Drive) et effectue pour chaque fichier une **analyse à deux niveaux**.
+Probo ingère un lot de documents par dépôt d'une archive ZIP et effectue pour chaque fichier une **analyse à deux niveaux**.
 
 **Niveau 1 — Vérification de la nature.** L'IA classifie chaque document : CV, lettre de motivation, lettre de recommandation, portfolio, autre. Elle attribue un score de confiance (0-100 %). Si la confiance est insuffisante ou le type inattendu, le document est marqué **atypique** et signalé explicitement — il n'entre pas dans le calcul de score.
 
@@ -147,7 +147,6 @@ L'entité centrale est `Document`, pas `Application` — la candidature. Chaque 
 
 ```
 Institution ─┬─ User
-             ├─ DriveConnection
              └─ Campaign ─┬─ Criterion
                           ├─ ImportBatch
                           └─ Application ── Document ─┬─ DocumentText
@@ -168,15 +167,15 @@ Trois décisions à connaître :
 
 Les règles métier sont implémentées et testées dans [`packages/shared/src/business-rules.ts`](packages/shared/src/business-rules.ts). Chacune porte un identifiant stable, repris dans les noms de tests et dans le dossier professionnel.
 
-| Règle | Énoncé                                                                                        |
-| ----- | --------------------------------------------------------------------------------------------- |
-| RG-01 | Confiance N1 sous le seuil de la campagne → document atypique                                 |
-| RG-02 | Type détecté hors des types attendus → document atypique                                      |
-| RG-03 | Texte non extractible → document atypique, motif `ILLISIBLE`, sans appel au modèle            |
-| RG-04 | Le niveau 2 n'est exécuté que sur les documents non atypiques                                 |
-| RG-05 | Score document = moyenne pondérée des trois sous-scores, poids définis par la campagne        |
-| RG-06 | Score candidature = moyenne des documents retenus ; `null` si aucun n'est exploitable         |
-| RG-07 | Un import Drive ne cite qu'une `DriveConnection` enregistrée, jamais un `folderId` de requête |
+| Règle | Énoncé                                                                                       |
+| ----- | -------------------------------------------------------------------------------------------- |
+| RG-01 | Confiance N1 sous le seuil de la campagne → document atypique                                |
+| RG-02 | Type détecté hors des types attendus → document atypique                                     |
+| RG-03 | Texte non extractible → document atypique, motif `ILLISIBLE`, sans appel au modèle           |
+| RG-04 | Le niveau 2 n'est exécuté que sur les documents non atypiques                                |
+| RG-05 | Score document = moyenne pondérée des trois sous-scores, poids définis par la campagne       |
+| RG-06 | Score candidature = moyenne des documents retenus ; `null` si aucun n'est exploitable        |
+| RG-07 | Décompression défensive : chemin résolu confiné, entrée régulière, type et plafonds vérifiés |
 
 ---
 
@@ -185,8 +184,8 @@ Les règles métier sont implémentées et testées dans [`packages/shared/src/b
 Trois points structurants, détaillés dans le plan de sécurisation (`docs/securite/`) :
 
 - **Cloisonnement multi-locataire.** `institutionId` est dénormalisé jusqu'aux tables profondes pour que tout filtre de cloisonnement tienne en une clause et reste auditable.
-- **RG-07 et la référence directe non sécurisée.** Le compte de service Google voit tous les dossiers qu'on lui a partagés, tous établissements confondus. Accepter un identifiant de dossier fourni par le client ouvrirait une fuite entre locataires : l'import ne part que d'une connexion préalablement enregistrée.
-- **Secrets.** La clé du compte de service Google et le `.env` ne sont jamais committés — voir `.gitignore`.
+- **RG-07 et la décompression défensive.** L'archive ZIP est le seul canal d'entrée, et son contenu est intégralement contrôlé par l'utilisateur : toute la surface d'attaque de l'ingestion tient là. Chaque entrée est vérifiée avant écriture — chemin résolu confiné au répertoire cible (_zip slip_), fichier régulier uniquement (liens symboliques), type réel en liste blanche, et plafonds de taille et de rapport de décompression contrôlés sur le flux (_zip bomb_).
+- **Secrets.** Le `.env` n'est jamais committé — voir `.gitignore`.
 
 ## RGPD
 

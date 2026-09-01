@@ -28,10 +28,6 @@
     "COMPLETED": "Analysé",
     "FAILED": "Erreur"
   },
-  "importSource": {
-    "ZIP": "Archive ZIP",
-    "GOOGLE_DRIVE": "Google Drive"
-  },
   "score": {
     "relevance": "Adéquation",
     "clarity": "Clarté",

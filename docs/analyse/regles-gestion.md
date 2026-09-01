@@ -100,17 +100,36 @@ _US-13, US-14 · testé_
 
 ---
 
-## RG-07 — Origine d'un import Drive
+## RG-07 — Décompression défensive d'une archive
 
-**Énoncé.** Un import Google Drive ne peut citer qu'une connexion préalablement **enregistrée** par l'établissement. Un identifiant de dossier reçu dans une requête n'est jamais utilisé.
+**Énoncé.** Une entrée d'archive n'est extraite que si elle satisfait **quatre** conditions, vérifiées avant toute écriture sur disque :
 
-**Pourquoi.** Le compte de service a accès à tous les dossiers qui lui ont été partagés, **tous établissements confondus**. Accepter un identifiant fourni par le client permettrait à l'établissement A de lire le dossier de candidatures de l'établissement B en devinant ou en interceptant son identifiant. C'est une référence directe non sécurisée, catégorie _Broken Access Control_ de l'OWASP Top 10.
+1. son chemin de destination, une fois résolu, reste **à l'intérieur** du répertoire cible ;
+2. c'est un fichier régulier — ni lien symbolique, ni répertoire, ni entrée spéciale ;
+3. son extension et son type MIME réel appartiennent à la liste blanche ;
+4. les plafonds du lot sont respectés : taille par fichier, nombre de fichiers, taille totale décompressée, et rapport de décompression.
 
-**Contre-mesure.** L'entité `DriveConnection` matérialise l'autorisation. L'API n'accepte qu'un identifiant de connexion, dont l'appartenance à l'établissement de l'appelant est vérifiée avant tout accès à Drive.
+Une entrée refusée n'interrompt pas l'import : elle est comptée dans `rejectedFileCount` et journalisée avec son motif.
 
-**Portée de la règle.** Elle est structurelle, pas seulement applicative : elle contraint le modèle de données. C'est la raison d'être de l'entité.
+**Pourquoi.** L'archive ZIP est devenue le **seul** canal d'entrée du produit (voir le journal de décisions, 31/08/2026). Toute la surface d'attaque de l'ingestion se concentre donc ici, et son contenu est intégralement contrôlé par l'utilisateur.
 
-_US-08, US-09 · à implémenter au lot 2_
+Trois attaques classiques, toutes rattachées à l'OWASP Top 10 :
+
+| Attaque         | Mécanisme                                                                        | Condition qui la bloque |
+| --------------- | -------------------------------------------------------------------------------- | ----------------------- |
+| _Zip slip_      | Une entrée nommée `../../etc/cron.d/x` écrit hors du répertoire de destination   | 1                       |
+| Lien symbolique | Une entrée symlink pointe vers `/etc/passwd`, lu ensuite comme un document       | 2                       |
+| _Zip bomb_      | 42 Ko d'archive qui se décompressent en plusieurs gigaoctets, saturant le disque | 4                       |
+
+**Contre-mesure.** La résolution du chemin est faite avec `path.resolve`, puis comparée au répertoire cible — jamais par une simple recherche de `..` dans la chaîne, qui se contourne par encodage. Les plafonds sont lus depuis l'environnement (`INGESTION_*`) et non codés en dur, pour être durcis en production sans redéploiement du code.
+
+Le rapport de décompression est vérifié **en cours d'extraction**, sur le flux, et non à partir de l'en-tête de l'archive : une archive malveillante déclare une taille décompressée mensongère.
+
+**Portée de la règle.** Contrairement à RG-01 à RG-06, cette règle ne porte pas sur la valeur métier d'un document mais sur les conditions de son admission. Elle est néanmoins une règle de gestion et non un simple détail d'implémentation : elle décide si un fichier entre ou non dans le lot, et ce refus est visible par l'utilisateur.
+
+**Historique.** Sous ce numéro figurait auparavant une règle sur l'origine d'un import Google Drive — un import ne pouvait citer qu'une `DriveConnection` enregistrée, jamais un identifiant de dossier reçu en requête. L'abandon de l'import Drive rend cette règle sans objet. Le raisonnement qui la fondait, sur la référence directe non sécurisée entre locataires, est conservé dans le journal de décisions.
+
+_US-07 · à implémenter au lot 2_
 
 ---
 
@@ -124,4 +143,4 @@ _US-08, US-09 · à implémenter au lot 2_
 | RG-04 | Niveau 2 sur documents retenus uniquement                 | US-11, US-12 | Testée        |
 | RG-05 | Score document = moyenne pondérée normalisée              | US-06, US-12 | Testée        |
 | RG-06 | Score candidature = moyenne des retenus ; `null` si aucun | US-13, US-14 | Testée        |
-| RG-07 | Import Drive depuis une connexion enregistrée uniquement  | US-08, US-09 | À implémenter |
+| RG-07 | Décompression défensive : chemin, type, plafonds          | US-07        | À implémenter |
