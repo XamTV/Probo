@@ -16,7 +16,7 @@ Probo ingère un lot de documents par dépôt d'une archive ZIP et effectue pour
 
 **Niveau 1 — Vérification de la nature.** L'IA classifie chaque document : CV, lettre de motivation, lettre de recommandation, portfolio, autre. Elle attribue un score de confiance (0-100 %). Si la confiance est insuffisante ou le type inattendu, le document est marqué **atypique** et signalé explicitement — il n'entre pas dans le calcul de score.
 
-**Niveau 2 — Adéquation à la campagne.** Pour les documents validés au niveau 1 uniquement, l'IA évalue l'adéquation aux critères de la campagne et produit trois sous-scores : adéquation, clarté, qualité formelle. Chaque score est accompagné d'une justification textuelle.
+**Niveau 2 — Adéquation à la campagne.** Pour les documents validés au niveau 1 uniquement, l'IA compare le document au **référentiel du type concerné** — un profil recherché que l'établissement décrit ou dépose, un par type de document attendu — et produit trois sous-scores : adéquation, clarté, qualité formelle. Chaque score est accompagné d'une justification textuelle.
 
 Les documents sont ensuite regroupés par candidat. L'utilisateur consulte un classement agrégé, peut zoomer sur chaque candidature, et voir le détail de chaque fichier avec son double niveau d'analyse.
 
@@ -147,7 +147,7 @@ L'entité centrale est `Document`, pas `Application` — la candidature. Chaque 
 
 ```
 Institution ─┬─ User
-             └─ Campaign ─┬─ Criterion
+             └─ Campaign ─┬─ ReferenceProfile
                           ├─ ImportBatch
                           └─ Application ── Document ─┬─ DocumentText
                                                       └─ DocumentAnalysis
@@ -157,7 +157,9 @@ Institution ─┬─ User
 
 Le modèle physique vit dans [`apps/api/prisma/schema.prisma`](apps/api/prisma/schema.prisma). Le MCD Merise correspondant sera établi après les maquettes — voir [docs/README.md](docs/README.md) pour la chaîne de dépendance des livrables de conception.
 
-Trois décisions à connaître :
+Quatre décisions à connaître :
+
+- **L'identité du candidat est lue dans le document, pas dans son nom de fichier.** Probo existe parce que les noms de fichiers mentent sur ce qu'est un document ; ils ne sont pas plus fiables sur son propriétaire. Un type mal détecté marque un document ; un regroupement erroné corrompt deux scores en silence.
 
 - **Le rang n'est pas stocké.** Il se calcule par fonction fenêtre à la lecture. Un rang matérialisé s'invaliderait à chaque document analysé.
 - **Un score de candidature vaut `null`, jamais zéro,** quand aucun document n'est exploitable. Zéro signifierait « mauvaise candidature » et la classerait en dernier ; `null` signifie « rien à évaluer ».
@@ -167,15 +169,17 @@ Trois décisions à connaître :
 
 Les règles métier sont implémentées et testées dans [`packages/shared/src/business-rules.ts`](packages/shared/src/business-rules.ts). Chacune porte un identifiant stable, repris dans les noms de tests et dans le dossier professionnel.
 
-| Règle | Énoncé                                                                                       |
-| ----- | -------------------------------------------------------------------------------------------- |
-| RG-01 | Confiance N1 sous le seuil de la campagne → document atypique                                |
-| RG-02 | Type détecté hors des types attendus → document atypique                                     |
-| RG-03 | Texte non extractible → document atypique, motif `ILLISIBLE`, sans appel au modèle           |
-| RG-04 | Le niveau 2 n'est exécuté que sur les documents non atypiques                                |
-| RG-05 | Score document = moyenne pondérée des trois sous-scores, poids définis par la campagne       |
-| RG-06 | Score candidature = moyenne des documents retenus ; `null` si aucun n'est exploitable        |
-| RG-07 | Décompression défensive : chemin résolu confiné, entrée régulière, type et plafonds vérifiés |
+| Règle | Énoncé                                                                                            |
+| ----- | ------------------------------------------------------------------------------------------------- |
+| RG-01 | Confiance N1 sous le seuil de la campagne → document atypique                                     |
+| RG-02 | Type détecté hors des types attendus → document atypique                                          |
+| RG-03 | Texte non extractible → document atypique, motif `UNREADABLE`, sans appel au modèle               |
+| RG-04 | Le niveau 2 n'est exécuté que sur les documents non atypiques                                     |
+| RG-05 | Score document = moyenne pondérée des trois sous-scores, poids définis par la campagne            |
+| RG-06 | Score candidature = moyenne des documents retenus ; `null` si aucun n'est exploitable             |
+| RG-07 | Décompression défensive : chemin résolu confiné, entrée régulière, type et plafonds vérifiés      |
+| RG-08 | Un référentiel de comparaison par type attendu — texte décrit ou document déposé, jamais les deux |
+| RG-09 | Identité du candidat lue dans le contenu ; réconciliation humaine avant analyse en cas de doute   |
 
 ---
 

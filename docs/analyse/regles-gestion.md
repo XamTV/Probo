@@ -10,7 +10,7 @@ Ce document n'est pas une paraphrase du code : il porte l'énoncé métier et sa
 
 ## RG-01 — Confiance insuffisante
 
-**Énoncé.** Un document dont la confiance de classification est strictement inférieure au seuil défini sur la campagne est marqué **atypique**, motif `CONFIANCE_INSUFFISANTE`.
+**Énoncé.** Un document dont la confiance de classification est strictement inférieure au seuil défini sur la campagne est marqué **atypique**, motif `LOW_CONFIDENCE`.
 
 **Pourquoi.** Une classification incertaine n'est pas une information exploitable. Scorer un document dont on ignore la nature reviendrait à comparer un CV à une lettre de motivation sur les mêmes critères.
 
@@ -24,7 +24,7 @@ _US-11 · testé_
 
 ## RG-02 — Type inattendu
 
-**Énoncé.** Un document dont le type détecté ne figure pas parmi les types attendus par la campagne est marqué **atypique**, motif `TYPE_INATTENDU`.
+**Énoncé.** Un document dont le type détecté ne figure pas parmi les types attendus par la campagne est marqué **atypique**, motif `UNEXPECTED_TYPE`.
 
 **Pourquoi.** C'est le cas d'usage fondateur du produit : le portfolio glissé à la place d'un CV. Le fichier est parfaitement lisible et correctement classé — il n'a simplement rien à faire là.
 
@@ -36,7 +36,7 @@ _US-05, US-11 · testé_
 
 ## RG-03 — Document illisible
 
-**Énoncé.** Un document dont le texte n'a pas pu être extrait est marqué **atypique**, motif `ILLISIBLE`. **Aucun appel au modèle n'est effectué pour lui.**
+**Énoncé.** Un document dont le texte n'a pas pu être extrait est marqué **atypique**, motif `UNREADABLE`. **Aucun appel au modèle n'est effectué pour lui.**
 
 **Pourquoi.** Sans texte, il n'y a rien à analyser. Appeler le modèle coûterait de l'argent et du quota pour produire une réponse inventée.
 
@@ -50,9 +50,9 @@ _US-11 · testé_
 
 ## Ordre de priorité des motifs
 
-Quand plusieurs motifs s'appliquent, l'ordre est : **`ILLISIBLE`, puis `CONFIANCE_INSUFFISANTE`, puis `TYPE_INATTENDU`.**
+Quand plusieurs motifs s'appliquent, l'ordre est : **`UNREADABLE`, puis `LOW_CONFIDENCE`, puis `UNEXPECTED_TYPE`.**
 
-`ILLISIBLE` vient d'abord parce qu'il est constaté avant tout appel au modèle.
+`UNREADABLE` vient d'abord parce qu'il est constaté avant tout appel au modèle.
 
 La confiance passe avant le type pour une raison moins évidente : un type détecté avec une confiance faible n'est pas une information fiable. Annoncer « type inattendu » sur une classification incertaine induirait l'utilisateur en erreur — on lui affirmerait la nature d'un document que l'on n'a justement pas su reconnaître.
 
@@ -133,6 +133,43 @@ _US-07 · à implémenter au lot 2_
 
 ---
 
+## RG-08 — Référentiel de comparaison du niveau 2
+
+**Énoncé.** Chaque type de document attendu par une campagne porte **un référentiel de comparaison**, et un seul. Il prend l'une de deux formes, jamais les deux à la fois : un **texte descriptif** saisi par l'établissement, ou un **document de référence déposé**, dont le texte est extrait par la même chaîne que les candidatures. Une campagne ne peut pas passer au statut actif tant qu'un type attendu n'a pas son référentiel.
+
+**Pourquoi.** Le niveau 2 évalue « l'adéquation à la campagne ». Jusqu'ici, aucun livrable ne disait à quoi cette adéquation était mesurée : le cahier des charges parlait de « critères de la campagne » que personne n'avait définis, et l'entité `Criterion` du schéma n'était rattachée à aucune user story. Sans référentiel explicite, le sous-score d'adéquation n'est pas explicable — et un score inexplicable est indéfendable devant un candidat qui conteste, ce que RGPD et persona Sofia interdisent.
+
+**Un référentiel par type, et non un par campagne.** On n'évalue pas une lettre de motivation sur les attendus d'un CV. Un référentiel unique et transverse rendrait le sous-score d'adéquation flou à expliquer, ce qui est exactement le défaut à éviter.
+
+**Réserve à assumer devant le jury.** Le référentiel doit décrire un **profil recherché**, à la manière d'une fiche de poste. Y déposer le CV d'un candidat réellement admis reviendrait à mécaniser un biais — école d'origine, parcours, âge implicite — dans un contexte d'admission où c'est juridiquement sensible. L'interface le dit explicitement au moment du dépôt ; le produit ne peut pas l'empêcher techniquement, et il serait malhonnête de prétendre le contraire.
+
+**Ce que cette règle remplace.** L'entité `Criterion` et son énumération `CriterionType` sont supprimées. Elles n'étaient justifiées par aucun besoin documenté, et les critères libres restent hors périmètre (`C-01`).
+
+_US-22 · à implémenter au lot 2_
+
+---
+
+## RG-09 — Identité du candidat déduite du contenu
+
+**Énoncé.** L'identité du candidat est lue **dans le texte du document**, pas dans son nom de fichier. Le nom de fichier et l'arborescence de l'archive sont des indices de départ, jamais l'autorité. Quand les deux se contredisent, ou quand l'identité lue est incertaine, le lot passe au statut `AWAITING_RECONCILIATION` : **aucune analyse de niveau 2 ne démarre** tant qu'un humain n'a pas arbitré.
+
+**Pourquoi.** C'est la contradiction que le produit se faisait à lui-même. Probo existe parce que **les noms de fichiers mentent** : un portfolio appelé `CV.pdf` est le cas d'école du README. Le niveau 1 lit donc le contenu pour établir ce qu'est un document. Mais le regroupement par candidat, lui, faisait une confiance aveugle à ce même nom de fichier.
+
+La conséquence n'est pas symétrique. Un type mal détecté ne fait que marquer **un** document, visiblement. Un regroupement erroné **corrompt silencieusement deux scores** : le candidat A hérite d'un document de B, les deux moyennes sont fausses, et rien ne le signale. C'est précisément le faux négatif invisible que Claire redoute le plus.
+
+**Ce que la règle impose.**
+
+- Chaque document porte l'identité lue dans son texte et la confiance associée — `detectedCandidateName`, `detectedNameConfidence`.
+- Chaque candidature enregistre **d'où vient** son identité : `FOLDER`, `FILENAME`, `CONTENT` ou `MANUAL`. Un regroupement doit rester explicable et contestable après coup.
+- Trois situations déclenchent la réconciliation : contradiction entre le nom de fichier et le contenu, confiance insuffisante sur l'identité lue, et homonymie entre deux candidatures du même lot.
+- Un arbitrage humain fixe l'identité en `MANUAL`, seule source qui n'est jamais réexaminée.
+
+**Le repli précédent était illusoire.** L'extension `6a` du CU-04 prévoyait « aucun regroupement déductible → une candidature par fichier ». À 412 candidatures et 1 248 documents, cela produit 1 248 candidatures d'un document : ce n'est pas une dégradation gracieuse, c'est un échec silencieux.
+
+_US-23 · à implémenter au lot 2_
+
+---
+
 ## Tableau de synthèse
 
 | Règle | Énoncé court                                              | US           | État          |
@@ -144,3 +181,5 @@ _US-07 · à implémenter au lot 2_
 | RG-05 | Score document = moyenne pondérée normalisée              | US-06, US-12 | Testée        |
 | RG-06 | Score candidature = moyenne des retenus ; `null` si aucun | US-13, US-14 | Testée        |
 | RG-07 | Décompression défensive : chemin, type, plafonds          | US-07        | À implémenter |
+| RG-08 | Un référentiel de comparaison par type attendu            | US-22        | À implémenter |
+| RG-09 | Identité lue dans le contenu, réconciliation si doute     | US-23        | À implémenter |

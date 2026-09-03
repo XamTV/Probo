@@ -128,35 +128,43 @@ model Campaign {
   createdAt DateTime  @default(now()) @map("created_at")
   updatedAt DateTime  @updatedAt @map("updated_at")
 
-  institution   Institution   @relation(fields: [institutionId], references: [id], onDelete: Cascade)
-  criteria      Criterion[]
-  importBatches ImportBatch[]
-  applications  Application[]
+  institution       Institution        @relation(fields: [institutionId], references: [id], onDelete: Cascade)
+  referenceProfiles ReferenceProfile[]
+  importBatches     ImportBatch[]
+  applications      Application[]
 
   @@index([institutionId, status])
   @@map("campaign")
 }
 
-enum CriterionType {
-  KEYWORD
-  REQUIRED_LEVEL
-  LANGUAGE
+/// What level 2 compares a document against — one per expected document type.
+///
+/// RG-08 — Exactly one form is filled: either `text`, a profile the institution
+/// typed, or an uploaded reference file. Never both, never neither.
+///
+/// Replaces the former `Criterion` entity, which no user story justified
+/// (see the 2026-09-03 entry in docs/journal-decisions.md).
+model ReferenceProfile {
+  id           String       @id @default(uuid()) @db.Uuid
+  campaignId   String       @map("campaign_id") @db.Uuid
+  documentType DocumentType @map("document_type")
 
-  @@map("criterion_type")
-}
+  /// The sought profile, described in the institution's own words.
+  text String?
 
-model Criterion {
-  id         String        @id @default(uuid()) @db.Uuid
-  campaignId String        @map("campaign_id") @db.Uuid
-  type       CriterionType
-  label      String
-  value      String
-  weight     Float         @default(1)
+  /// An uploaded reference document, when one was given instead of `text`.
+  /// Its text goes through the same extraction chain as a candidate's file.
+  fileName      String? @map("file_name")
+  storageKey    String? @map("storage_key")
+  extractedText String? @map("extracted_text")
+
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
 
   campaign Campaign @relation(fields: [campaignId], references: [id], onDelete: Cascade)
 
-  @@index([campaignId])
-  @@map("criterion")
+  @@unique([campaignId, documentType])
+  @@map("reference_profile")
 }
 
 // ---------------------------------------------------------------------------
@@ -166,10 +174,30 @@ model Criterion {
 enum ImportBatchStatus {
   PENDING
   RUNNING
+
+  /// Documents are unpacked and their identity read, but at least one grouping
+  /// is ambiguous. No analysis starts until a human has arbitrated (RG-09).
+  AWAITING_RECONCILIATION
+
   COMPLETED
   FAILED
 
   @@map("import_batch_status")
+}
+
+/// How a document ended up attached to a given candidate — kept because the
+/// grouping has to be explainable, and contestable, after the fact.
+enum IdentitySource {
+  /// A sub-folder of the archive named the candidate.
+  FOLDER
+  /// The common prefix of the file names.
+  FILENAME
+  /// The identity read from the documents' own text.
+  CONTENT
+  /// A human arbitrated the grouping during reconciliation.
+  MANUAL
+
+  @@map("identity_source")
 }
 
 /// A single ZIP upload, and the outcome of unpacking it.
@@ -224,6 +252,11 @@ model Application {
   candidateEmail String?           @map("candidate_email")
   externalRef    String?           @map("external_ref")
   status         ApplicationStatus @default(PENDING)
+
+  /// Where `candidateName` came from (RG-09). `MANUAL` means a human settled
+  /// it during reconciliation, which is the only source that never needs
+  /// re-examining.
+  identitySource IdentitySource @map("identity_source")
 
   /// Mean score of the retained documents (RG-06).
   /// `null` means "nothing to evaluate" — never zero.
@@ -283,6 +316,15 @@ model Document {
 
   sizeBytes Int    @map("size_bytes")
   mimeType  String @map("mime_type")
+
+  /// Candidate identity read from the document's own text (RG-09).
+  ///
+  /// The filename is a hint, never the authority: Probo exists because file
+  /// names lie about what a document is, so they cannot be trusted about whose
+  /// it is either. A mistyped type only flags one document; a wrong grouping
+  /// silently corrupts two candidates' scores.
+  detectedCandidateName  String? @map("detected_candidate_name")
+  detectedNameConfidence Int?    @map("detected_name_confidence")
 
   extractionMethod ExtractionMethod? @map("extraction_method")
   status           DocumentStatus    @default(PENDING)

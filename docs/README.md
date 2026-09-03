@@ -10,31 +10,33 @@ Une première version du MCD avait été produite avant les user stories. Elle a
 
 Deux raisons de ne pas y revenir plus tôt. D'abord, chaque entité doit pouvoir se rattacher à une user story — c'est la vérification à faire avant de dessiner quoi que ce soit. Ensuite, **les maquettes modifient toujours le modèle** : dessiner les écrans révèle systématiquement des attributs manquants. Faire le MCD avant, c'est le faire deux fois.
 
+> **Vérifié par l'expérience, le 03/09/2026.** Le maquettage a produit bien plus que des écrans : deux règles de gestion (RG-08, RG-09), deux entrées de périmètre, deux user stories, la suppression de l'entité `Criterion` et l'ajout de `ReferenceProfile`. Le niveau 2 n'avait aucun référentiel de comparaison documenté, et le regroupement par candidat se fiait au nom de fichier alors que tout le produit repose sur le fait que les noms de fichiers mentent. Un MCD dessiné avant cette étape aurait été à refaire. Voir le journal de décisions.
+
 ## État des livrables
 
-| Livrable                                          | État                                           |
-| ------------------------------------------------- | ---------------------------------------------- |
-| `journal-decisions.md`                            | Écrit, tenu au fil de l'eau                    |
-| `analyse/cahier-des-charges.md`                   | Écrit                                          |
-| `analyse/perimetre.md`                            | Écrit — MoSCoW, refus actés et reports datés   |
-| `analyse/personas.md`                             | Écrit — Claire, Marc, Sofia                    |
-| `analyse/user-stories.md`                         | Écrit — 21 US dont 2 reportées, 6 épopées      |
-| `analyse/regles-gestion.md`                       | Écrit — RG-01 à RG-07, dont 6 sous test        |
-| `analyse/cas-utilisation.md`                      | Écrit — 14 CU dont 1 reporté, 2 scénarios      |
-| `maquettage/prompt-claude-design.md`              | Écrit — prompt autoportant                     |
-| **`maquettage/` — maquettes, charte, RGAA**       | **À produire — étape en cours**                |
-| `conception/mcd.*`, `mld.md`, `ecarts-mcd-mpd.md` | À reconstruire **après** les maquettes         |
-| `conception/dictionnaire-donnees.md`              | À dériver de `schema.prisma`                   |
-| `conception/diagramme-classes.md`                 | À produire                                     |
-| `conception/diagramme-sequence-analyse.md`        | À produire — meilleur atout de soutenance      |
-| `conception/diagramme-deploiement.md`             | À produire                                     |
-| `securite/plan-securisation.md`                   | À produire — OWASP Top 10 point par point      |
-| `securite/rgpd.md`                                | À produire                                     |
-| `tests/plan-de-tests.md`                          | À produire                                     |
-| `tests/cahier-de-recettes.md`                     | À produire — dérivé des critères d'acceptation |
-| `tests/jeu-essai/`                                | À constituer — 40 documents réels annotés      |
-| `veille/methode-et-sources.md`                    | À produire                                     |
-| `veille/veille-anglophone.md`                     | À produire                                     |
+| Livrable                                          | État                                            |
+| ------------------------------------------------- | ----------------------------------------------- |
+| `journal-decisions.md`                            | Écrit, tenu au fil de l'eau                     |
+| `analyse/cahier-des-charges.md`                   | Écrit                                           |
+| `analyse/perimetre.md`                            | Écrit — MoSCoW, refus actés et reports datés    |
+| `analyse/personas.md`                             | Écrit — Claire, Marc, Sofia                     |
+| `analyse/user-stories.md`                         | Écrit — 23 US dont 2 reportées, 6 épopées       |
+| `analyse/regles-gestion.md`                       | Écrit — RG-01 à RG-09, dont 6 sous test         |
+| `analyse/cas-utilisation.md`                      | Écrit — 15 CU dont 1 reporté, 2 scénarios       |
+| `maquettage/prompt-claude-design.md`              | Écrit — prompt autoportant                      |
+| **`maquettage/` — maquettes, charte, RGAA**       | **En cours — 16 artboards, 2 écrans à ajouter** |
+| `conception/mcd.*`, `mld.md`, `ecarts-mcd-mpd.md` | À reconstruire **après** les maquettes          |
+| `conception/dictionnaire-donnees.md`              | À dériver de `schema.prisma`                    |
+| `conception/diagramme-classes.md`                 | À produire                                      |
+| `conception/diagramme-sequence-analyse.md`        | À produire — meilleur atout de soutenance       |
+| `conception/diagramme-deploiement.md`             | À produire                                      |
+| `securite/plan-securisation.md`                   | À produire — OWASP Top 10 point par point       |
+| `securite/rgpd.md`                                | À produire                                      |
+| `tests/plan-de-tests.md`                          | À produire                                      |
+| `tests/cahier-de-recettes.md`                     | À produire — dérivé des critères d'acceptation  |
+| `tests/jeu-essai/`                                | À constituer — 40 documents réels annotés       |
+| `veille/methode-et-sources.md`                    | À produire                                      |
+| `veille/veille-anglophone.md`                     | À produire                                      |
 
 ## Deux règles de travail
 

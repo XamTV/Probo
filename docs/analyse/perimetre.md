@@ -24,26 +24,30 @@ Ce document dit ce qui est dans le projet, ce qui n'y est pas, et ce qui n'y ser
 | M-12 | Purge automatique à 90 jours et journal d'audit                                             | Obligation RGPD, et argument commercial                                    |
 | M-13 | Export CSV du classement                                                                    | Le format que les équipes d'admission utilisent réellement                 |
 | M-15 | Export PDF du classement                                                                    | Demande explicite : le document qui circule en commission                  |
+| M-16 | Référentiel de comparaison par type de document attendu                                     | Sans lui, le niveau 2 n'a rien à quoi comparer — voir RG-08                |
+| M-17 | Réconciliation de l'identité des candidats avant analyse                                    | Un regroupement erroné corrompt deux scores en silence — voir RG-09        |
 
 > **M-14 est vacant.** Il portait l'import depuis un dossier Google Drive, sorti du périmètre le 31/08/2026 — voir la table des reports ci-dessous. L'identifiant n'est pas réattribué : `M-15` reste `M-15`, sans quoi les user stories qui le citent désigneraient silencieusement une autre fonctionnalité.
 
+> **M-16 et M-17 sont des ajouts du 03/09/2026**, et non du cadrage initial. Ils comblent deux trous que le maquettage a révélés : le niveau 2 n'avait aucun référentiel de comparaison documenté, et le regroupement par candidat se fiait au nom de fichier alors que tout le produit repose sur le fait que les noms de fichiers mentent. Ce sont des « doit être fait » : sans eux, le cœur du produit ne tient pas. Voir le journal de décisions.
+
 ## Devrait être fait — sera coupé en premier en cas de retard
 
-| Réf  | Fonctionnalité                                     | Conséquence si coupé                                                                                                   |
-| ---- | -------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------- |
-| S-01 | OCR des PDF scannés (`tesseract`)                  | Un scan sans couche texte est marqué `ILLISIBLE`, ce qui reste un comportement cohérent avec RG-03 plutôt qu'un défaut |
-| S-02 | Tests de parcours Playwright                       | Les tests unitaires et d'intégration couvrent déjà le référentiel ; le cahier de recettes prend le relais en manuel    |
-| S-03 | Migration du stockage vers Scaleway Object Storage | Le volume disque fonctionne ; la limite est documentée avec sa voie de migration                                       |
-| S-04 | Détection des doublons via l'empreinte SHA-256     | L'empreinte est stockée dès le départ ; seule l'exploitation en interface serait reportée                              |
+| Réf  | Fonctionnalité                                     | Conséquence si coupé                                                                                                    |
+| ---- | -------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------- |
+| S-01 | OCR des PDF scannés (`tesseract`)                  | Un scan sans couche texte est marqué `UNREADABLE`, ce qui reste un comportement cohérent avec RG-03 plutôt qu'un défaut |
+| S-02 | Tests de parcours Playwright                       | Les tests unitaires et d'intégration couvrent déjà le référentiel ; le cahier de recettes prend le relais en manuel     |
+| S-03 | Migration du stockage vers Scaleway Object Storage | Le volume disque fonctionne ; la limite est documentée avec sa voie de migration                                        |
+| S-04 | Détection des doublons via l'empreinte SHA-256     | L'empreinte est stockée dès le départ ; seule l'exploitation en interface serait reportée                               |
 
 ## Pourrait être fait — uniquement si tout le reste est terminé
 
-| Réf  | Fonctionnalité                                                     |
-| ---- | ------------------------------------------------------------------ |
-| C-01 | Critères de campagne libres, au-delà des trois axes de pondération |
-| C-02 | Comparaison côte à côte de deux candidatures                       |
-| C-03 | Notifications par email en fin de traitement d'un lot              |
-| C-04 | Réexécution d'une analyse après changement de prompt               |
+| Réf  | Fonctionnalité                                                                                                      |
+| ---- | ------------------------------------------------------------------------------------------------------------------- |
+| C-01 | Critères de campagne libres et structurés — mots-clés, niveau requis, langue — en complément du référentiel de M-16 |
+| C-02 | Comparaison côte à côte de deux candidatures                                                                        |
+| C-03 | Notifications par email en fin de traitement d'un lot                                                               |
+| C-04 | Réexécution d'une analyse après changement de prompt                                                                |
 
 ## Sorti du périmètre en cours de route — reporté après le titre
 

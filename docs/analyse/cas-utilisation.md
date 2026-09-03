@@ -30,6 +30,9 @@ L'administrateur **généralise** le chargé d'admission : tout ce que le second
       │  ────────────────┼──▶        │                                   │
       │                   │          │ «include»                         │
       │                   │          ▼                                   │
+      │                   │   ( CU-15  Réconcilier les candidats )       │
+      │                   │          │ «include»                         │
+      │                   │          ▼                                   │
       │                   │   ( CU-05  Analyser un document )────────────┼──▶ Mistral AI
       │                   │          │           ▲                       │
       │                   │          │           │ «extend»              │
@@ -69,22 +72,23 @@ L'administrateur **généralise** le chargé d'admission : tout ce que le second
 
 ## Fiches
 
-| Réf   | Cas                                 | Acteur               | US                  |
-| ----- | ----------------------------------- | -------------------- | ------------------- |
-| CU-01 | Se connecter                        | Chargé d'admission   | US-01               |
-| CU-02 | Gérer les comptes                   | Administrateur       | US-02               |
-| CU-03 | Configurer une campagne             | Administrateur       | US-04, US-05, US-06 |
-| CU-04 | Importer un lot                     | Chargé d'admission   | US-07               |
-| CU-05 | Analyser un document                | Système, via Mistral | US-10, US-12        |
-| CU-06 | Signaler un document atypique       | Système              | US-11               |
-| CU-07 | Calculer le score d'une candidature | Système              | US-13               |
-| CU-08 | Consulter le classement             | Chargé d'admission   | US-14, US-15        |
-| CU-09 | Consulter le détail d'un document   | Chargé d'admission   | US-16               |
-| CU-10 | Exporter le classement              | Chargé d'admission   | US-17, US-18        |
-| CU-11 | ~~Enregistrer un dossier Drive~~    | ~~Administrateur~~   | US-08 — reporté v2  |
-| CU-12 | Supprimer une candidature           | Administrateur       | US-19               |
-| CU-13 | Consulter le journal d'audit        | Administrateur       | US-21               |
-| CU-14 | Purger les données échues           | Planificateur        | US-20               |
+| Réf   | Cas                                  | Acteur               | US                         |
+| ----- | ------------------------------------ | -------------------- | -------------------------- |
+| CU-01 | Se connecter                         | Chargé d'admission   | US-01                      |
+| CU-02 | Gérer les comptes                    | Administrateur       | US-02                      |
+| CU-03 | Configurer une campagne              | Administrateur       | US-04, US-05, US-06, US-22 |
+| CU-04 | Importer un lot                      | Chargé d'admission   | US-07                      |
+| CU-05 | Analyser un document                 | Système, via Mistral | US-10, US-12               |
+| CU-06 | Signaler un document atypique        | Système              | US-11                      |
+| CU-07 | Calculer le score d'une candidature  | Système              | US-13                      |
+| CU-08 | Consulter le classement              | Chargé d'admission   | US-14, US-15               |
+| CU-09 | Consulter le détail d'un document    | Chargé d'admission   | US-16                      |
+| CU-10 | Exporter le classement               | Chargé d'admission   | US-17, US-18               |
+| CU-11 | ~~Enregistrer un dossier Drive~~     | ~~Administrateur~~   | US-08 — reporté v2         |
+| CU-12 | Supprimer une candidature            | Administrateur       | US-19                      |
+| CU-13 | Consulter le journal d'audit         | Administrateur       | US-21                      |
+| CU-14 | Purger les données échues            | Planificateur        | US-20                      |
+| CU-15 | Réconcilier l'identité des candidats | Chargé d'admission   | US-23                      |
 
 ---
 
@@ -103,10 +107,12 @@ Le cas le plus riche, et celui qui porte le plus de règles de gestion.
 3. Le système crée un lot d'import au statut « en cours »
 4. Le système énumère les entrées de l'archive
 5. Pour chaque entrée, le système contrôle la sûreté du chemin résolu, la nature de l'entrée, le type MIME réel et la taille _(RG-07)_
-6. Le système regroupe les fichiers par candidat, d'après l'arborescence ou le préfixe du nom
-7. Le système enregistre chaque document et met un travail d'analyse en file _(inclut CU-05)_
-8. Le système affiche l'avancement, document par document
-9. Le lot passe au statut « terminé » lorsque tous ses documents sont traités
+6. Le système extrait le texte de chaque document et y lit l'identité du candidat _(RG-09)_
+7. Le système regroupe les documents par candidat, l'arborescence et le préfixe du nom servant d'indices que l'identité lue confirme ou infirme
+8. Si un regroupement est douteux, le lot passe au statut « à réconcilier » et attend un arbitrage _(inclut CU-15)_
+9. Le système enregistre chaque document et met un travail d'analyse en file _(inclut CU-05)_
+10. Le système affiche l'avancement, document par document
+11. Le lot passe au statut « terminé » lorsque tous ses documents sont traités
 
 **Extensions**
 
@@ -115,8 +121,10 @@ Le cas le plus riche, et celui qui porte le plus de règles de gestion.
 - **5b.** Le chemin résolu d'une entrée sort du répertoire de destination → rejet sans écriture sur disque, incident journalisé _(RG-07)_
 - **5c.** Une entrée est un lien symbolique ou une entrée spéciale → rejet sans écriture, incident journalisé _(RG-07)_
 - **5d.** Le rapport de décompression dépasse le plafond en cours d'extraction → interruption immédiate du lot, statut « erreur », fichiers déjà écrits supprimés _(RG-07)_
-- **6a.** Aucun regroupement déductible → une candidature par fichier, signalée à l'utilisateur
-- **7a.** L'extraction de texte échoue → document marqué `ILLISIBLE`, **sans appel au modèle** _(RG-03)_
+- **7a.** Le nom de fichier et l'identité lue se contredisent → le cas est soumis à réconciliation, jamais tranché en silence _(RG-09)_
+- **7b.** Deux candidatures du lot portent le même nom → homonymie soumise à réconciliation
+- **8a.** Aucune identité n'est lisible sur un document → il est présenté comme orphelin à la réconciliation, à rattacher à la main
+- **7a.** L'extraction de texte échoue → document marqué `UNREADABLE`, **sans appel au modèle** _(RG-03)_
 
 ---
 

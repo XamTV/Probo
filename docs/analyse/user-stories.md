@@ -73,6 +73,18 @@ _Périmètre : M-02_
 - Une pondération entièrement nulle est refusée à l'enregistrement
 - Modifier ces réglages n'altère pas les analyses déjà produites
 
+### US-22 · Fournir le référentiel de comparaison
+
+**En tant que** Marc, **je veux** décrire ce que j'attends de chaque type de document **afin que** le score d'adéquation ait un point de comparaison explicite.
+_Périmètre : M-16_
+
+- Chaque type de document attendu porte un référentiel, et un seul (RG-08)
+- Deux formes au choix, exclusives : un texte descriptif saisi, ou un document de référence déposé
+- Le texte d'un document déposé est extrait par la même chaîne que les candidatures ; un référentiel illisible est refusé à l'enregistrement, pas découvert à l'analyse
+- Le passage de la campagne au statut actif exige un référentiel par type attendu
+- L'écran avertit explicitement qu'il faut décrire un **profil recherché**, et non déposer le CV d'un candidat réel
+- Modifier un référentiel n'altère pas les analyses déjà produites
+
 ---
 
 ## Épopée 3 — Import
@@ -83,7 +95,7 @@ _Périmètre : M-02_
 _Périmètre : M-03_
 
 - Le dépôt accepte le glisser-déposer et la sélection de fichier
-- Un sous-dossier par candidat est interprété comme une candidature ; à défaut, le regroupement se fait sur le préfixe du nom de fichier
+- Un sous-dossier par candidat et le préfixe du nom de fichier servent d'**indices** de regroupement, confirmés ou infirmés par l'identité lue dans le contenu (RG-09, US-23)
 - Les fichiers dépassant la taille maximale, hors types autorisés, ou en surnombre sont rejetés et **listés à l'écran** — jamais ignorés en silence
 - Une entrée d'archive dont le chemin résolu sort du répertoire de destination est rejetée sans être écrite sur disque (RG-07)
 - Une entrée qui n'est pas un fichier régulier — lien symbolique en particulier — est rejetée (RG-07)
@@ -92,6 +104,19 @@ _Périmètre : M-03_
 - L'écran affiche l'avancement document par document
 
 > **L'archive ZIP est le seul canal d'ingestion** depuis le 31/08/2026. Cette US n'est donc plus un chemin parmi deux : elle est la porte d'entrée unique du produit, et RG-07 en est la serrure.
+
+### US-23 · Réconcilier les candidats avant l'analyse
+
+**En tant que** Claire, **je veux** arbitrer les regroupements douteux **afin qu'**aucun document ne soit attribué au mauvais candidat.
+_Périmètre : M-17_
+
+- L'identité est lue dans le texte de chaque document, jamais dans son seul nom de fichier (RG-09)
+- Trois cas sont soumis à l'arbitrage : contradiction entre nom de fichier et contenu, identité lue avec une confiance insuffisante, homonymie entre deux candidatures du lot
+- Tant qu'un cas reste en attente, le lot est au statut « à réconcilier » et **aucune analyse de niveau 2 ne démarre**
+- Chaque cas montre côte à côte ce que dit le nom de fichier et ce que dit le contenu, avec un extrait du texte à l'appui
+- L'utilisateur peut rattacher un document à une autre candidature, fusionner deux candidatures, ou en créer une
+- Les regroupements non douteux sont appliqués sans intervention : l'écran ne montre que ce qui mérite un arbitrage
+- Chaque arbitrage fixe l'origine de l'identité à `MANUAL` et est inscrit au journal d'audit
 
 ### US-08 · Enregistrer un dossier Google Drive — hors périmètre v1
 
@@ -138,7 +163,7 @@ _Périmètre : M-06_
 
 - Une confiance sous le seuil de la campagne rend le document atypique (RG-01)
 - Un type hors des attendus rend le document atypique (RG-02)
-- Un texte non extractible rend le document atypique, motif `ILLISIBLE`, sans aucun appel au modèle (RG-03)
+- Un texte non extractible rend le document atypique, motif `UNREADABLE`, sans aucun appel au modèle (RG-03)
 - Le motif est affiché en clair, pas sous forme de code
 - Un document atypique n'entre dans aucun calcul de score (RG-04)
 - Le signalement est visible **dans toutes les vues** : liste, détail candidature, détail document, et exports
@@ -149,6 +174,7 @@ _Périmètre : M-06_
 _Périmètre : M-07_
 
 - Trois sous-scores de 0 à 100 : adéquation, clarté, qualité formelle
+- L'adéquation est mesurée au **référentiel du type de document concerné** (RG-08), et la justification s'y réfère explicitement
 - Chacun est accompagné de sa propre justification textuelle
 - Le score du document est la moyenne pondérée selon la campagne (RG-05)
 - Le niveau 2 n'est exécuté que sur les documents retenus au niveau 1 (RG-04)

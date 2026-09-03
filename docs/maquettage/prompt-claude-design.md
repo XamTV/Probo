@@ -2,7 +2,7 @@
 
 Prompt autoportant à transmettre à un outil de design. Il ne suppose aucune connaissance préalable du projet.
 
-**Comment l'utiliser.** Copier le bloc ci-dessous intégralement. Demander les écrans **un par un** plutôt que les six d'un coup : la qualité chute nettement au-delà de deux écrans par requête. Commencer par le classement, qui fixe le système visuel réutilisé ensuite.
+**Comment l'utiliser.** Copier le bloc ci-dessous intégralement. Demander les écrans **un par un** plutôt que les sept d'un coup : la qualité chute nettement au-delà de deux écrans par requête. Commencer par le classement, qui fixe le système visuel réutilisé ensuite.
 
 **Ce qui revient ensuite dans le dossier.** Les maquettes servent de spécification visuelle _et_ de point de départ des composants Angular. Prévoir en plus une trace de wireframe basse fidélité — Excalidraw suffit — pour montrer l'étape de conception amont.
 
@@ -197,7 +197,42 @@ lisible et contestable.
 - Trois curseurs de pondération : adéquation, clarté, qualité formelle. Leur
   somme n'a pas besoin de valoir 100, ils sont normalisés — mais l'écran doit
   montrer le poids relatif de chacun
+- LE RÉFÉRENTIEL DE COMPARAISON, un par type de document coché. C'est ce à quoi
+  le niveau 2 compare chaque document, donc le réglage le plus structurant de
+  l'écran. Pour chaque type, l'administrateur choisit UNE des deux formes,
+  jamais les deux : un texte décrivant le profil recherché, ou un document de
+  référence déposé
+- Un avertissement visible, non contournable du regard : il faut DÉCRIRE un
+  profil recherché, pas déposer le CV d'un candidat réellement admis — cela
+  mécaniserait un biais dans un contexte d'admission
+- Une campagne ne peut pas passer au statut actif tant qu'un type coché n'a pas
+  son référentiel ; l'écran doit rendre ce manque évident avant qu'on essaie
 - Un aperçu de l'effet des réglages serait un plus
+
+### Écran 7 — Réconciliation des candidats
+
+Écran intercalé entre l'import et le classement, qui n'apparaît que si un
+regroupement est douteux. Rien ne s'analyse tant qu'il n'est pas traité.
+
+Le problème : les documents arrivent en vrac dans une archive, et le système
+lit l'identité du candidat DANS LE TEXTE de chaque document — le nom de fichier
+n'est qu'un indice. Quand les deux se contredisent, un humain tranche.
+
+- Trois cas à dessiner, dans une même file de traitement : le nom de fichier
+  contredit le contenu ; l'identité lue est trop incertaine ; deux candidatures
+  du lot portent le même nom
+- Chaque cas montre CÔTE À CÔTE ce que dit le nom de fichier et ce que dit le
+  contenu, avec un extrait du texte à l'appui — c'est ce qui permet de trancher
+  sans ouvrir le PDF
+- Trois gestes possibles : rattacher le document à une autre candidature,
+  fusionner deux candidatures, en créer une
+- Les regroupements SÛRS ne sont pas montrés. L'écran ne contient que ce qui
+  demande un arbitrage, avec un compteur de ce qui a été résolu sans
+  intervention
+- L'écran doit dire pourquoi il existe, en une phrase : un document attribué au
+  mauvais candidat fausse deux scores sans que rien ne le signale
+- États : file de cas à traiter, et file vide (tout a été résolu
+  automatiquement — le cas le plus fréquent)
 
 ### Écran 6 — Journal d'audit
 

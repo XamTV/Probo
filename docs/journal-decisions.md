@@ -160,3 +160,58 @@ Rapporté à une marge de vingt heures sur 277, ce n'est pas finançable sans pr
 - **La veille anglophone n'y perd rien, au contraire.** La recherche sur les scopes Google a désormais motivé deux décisions successives — le compte de service, puis l'abandon. Une lecture technique qui débouche sur un arbitrage de périmètre est un meilleur exemple qu'une lecture qui débouche sur une ligne de code.
 
 **Ce qu'il faut assumer.** M-14 était classé « doit être fait », avec la mention « facteur d'adoption réel ». Le retirer est un recul de périmètre, pas une optimisation. Il est daté, motivé et tracé plutôt que dilué — mais c'est bien un renoncement, et il sera présenté comme tel.
+
+---
+
+## 2026-09-03 — Deux trous au cœur du produit, révélés par le maquettage
+
+**Contexte.** Le maquettage des seize écrans a mis au jour deux manques que cinq mois de documentation n'avaient pas fait apparaître. Ils ne relèvent ni du dessin ni de l'ergonomie : ce sont des trous de conception, et ils touchent le cœur de la proposition de valeur.
+
+C'est exactement l'effet attendu de l'étape — `docs/README.md` prévoyait que « les maquettes modifient toujours le modèle ». Elles l'ont fait plus profondément que prévu.
+
+---
+
+### Premier trou — le niveau 2 n'avait aucun référentiel de comparaison
+
+**Le constat.** Le cahier des charges annonce que le niveau 2 répond à « ce document répond-il **aux critères de la campagne** ? ». Aucune user story ne définissait ces critères. US-06 s'arrêtait au seuil de confiance et aux trois poids. L'entité `Criterion` — `KEYWORD`, `REQUIRED_LEVEL`, `LANGUAGE` — existait dans le schéma sans être rattachée à un seul besoin, et les critères libres étaient classés `C-01`, « pourrait être fait ».
+
+Autrement dit : la fonctionnalité centrale du produit comparait des documents à un référentiel qui n'était spécifié nulle part.
+
+**Options.** (a) Des critères structurés saisis — mots-clés, niveau requis, langue. (b) Un référentiel textuel décrivant le profil recherché. (c) Un document de référence déposé. (d) Les formes (b) et (c) au choix.
+
+**Décision.** (d), avec **un référentiel par type de document attendu** — RG-08, M-16, US-22. L'entité `Criterion` et son énumération sont supprimées ; `ReferenceProfile` les remplace.
+
+**Raison.** Les deux formes servent deux réalités. Rédiger un profil est plus rigoureux et n'exige aucun fichier ; déposer un document existant est le geste naturel d'un établissement qui a déjà une fiche de formation. Refuser l'un des deux aurait imposé une conversion manuelle sans bénéfice.
+
+Un référentiel **par type** et non un par campagne : on n'évalue pas une lettre de motivation sur les attendus d'un CV. Un référentiel transverse rendrait le sous-score d'adéquation flou à expliquer — exactement le défaut que le produit reproche aux outils concurrents.
+
+**Réserve, à porter en soutenance.** Le référentiel doit décrire un **profil recherché**, à la manière d'une fiche de poste. Y déposer le CV d'un candidat réellement admis reviendrait à mécaniser un biais — école d'origine, parcours, âge implicite — dans un contexte d'admission où c'est juridiquement sensible. L'interface l'avertit au moment du dépôt. **Le produit ne peut pas l'empêcher techniquement**, et prétendre le contraire serait malhonnête. C'est une limite assumée, pas une lacune ignorée.
+
+**Conséquence sur `Criterion`.** Sa suppression applique la même règle que la purge du premier MCD : une entité qu'aucun besoin documenté ne justifie n'a pas sa place. À la question « d'où sort cette entité ? », la seule réponse aurait été « d'une conversation ».
+
+---
+
+### Second trou — le regroupement par candidat se contredisait lui-même
+
+**Le constat.** US-07 et CU-04 déduisaient la candidature de l'arborescence de l'archive ou du préfixe du nom de fichier. `Application.candidateName` était une colonne obligatoire dont aucun livrable ne disait l'origine.
+
+Or **le produit tout entier repose sur le fait que les noms de fichiers mentent.** Le premier paragraphe du README le dit : un portfolio glissé à la place d'un CV. Le niveau 1 lit le contenu précisément parce que l'apparence n'est pas fiable. Et pour l'identité — à qui appartient ce document — on faisait au nom de fichier une confiance aveugle.
+
+**Pourquoi c'est plus grave qu'un type mal détecté.** L'erreur n'est pas symétrique. Un type mal classé marque **un** document, visiblement, et RG-01 à RG-03 le rattrapent. Un regroupement erroné **corrompt silencieusement deux scores** : le candidat A hérite d'un document de B, les deux moyennes sont fausses, et rien ne le signale. C'est le faux négatif invisible — le cas que les personas désignent comme celui qui ferait abandonner l'outil.
+
+**Le repli documenté n'en était pas un.** L'extension `6a` du CU-04 prévoyait « aucun regroupement déductible → une candidature par fichier ». À 1 248 documents, cela produit 1 248 candidatures d'un document. Ce n'est pas une dégradation gracieuse, c'est un échec silencieux présenté comme un comportement.
+
+**Décision.** L'identité est lue **dans le texte du document**, comme le type — RG-09, M-17, US-23. Le nom de fichier et l'arborescence deviennent des indices, plus des autorités. Quand les deux se contredisent, quand la confiance est insuffisante, ou en cas d'homonymie, le lot passe au statut `AWAITING_RECONCILIATION` et **aucune analyse de niveau 2 ne démarre** avant arbitrage humain.
+
+**Conséquences sur le modèle.**
+
+- `Document` porte `detectedCandidateName` et `detectedNameConfidence`.
+- `Application` porte `identitySource` — `FOLDER`, `FILENAME`, `CONTENT` ou `MANUAL`. Un regroupement doit rester explicable et contestable, au même titre qu'un score.
+- `ImportBatchStatus` gagne `AWAITING_RECONCILIATION`.
+- Un écran de réconciliation s'ajoute au lot de maquettes, entre l'import et le classement.
+
+**Ce que cela coûte.** Un appel supplémentaire au modèle par document, ou une extraction d'identité greffée sur l'appel de niveau 1 — à trancher à l'implémentation. Et une étape humaine de plus dans un parcours qu'on voulait sans friction. C'est le prix d'un classement dont les regroupements sont défendables ; un classement rapide et faux ne vaut rien.
+
+---
+
+**Ce que ces deux entrées disent de la méthode.** Le maquettage n'a pas produit que des écrans : il a produit deux règles de gestion, deux entrées de périmètre, deux user stories et une refonte partielle du schéma. C'est l'argument à donner au jury sur la chaîne `besoins → US → CU → maquettes → MCD` — la preuve, par l'exemple, que faire le MCD avant les maquettes aurait obligé à le refaire.
