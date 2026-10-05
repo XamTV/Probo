@@ -27,6 +27,7 @@ Deux raisons de ne pas y revenir plus tôt. D'abord, chaque entité doit pouvoir
 | `maquettage/artboards/`                           | Écrit — 18 artboards, 15 CU couverts           |
 | `maquettage/charte-graphique.md`                  | À extraire des artboards                       |
 | `maquettage/accessibilite-rgaa.md`                | À produire — position RGAA retenue             |
+| `conception/diagramme-cas-utilisation.puml`       | Écrit — 14 CU, CU-11 exclu car reporté         |
 | `conception/mcd.*`, `mld.md`, `ecarts-mcd-mpd.md` | À reconstruire **après** les maquettes         |
 | `conception/dictionnaire-donnees.md`              | À dériver de `schema.prisma`                   |
 | `conception/diagramme-classes.md`                 | À produire                                     |
