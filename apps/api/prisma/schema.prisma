@@ -73,9 +73,10 @@ model User {
   createdAt     DateTime  @default(now()) @map("created_at")
   updatedAt     DateTime  @updatedAt @map("updated_at")
 
-  institution   Institution   @relation(fields: [institutionId], references: [id], onDelete: Cascade)
-  importBatches ImportBatch[]
-  auditEntries  AuditEntry[]
+  institution        Institution        @relation(fields: [institutionId], references: [id], onDelete: Cascade)
+  importBatches      ImportBatch[]
+  auditEntries       AuditEntry[]
+  overriddenVerdicts DocumentAnalysis[]
 
   @@index([institutionId])
   @@map("user")
@@ -391,6 +392,19 @@ model DocumentAnalysis {
 
   // --- Traceability: without it, there is no explaining why the same document
   //     scored differently two weeks apart.
+  /// RG-10 — a human may contradict the level 1 verdict.
+  ///
+  /// The model's own verdict is never overwritten: `detectedType`,
+  /// `confidence` and `isAtypical` keep what the model said. The human
+  /// decision is recorded beside it, so a score remains explainable — down to
+  /// "a person decided otherwise, on this date, for this reason".
+  ///
+  /// `UNREADABLE` is not overridable: no human decision makes text appear.
+  overriddenType    DocumentType? @map("overridden_type")
+  overriddenById    String?       @map("overridden_by_id") @db.Uuid
+  overriddenAt      DateTime?     @map("overridden_at")
+  overrideRationale String?       @map("override_rationale")
+
   level1Model   String? @map("level1_model")
   level2Model   String? @map("level2_model")
   promptVersion String  @map("prompt_version")
@@ -400,7 +414,8 @@ model DocumentAnalysis {
 
   analysedAt DateTime @default(now()) @map("analysed_at")
 
-  document Document @relation(fields: [documentId], references: [id], onDelete: Cascade)
+  document     Document @relation(fields: [documentId], references: [id], onDelete: Cascade)
+  overriddenBy User?    @relation(fields: [overriddenById], references: [id], onDelete: SetNull)
 
   @@index([isAtypical])
   @@map("document_analysis")
@@ -412,17 +427,55 @@ model DocumentAnalysis {
 
 /// Attached to the institution, never to the application: the 90-day GDPR
 /// purge of applications therefore leaves the audit trail intact.
+/// What was done. Bounded and knowable: one value per audited operation in
+/// the use cases. A free string would send raw values to the screen, which the
+/// project's i18n rule forbids.
+enum AuditAction {
+  USER_LOGGED_IN
+  USER_LOGIN_FAILED
+  USER_CREATED
+  USER_UPDATED
+  USER_DEACTIVATED
+  CAMPAIGN_CREATED
+  CAMPAIGN_UPDATED
+  REFERENCE_PROFILE_UPDATED
+  BATCH_IMPORTED
+  BATCH_REJECTED
+  ARCHIVE_ENTRY_REJECTED
+  IDENTITY_RECONCILED
+  ANALYSIS_VERDICT_OVERRIDDEN
+  APPLICATION_DELETED
+  APPLICATION_PURGED
+  RANKING_EXPORTED
+
+  @@map("audit_action")
+}
+
+/// What the action was done to.
+enum AuditEntityType {
+  INSTITUTION
+  USER
+  CAMPAIGN
+  REFERENCE_PROFILE
+  IMPORT_BATCH
+  APPLICATION
+  DOCUMENT
+  SESSION
+
+  @@map("audit_entity_type")
+}
+
 model AuditEntry {
-  id            String   @id @default(uuid()) @db.Uuid
-  institutionId String   @map("institution_id") @db.Uuid
-  userId        String?  @map("user_id") @db.Uuid
-  action        String
-  entityType    String   @map("entity_type")
-  entityId      String?  @map("entity_id")
-  ipAddress     String?  @map("ip_address")
-  userAgent     String?  @map("user_agent")
+  id            String          @id @default(uuid()) @db.Uuid
+  institutionId String          @map("institution_id") @db.Uuid
+  userId        String?         @map("user_id") @db.Uuid
+  action        AuditAction
+  entityType    AuditEntityType @map("entity_type")
+  entityId      String?         @map("entity_id")
+  ipAddress     String?         @map("ip_address")
+  userAgent     String?         @map("user_agent")
   details       Json?
-  occurredAt    DateTime @default(now()) @map("occurred_at")
+  occurredAt    DateTime        @default(now()) @map("occurred_at")
 
   institution Institution @relation(fields: [institutionId], references: [id], onDelete: Cascade)
   user        User?       @relation(fields: [userId], references: [id], onDelete: SetNull)
