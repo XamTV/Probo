@@ -1,0 +1,301 @@
+<!doctype html>
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <script src="./support.js"></script>
+  </head>
+  <body>
+    <x-dc>
+      <helmet>
+        <link
+          rel="stylesheet"
+          href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;450;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap"
+        />
+        <style>
+          * {
+            box-sizing: border-box;
+          }
+          body {
+            margin: 0;
+          }
+          a {
+            color: #294b8a;
+            text-decoration: none;
+          }
+          a:hover {
+            color: #1b3565;
+            text-decoration: underline;
+          }
+          .num {
+            font-family: 'IBM Plex Mono', ui-monospace, monospace;
+            font-variant-numeric: tabular-nums;
+          }
+          .field {
+            font-size: 11px;
+            font-weight: 600;
+            letter-spacing: 0.07em;
+            text-transform: uppercase;
+            color: #6c757f;
+            display: block;
+            margin-bottom: 7px;
+          }
+          .input {
+            height: 38px;
+            padding: 0 12px;
+            background: #ffffff;
+            border: 1px solid #d7dbe0;
+            border-radius: 4px;
+            font-size: 14px;
+            color: #14181d;
+            display: flex;
+            align-items: center;
+          }
+        </style>
+      </helmet>
+
+      <div
+        style="
+          width: 1180px;
+          min-height: 760px;
+          background: #1b2027;
+          font-family: 'IBM Plex Sans', 'Segoe UI', system-ui, sans-serif;
+          color: #14181d;
+          display: flex;
+        "
+      >
+        <!-- Volet de marque -->
+        <div
+          style="
+            width: 480px;
+            flex-shrink: 0;
+            padding: 44px 44px 36px;
+            display: flex;
+            flex-direction: column;
+            gap: 30px;
+          "
+        >
+          <span
+            style="
+              font-family: 'IBM Plex Mono', monospace;
+              font-size: 15px;
+              font-weight: 500;
+              letter-spacing: 0.16em;
+              color: #ffffff;
+            "
+            >PROBO</span
+          >
+          <div
+            style="
+              flex-grow: 1;
+              display: flex;
+              flex-direction: column;
+              justify-content: center;
+              gap: 18px;
+            "
+          >
+            <p
+              style="
+                margin: 0;
+                font-size: 26px;
+                font-weight: 400;
+                line-height: 1.35;
+                color: #ffffff;
+                letter-spacing: -0.01em;
+                text-wrap: pretty;
+              "
+            >
+              La preuve,<br />document par document.
+            </p>
+            <p
+              style="
+                margin: 0;
+                font-size: 13.5px;
+                line-height: 1.65;
+                color: #9aa1a9;
+                max-width: 330px;
+                text-wrap: pretty;
+              "
+            >
+              Probo vérifie d'abord la nature de chaque fichier, puis n'évalue que ceux dont il est
+              sûr. Les documents douteux sont signalés, jamais notés au hasard.
+            </p>
+          </div>
+          <div
+            style="display: flex; align-items: center; gap: 10px; font-size: 11.5px; color: #7c858f"
+          >
+            <svg
+              width="14"
+              height="14"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="#7C858F"
+              stroke-width="1.8"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+            >
+              <path d="M12 3l7 3v6c0 4.2-2.9 7.6-7 9-4.1-1.4-7-4.8-7-9V6z" />
+            </svg>
+            Données hébergées en Union européenne · Conservation 90 jours
+          </div>
+        </div>
+
+        <!-- Formulaire -->
+        <div
+          style="
+            flex-grow: 1;
+            background: #fbfbfa;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 44px;
+          "
+        >
+          <div
+            style="width: 100%; max-width: 384px; display: flex; flex-direction: column; gap: 22px"
+          >
+            <div style="display: flex; flex-direction: column; gap: 6px">
+              <h1 style="margin: 0; font-size: 21px; font-weight: 600; letter-spacing: -0.01em">
+                Connexion
+              </h1>
+              <p style="margin: 0; font-size: 13.5px; color: #6c757f">
+                Accédez aux candidatures de votre établissement.
+              </p>
+            </div>
+
+            <div style="display: flex; flex-direction: column; gap: 15px">
+              <div>
+                <label class="field" for="email">Adresse email</label>
+                <div class="input" id="email" style="color: #14181d">
+                  claire.fontaine@esm-lyon.fr
+                </div>
+              </div>
+              <div>
+                <label class="field" for="mdp">Mot de passe</label>
+                <div
+                  class="input"
+                  id="mdp"
+                  style="
+                    border-color: #294b8a;
+                    outline: 2px solid #c9d6ee;
+                    outline-offset: 1px;
+                    justify-content: space-between;
+                  "
+                >
+                  <span style="letter-spacing: 0.18em; color: #545c66">••••••••••••</span>
+                  <svg
+                    width="17"
+                    height="17"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="#6C757F"
+                    stroke-width="1.8"
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                  >
+                    <path d="M2 12s3.6-6.5 10-6.5S22 12 22 12s-3.6 6.5-10 6.5S2 12 2 12z" />
+                    <circle cx="12" cy="12" r="2.7" />
+                  </svg>
+                </div>
+              </div>
+            </div>
+
+            <button
+              type="button"
+              style="
+                height: 40px;
+                background: #294b8a;
+                border: 1px solid #294b8a;
+                border-radius: 4px;
+                font: inherit;
+                font-size: 14px;
+                font-weight: 500;
+                color: #ffffff;
+                cursor: pointer;
+              "
+            >
+              Se connecter
+            </button>
+
+            <!-- Message d'échec unique : ne révèle jamais si l'email existe (US-01) -->
+            <div
+              style="
+                display: flex;
+                align-items: flex-start;
+                gap: 10px;
+                padding: 12px 14px;
+                background: #fcf2f1;
+                border: 1px solid #e8c4c0;
+                border-radius: 5px;
+              "
+            >
+              <svg
+                width="16"
+                height="16"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="#A32B22"
+                stroke-width="1.9"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                style="margin-top: 1px; flex-shrink: 0"
+              >
+                <circle cx="12" cy="12" r="9" />
+                <path d="M12 8v5" />
+                <path d="M12 16.5h.01" />
+              </svg>
+              <div style="display: flex; flex-direction: column; gap: 3px">
+                <span style="font-size: 13px; font-weight: 500; color: #8a241d"
+                  >Identifiants incorrects.</span
+                >
+                <span style="font-size: 12.5px; line-height: 1.5; color: #8a241d"
+                  >Après six tentatives, les essais suivants seront temporisés.</span
+                >
+              </div>
+            </div>
+
+            <div style="display: flex; align-items: center; gap: 12px">
+              <a href="#" style="font-size: 13px">Mot de passe oublié</a>
+              <div style="flex-grow: 1"></div>
+              <div
+                style="
+                  display: flex;
+                  border: 1px solid #d7dbe0;
+                  border-radius: 4px;
+                  overflow: hidden;
+                "
+              >
+                <span
+                  style="
+                    padding: 4px 9px;
+                    font-size: 12px;
+                    font-weight: 500;
+                    background: #294b8a;
+                    color: #ffffff;
+                  "
+                  >FR</span
+                >
+                <span style="padding: 4px 9px; font-size: 12px; color: #545c66; background: #ffffff"
+                  >EN</span
+                >
+              </div>
+            </div>
+
+            <p
+              style="
+                margin: 4px 0 0;
+                font-size: 12px;
+                line-height: 1.6;
+                color: #9aa1a9;
+                text-wrap: pretty;
+              "
+            >
+              Les comptes sont créés par l'administrateur de votre établissement. Il n'y a pas
+              d'inscription libre.
+            </p>
+          </div>
+        </div>
+      </div>
+    </x-dc>
+  </body>
+</html>

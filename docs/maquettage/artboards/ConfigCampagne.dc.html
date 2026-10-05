@@ -1,0 +1,1327 @@
+<!doctype html>
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <script src="./support.js"></script>
+  </head>
+  <body>
+    <x-dc>
+      <helmet>
+        <link
+          rel="stylesheet"
+          href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;450;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap"
+        />
+        <style>
+          * {
+            box-sizing: border-box;
+          }
+          body {
+            margin: 0;
+          }
+          a {
+            color: #294b8a;
+            text-decoration: none;
+          }
+          a:hover {
+            color: #1b3565;
+            text-decoration: underline;
+          }
+          .num {
+            font-family: 'IBM Plex Mono', ui-monospace, monospace;
+            font-variant-numeric: tabular-nums;
+          }
+          .navitem {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            height: 34px;
+            padding: 0 10px;
+            border-radius: 4px;
+            font-size: 13.5px;
+            color: #d4d8de;
+          }
+          .navitem.on {
+            background: #313a45;
+            color: #ffffff;
+            font-weight: 500;
+          }
+          .navsec {
+            padding: 18px 10px 7px;
+            font-size: 10.5px;
+            font-weight: 600;
+            letter-spacing: 0.09em;
+            text-transform: uppercase;
+            color: #7c858f;
+          }
+          .card {
+            background: #ffffff;
+            border: 1px solid #e2e5e9;
+            border-radius: 6px;
+          }
+          .cardhead {
+            padding: 15px 20px;
+            border-bottom: 1px solid #eaecef;
+          }
+          .cardtitle {
+            margin: 0;
+            font-size: 14.5px;
+            font-weight: 600;
+          }
+          .cardhint {
+            margin: 4px 0 0;
+            font-size: 12.5px;
+            line-height: 1.55;
+            color: #6c757f;
+            text-wrap: pretty;
+          }
+          .field {
+            font-size: 11px;
+            font-weight: 600;
+            letter-spacing: 0.07em;
+            text-transform: uppercase;
+            color: #6c757f;
+            display: block;
+            margin-bottom: 7px;
+          }
+          .input {
+            height: 34px;
+            padding: 0 11px;
+            background: #ffffff;
+            border: 1px solid #d7dbe0;
+            border-radius: 4px;
+            font-size: 13.5px;
+            color: #14181d;
+            display: flex;
+            align-items: center;
+          }
+          .track {
+            position: relative;
+            height: 4px;
+            background: #e7eaee;
+            border-radius: 2px;
+          }
+          .knob {
+            position: absolute;
+            top: -6px;
+            width: 16px;
+            height: 16px;
+            background: #ffffff;
+            border: 2px solid #294b8a;
+            border-radius: 50%;
+          }
+        </style>
+      </helmet>
+
+      <div
+        style="
+          width: 1440px;
+          min-height: 1320px;
+          background: #fbfbfa;
+          font-family: 'IBM Plex Sans', 'Segoe UI', system-ui, sans-serif;
+          color: #14181d;
+          display: flex;
+        "
+      >
+        <nav
+          style="
+            width: 232px;
+            flex-shrink: 0;
+            background: #1b2027;
+            display: flex;
+            flex-direction: column;
+            padding: 0 12px 14px;
+          "
+        >
+          <div style="display: flex; align-items: center; height: 56px; padding: 0 10px">
+            <span
+              style="
+                font-family: 'IBM Plex Mono', monospace;
+                font-size: 14px;
+                font-weight: 500;
+                letter-spacing: 0.14em;
+                color: #ffffff;
+              "
+              >PROBO</span
+            >
+          </div>
+          <div
+            style="
+              padding: 10px 11px 11px;
+              background: #262c34;
+              border: 1px solid #333b45;
+              border-radius: 5px;
+            "
+          >
+            <div
+              style="
+                font-size: 10.5px;
+                font-weight: 600;
+                letter-spacing: 0.09em;
+                text-transform: uppercase;
+                color: #7c858f;
+                margin-bottom: 7px;
+              "
+            >
+              Campagne
+            </div>
+            <div style="display: flex; align-items: flex-start; gap: 7px">
+              <span style="font-size: 13px; font-weight: 500; color: #ffffff; line-height: 1.35"
+                >Mastère Marketing Digital — Rentrée 2026</span
+              >
+              <svg
+                width="12"
+                height="12"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="#9AA1A9"
+                stroke-width="2.2"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                style="margin-top: 4px; flex-shrink: 0"
+              >
+                <path d="M6 9l6 6 6-6" />
+              </svg>
+            </div>
+            <div
+              style="
+                display: flex;
+                align-items: center;
+                gap: 7px;
+                margin-top: 9px;
+                padding-top: 9px;
+                border-top: 1px solid #333b45;
+              "
+            >
+              <span
+                style="
+                  display: inline-flex;
+                  align-items: center;
+                  padding: 2px 7px;
+                  background: #21402f;
+                  border-radius: 3px;
+                  font-size: 10.5px;
+                  font-weight: 600;
+                  letter-spacing: 0.04em;
+                  text-transform: uppercase;
+                  color: #7bc49b;
+                "
+                >Active</span
+              >
+              <div style="flex-grow: 1"></div>
+              <span
+                style="
+                  display: inline-flex;
+                  align-items: center;
+                  gap: 5px;
+                  font-size: 12px;
+                  color: #ffffff;
+                  font-weight: 500;
+                "
+              >
+                <svg
+                  width="12"
+                  height="12"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="#FFFFFF"
+                  stroke-width="2"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                >
+                  <circle cx="12" cy="12" r="3" />
+                  <path d="M4 12h2" />
+                  <path d="M18 12h2" />
+                  <path d="M12 4v2" />
+                  <path d="M12 18v2" />
+                </svg>
+                Réglages
+              </span>
+            </div>
+          </div>
+          <div class="navsec">Candidatures</div>
+          <div class="navitem">
+            <svg
+              width="16"
+              height="16"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="1.9"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+            >
+              <path d="M4 6h16" />
+              <path d="M4 12h11" />
+              <path d="M4 18h7" /></svg
+            >Classement
+          </div>
+          <div class="navitem">
+            <svg
+              width="16"
+              height="16"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="1.9"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+            >
+              <path d="M12 19V7" />
+              <path d="M7 12l5-5 5 5" />
+              <path d="M4 20h16" /></svg
+            >Importer un lot
+          </div>
+          <div class="navsec">Administration</div>
+          <div class="navitem on">
+            <svg
+              width="16"
+              height="16"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="1.9"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+            >
+              <rect x="3" y="4" width="18" height="16" rx="2" />
+              <path d="M3 9h18" /></svg
+            >Campagnes
+          </div>
+          <div class="navitem">
+            <svg
+              width="16"
+              height="16"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="1.9"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+            >
+              <circle cx="9" cy="8" r="3.2" />
+              <path d="M3.5 19a5.5 5.5 0 0 1 11 0" />
+              <path d="M17 8.5h4" />
+              <path d="M19 6.5v4" /></svg
+            >Comptes
+          </div>
+          <div class="navitem">
+            <svg
+              width="16"
+              height="16"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="1.9"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+            >
+              <path d="M12 3l7 3v6c0 4.2-2.9 7.6-7 9-4.1-1.4-7-4.8-7-9V6z" />
+              <path d="M9.5 12l1.8 1.8 3.4-3.6" /></svg
+            >Journal d'audit
+          </div>
+          <div style="flex-grow: 1"></div>
+          <div
+            style="
+              padding: 12px 10px 10px;
+              border-top: 1px solid #2c333c;
+              display: flex;
+              flex-direction: column;
+              gap: 11px;
+            "
+          >
+            <div style="display: flex; align-items: center; gap: 9px">
+              <span
+                style="
+                  display: inline-flex;
+                  align-items: center;
+                  justify-content: center;
+                  width: 27px;
+                  height: 27px;
+                  border-radius: 50%;
+                  background: #333b45;
+                  font-size: 11px;
+                  font-weight: 600;
+                  color: #d4d8de;
+                "
+                >MD</span
+              >
+              <div style="display: flex; flex-direction: column">
+                <span style="font-size: 12.5px; color: #ffffff">Marc Delaunay</span>
+                <span style="font-size: 11px; color: #7c858f">Administrateur</span>
+              </div>
+            </div>
+            <div style="display: flex; align-items: center; gap: 8px">
+              <div
+                style="
+                  display: flex;
+                  border: 1px solid #3b434d;
+                  border-radius: 4px;
+                  overflow: hidden;
+                "
+              >
+                <span
+                  style="
+                    padding: 3px 8px;
+                    font-size: 11.5px;
+                    font-weight: 500;
+                    background: #313a45;
+                    color: #ffffff;
+                  "
+                  >FR</span
+                >
+                <span style="padding: 3px 8px; font-size: 11.5px; color: #9aa1a9">EN</span>
+              </div>
+              <div style="flex-grow: 1"></div>
+              <a href="#" style="font-size: 12px; color: #9aa1a9">Déconnexion</a>
+            </div>
+          </div>
+        </nav>
+
+        <div
+          style="
+            flex-grow: 1;
+            padding: 28px 32px 44px;
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+          "
+        >
+          <div style="display: flex; align-items: flex-start; gap: 24px">
+            <div style="display: flex; flex-direction: column; gap: 6px">
+              <div style="font-size: 12.5px; color: #6c757f">
+                Campagnes › Mastère Marketing Digital — Rentrée 2026
+              </div>
+              <h1 style="margin: 0; font-size: 24px; font-weight: 600; letter-spacing: -0.01em">
+                Réglages de la campagne
+              </h1>
+            </div>
+            <div style="flex-grow: 1"></div>
+            <div style="display: flex; flex-direction: column; align-items: flex-end; gap: 6px">
+              <div style="display: flex; align-items: center; gap: 11px">
+                <button
+                  type="button"
+                  style="
+                    height: 34px;
+                    padding: 0 14px;
+                    background: #ffffff;
+                    border: 1px solid #a9b1ba;
+                    border-radius: 4px;
+                    font: inherit;
+                    font-size: 13px;
+                    color: #14181d;
+                    cursor: pointer;
+                  "
+                >
+                  Annuler
+                </button>
+                <button
+                  type="button"
+                  style="
+                    height: 34px;
+                    padding: 0 16px;
+                    background: #edeef0;
+                    border: 1px solid #d7dbe0;
+                    border-radius: 4px;
+                    font: inherit;
+                    font-size: 13px;
+                    font-weight: 500;
+                    color: #9aa1a9;
+                    cursor: not-allowed;
+                  "
+                >
+                  Enregistrer
+                </button>
+              </div>
+              <span
+                style="
+                  display: inline-flex;
+                  align-items: center;
+                  gap: 7px;
+                  font-size: 12px;
+                  color: #8a241d;
+                "
+              >
+                <svg
+                  width="13"
+                  height="13"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="#A32B22"
+                  stroke-width="2.2"
+                  stroke-linecap="round"
+                >
+                  <circle cx="12" cy="12" r="9" />
+                  <path d="M12 7v6" />
+                  <path d="M12 16.5h.01" />
+                </svg>
+                Un type attendu n'a pas de référentiel
+              </span>
+            </div>
+          </div>
+
+          <!-- Avertissement de portée : US-06 -->
+          <div
+            style="
+              display: flex;
+              align-items: flex-start;
+              gap: 11px;
+              padding: 13px 16px;
+              background: #f4f6fa;
+              border: 1px solid #c9d6ee;
+              border-radius: 5px;
+            "
+          >
+            <svg
+              width="17"
+              height="17"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="#294B8A"
+              stroke-width="1.9"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              style="margin-top: 1px; flex-shrink: 0"
+            >
+              <circle cx="12" cy="12" r="9" />
+              <path d="M12 16v-5" />
+              <path d="M12 8h.01" />
+            </svg>
+            <span style="font-size: 13px; line-height: 1.55; color: #1f3663; text-wrap: pretty"
+              >Modifier ces réglages
+              <strong style="font-weight: 600"
+                >n'altère pas les 412 candidatures déjà analysées</strong
+              >. Les nouveaux réglages s'appliquent aux prochains imports. Pour réévaluer
+              l'existant, relancez l'analyse depuis la fiche du lot.</span
+            >
+          </div>
+
+          <div style="display: flex; gap: 20px; align-items: flex-start">
+            <!-- Colonne principale -->
+            <div style="flex-grow: 1; display: flex; flex-direction: column; gap: 20px">
+              <!-- Identité -->
+              <div class="card">
+                <div class="cardhead">
+                  <h2 class="cardtitle">Identité</h2>
+                </div>
+                <div style="padding: 18px 20px; display: flex; flex-direction: column; gap: 16px">
+                  <div>
+                    <span class="field">Nom de la campagne</span>
+                    <div class="input">Mastère Marketing Digital — Rentrée 2026</div>
+                  </div>
+                  <div>
+                    <span class="field"
+                      >Description
+                      <span
+                        style="
+                          text-transform: none;
+                          letter-spacing: 0;
+                          font-weight: 400;
+                          color: #9aa1a9;
+                        "
+                        >— facultative</span
+                      ></span
+                    >
+                    <div
+                      style="
+                        min-height: 62px;
+                        padding: 9px 11px;
+                        background: #ffffff;
+                        border: 1px solid #d7dbe0;
+                        border-radius: 4px;
+                        font-size: 13.5px;
+                        line-height: 1.5;
+                        color: #14181d;
+                      "
+                    >
+                      Formation en alternance, 24 mois. Profils visés : bac+3 en communication,
+                      marketing ou école de commerce.
+                    </div>
+                  </div>
+                  <div style="display: flex; gap: 16px">
+                    <div style="width: 210px">
+                      <span class="field">Ouverture</span>
+                      <div class="input"><span class="num">12/01/2026</span></div>
+                    </div>
+                    <div style="width: 210px">
+                      <span class="field">Clôture</span>
+                      <div class="input"><span class="num">30/04/2026</span></div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Les types attendus : la COMPOSITION d'une candidature. Leur contenu attendu est le référentiel, écran voisin. -->
+              <div class="card">
+                <div class="cardhead">
+                  <h2 class="cardtitle">Documents attendus</h2>
+                  <p class="cardhint">
+                    Ce que vous réclamez à chaque candidat. Un document dont le type détecté ne
+                    figure pas dans cette liste est marqué
+                    <strong style="font-weight: 600; color: #545c66">atypique</strong> et sort du
+                    calcul de score. Au moins un type est obligatoire.
+                  </p>
+                </div>
+                <div style="padding: 18px 20px; display: flex; flex-direction: column; gap: 10px">
+                  <label
+                    style="
+                      display: flex;
+                      align-items: center;
+                      gap: 11px;
+                      padding: 11px 13px;
+                      background: #f4f6fa;
+                      border: 1px solid #294b8a;
+                      border-radius: 5px;
+                      cursor: pointer;
+                    "
+                  >
+                    <span
+                      style="
+                        display: inline-flex;
+                        align-items: center;
+                        justify-content: center;
+                        width: 16px;
+                        height: 16px;
+                        background: #294b8a;
+                        border: 1.5px solid #294b8a;
+                        border-radius: 3px;
+                        flex-shrink: 0;
+                      "
+                    >
+                      <svg
+                        width="11"
+                        height="11"
+                        viewBox="0 0 24 24"
+                        fill="none"
+                        stroke="#FFFFFF"
+                        stroke-width="3.2"
+                        stroke-linecap="round"
+                        stroke-linejoin="round"
+                      >
+                        <path d="M5 12.5l5 5 9-10" />
+                      </svg>
+                    </span>
+                    <span style="font-size: 13.5px; font-weight: 500">CV</span>
+                    <div style="flex-grow: 1"></div>
+                    <span class="num" style="font-size: 12px; color: #6c757f">408 reçus</span>
+                  </label>
+
+                  <label
+                    style="
+                      display: flex;
+                      align-items: center;
+                      gap: 11px;
+                      padding: 11px 13px;
+                      background: #f4f6fa;
+                      border: 1px solid #294b8a;
+                      border-radius: 5px;
+                      cursor: pointer;
+                    "
+                  >
+                    <span
+                      style="
+                        display: inline-flex;
+                        align-items: center;
+                        justify-content: center;
+                        width: 16px;
+                        height: 16px;
+                        background: #294b8a;
+                        border: 1.5px solid #294b8a;
+                        border-radius: 3px;
+                        flex-shrink: 0;
+                      "
+                    >
+                      <svg
+                        width="11"
+                        height="11"
+                        viewBox="0 0 24 24"
+                        fill="none"
+                        stroke="#FFFFFF"
+                        stroke-width="3.2"
+                        stroke-linecap="round"
+                        stroke-linejoin="round"
+                      >
+                        <path d="M5 12.5l5 5 9-10" />
+                      </svg>
+                    </span>
+                    <span style="font-size: 13.5px; font-weight: 500">Lettre de motivation</span>
+                    <div style="flex-grow: 1"></div>
+                    <span class="num" style="font-size: 12px; color: #6c757f">401 reçus</span>
+                  </label>
+
+                  <label
+                    style="
+                      display: flex;
+                      align-items: center;
+                      gap: 11px;
+                      padding: 11px 13px;
+                      background: #f4f6fa;
+                      border: 1px solid #294b8a;
+                      border-radius: 5px;
+                      cursor: pointer;
+                    "
+                  >
+                    <span
+                      style="
+                        display: inline-flex;
+                        align-items: center;
+                        justify-content: center;
+                        width: 16px;
+                        height: 16px;
+                        background: #294b8a;
+                        border: 1.5px solid #294b8a;
+                        border-radius: 3px;
+                        flex-shrink: 0;
+                      "
+                    >
+                      <svg
+                        width="11"
+                        height="11"
+                        viewBox="0 0 24 24"
+                        fill="none"
+                        stroke="#FFFFFF"
+                        stroke-width="3.2"
+                        stroke-linecap="round"
+                        stroke-linejoin="round"
+                      >
+                        <path d="M5 12.5l5 5 9-10" />
+                      </svg>
+                    </span>
+                    <span style="font-size: 13.5px; font-weight: 500"
+                      >Lettre de recommandation</span
+                    >
+                    <div style="flex-grow: 1"></div>
+                    <span class="num" style="font-size: 12px; color: #6c757f">287 reçus</span>
+                  </label>
+
+                  <label
+                    style="
+                      display: flex;
+                      align-items: center;
+                      gap: 11px;
+                      padding: 11px 13px;
+                      background: #ffffff;
+                      border: 1px solid #d7dbe0;
+                      border-radius: 5px;
+                      cursor: pointer;
+                    "
+                  >
+                    <span
+                      style="
+                        width: 16px;
+                        height: 16px;
+                        border: 1.5px solid #a9b1ba;
+                        border-radius: 3px;
+                        background: #ffffff;
+                        flex-shrink: 0;
+                      "
+                    ></span>
+                    <span style="font-size: 13.5px; color: #545c66">Portfolio</span>
+                    <div style="flex-grow: 1"></div>
+                    <span
+                      style="
+                        display: inline-flex;
+                        align-items: center;
+                        gap: 6px;
+                        padding: 2px 8px 2px 6px;
+                        background: #fbf3e4;
+                        border: 1px solid #e8d5ae;
+                        border-radius: 3px;
+                      "
+                    >
+                      <span
+                        style="width: 6px; height: 6px; border-radius: 50%; background: #b07818"
+                      ></span>
+                      <span class="num" style="font-size: 12px; font-weight: 500; color: #8a5b14"
+                        >14 reçus, marqués atypiques</span
+                      >
+                    </span>
+                  </label>
+
+                  <div
+                    style="
+                      display: flex;
+                      align-items: flex-start;
+                      gap: 9px;
+                      margin-top: 4px;
+                      padding: 11px 13px;
+                      background: #fcfcfb;
+                      border-radius: 5px;
+                    "
+                  >
+                    <svg
+                      width="15"
+                      height="15"
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      stroke="#9AA1A9"
+                      stroke-width="1.9"
+                      stroke-linecap="round"
+                      stroke-linejoin="round"
+                      style="margin-top: 1px; flex-shrink: 0"
+                    >
+                      <circle cx="12" cy="12" r="9" />
+                      <path d="M12 16v-5" />
+                      <path d="M12 8h.01" />
+                    </svg>
+                    <span
+                      style="
+                        font-size: 12.5px;
+                        line-height: 1.55;
+                        color: #6c757f;
+                        text-wrap: pretty;
+                      "
+                      >14 portfolios sont déjà arrivés alors qu'ils ne sont pas attendus. Les cocher
+                      les ferait entrer dans le calcul des scores des prochains imports — et
+                      exigerait un référentiel de comparaison pour ce type.</span
+                    >
+                  </div>
+                </div>
+              </div>
+
+              <!-- Le référentiel : résumé, l'édition a son propre écran (RG-08) -->
+              <div class="card">
+                <div class="cardhead">
+                  <h2 class="cardtitle">Référentiel de comparaison</h2>
+                  <p class="cardhint">
+                    Ce à quoi le niveau 2 compare chaque document pour établir le sous-score
+                    d'<strong style="font-weight: 600; color: #545c66">adéquation</strong>. Un
+                    référentiel par type attendu : on n'évalue pas une lettre de motivation sur les
+                    attendus d'un CV.
+                  </p>
+                </div>
+                <div style="padding: 16px 20px; display: flex; flex-direction: column; gap: 10px">
+                  <div
+                    style="
+                      display: flex;
+                      align-items: center;
+                      gap: 13px;
+                      padding: 11px 14px;
+                      border: 1px solid #e2e5e9;
+                      border-radius: 5px;
+                    "
+                  >
+                    <span style="width: 200px; font-size: 13.5px; font-weight: 500">CV</span>
+                    <span
+                      style="
+                        display: inline-flex;
+                        align-items: center;
+                        gap: 6px;
+                        padding: 2px 8px;
+                        background: #e4f0ea;
+                        border-radius: 3px;
+                        font-size: 11px;
+                        font-weight: 600;
+                        letter-spacing: 0.04em;
+                        text-transform: uppercase;
+                        color: #24614a;
+                      "
+                    >
+                      <svg
+                        width="11"
+                        height="11"
+                        viewBox="0 0 24 24"
+                        fill="none"
+                        stroke="#2F7D5E"
+                        stroke-width="3"
+                        stroke-linecap="round"
+                        stroke-linejoin="round"
+                      >
+                        <path d="M5 12.5l5 5 9-10" />
+                      </svg>
+                      Défini
+                    </span>
+                    <span style="font-size: 12.5px; color: #6c757f"
+                      >Profil décrit — 412 caractères</span
+                    >
+                    <div style="flex-grow: 1"></div>
+                    <a href="#" style="font-size: 12.5px">Modifier</a>
+                  </div>
+
+                  <div
+                    style="
+                      display: flex;
+                      align-items: center;
+                      gap: 13px;
+                      padding: 11px 14px;
+                      border: 1px solid #e2e5e9;
+                      border-radius: 5px;
+                    "
+                  >
+                    <span style="width: 200px; font-size: 13.5px; font-weight: 500"
+                      >Lettre de motivation</span
+                    >
+                    <span
+                      style="
+                        display: inline-flex;
+                        align-items: center;
+                        gap: 6px;
+                        padding: 2px 8px;
+                        background: #e4f0ea;
+                        border-radius: 3px;
+                        font-size: 11px;
+                        font-weight: 600;
+                        letter-spacing: 0.04em;
+                        text-transform: uppercase;
+                        color: #24614a;
+                      "
+                    >
+                      <svg
+                        width="11"
+                        height="11"
+                        viewBox="0 0 24 24"
+                        fill="none"
+                        stroke="#2F7D5E"
+                        stroke-width="3"
+                        stroke-linecap="round"
+                        stroke-linejoin="round"
+                      >
+                        <path d="M5 12.5l5 5 9-10" />
+                      </svg>
+                      Défini
+                    </span>
+                    <span class="num" style="font-size: 12.5px; color: #6c757f"
+                      >attendus_lettre_motivation_mmd.pdf</span
+                    >
+                    <div style="flex-grow: 1"></div>
+                    <a href="#" style="font-size: 12.5px">Modifier</a>
+                  </div>
+
+                  <div
+                    style="
+                      display: flex;
+                      align-items: center;
+                      gap: 13px;
+                      padding: 11px 14px;
+                      border: 1px solid #e8c4c0;
+                      border-left: 3px solid #a32b22;
+                      border-radius: 5px;
+                      background: #fdf6f5;
+                    "
+                  >
+                    <span style="width: 200px; font-size: 13.5px; font-weight: 500"
+                      >Lettre de recommandation</span
+                    >
+                    <span
+                      style="
+                        display: inline-flex;
+                        align-items: center;
+                        gap: 6px;
+                        padding: 2px 8px;
+                        background: #fcf2f1;
+                        border-radius: 3px;
+                        font-size: 11px;
+                        font-weight: 600;
+                        letter-spacing: 0.04em;
+                        text-transform: uppercase;
+                        color: #8a241d;
+                      "
+                    >
+                      <svg
+                        width="11"
+                        height="11"
+                        viewBox="0 0 24 24"
+                        fill="none"
+                        stroke="#A32B22"
+                        stroke-width="2.4"
+                        stroke-linecap="round"
+                      >
+                        <path d="M12 7v6" />
+                        <path d="M12 16.5h.01" />
+                      </svg>
+                      Manquant
+                    </span>
+                    <span style="font-size: 12.5px; color: #8a241d"
+                      >Bloque l'enregistrement de la campagne</span
+                    >
+                    <div style="flex-grow: 1"></div>
+                    <a href="#" style="font-size: 12.5px; font-weight: 500"
+                      >Fournir le référentiel</a
+                    >
+                  </div>
+
+                  <div
+                    style="
+                      display: flex;
+                      align-items: center;
+                      gap: 11px;
+                      margin-top: 4px;
+                      padding: 12px 14px;
+                      background: #fdf8ef;
+                      border: 1px solid #e8d5ae;
+                      border-radius: 5px;
+                    "
+                  >
+                    <svg
+                      width="16"
+                      height="16"
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      stroke="#B07818"
+                      stroke-width="1.9"
+                      stroke-linecap="round"
+                      stroke-linejoin="round"
+                      style="flex-shrink: 0"
+                    >
+                      <path d="M12 3l9 16H3z" />
+                      <path d="M12 9v5" />
+                      <path d="M12 17h.01" />
+                    </svg>
+                    <span
+                      style="
+                        font-size: 12.5px;
+                        line-height: 1.55;
+                        color: #7a4f11;
+                        text-wrap: pretty;
+                      "
+                      ><strong style="font-weight: 600"
+                        >Décrivez le profil recherché, ne copiez pas un dossier admis.</strong
+                      >
+                      Un référentiel construit sur le CV d'un candidat réel reproduit son école et
+                      son parcours sur la promotion suivante.</span
+                    >
+                  </div>
+                </div>
+              </div>
+
+              <!-- Pondération -->
+              <div class="card">
+                <div class="cardhead">
+                  <h2 class="cardtitle">Pondération des trois axes</h2>
+                  <p class="cardhint">
+                    Le score d'un document est la moyenne pondérée de ses trois sous-scores. Les
+                    poids sont
+                    <strong style="font-weight: 600; color: #545c66"
+                      >normalisés par leur somme</strong
+                    >
+                    : leur total n'a pas besoin de valoir 100. Une pondération entièrement nulle est
+                    refusée.
+                  </p>
+                </div>
+                <div style="padding: 18px 20px; display: flex; flex-direction: column; gap: 20px">
+                  <div style="display: flex; align-items: center; gap: 18px">
+                    <span style="width: 132px; font-size: 13.5px; font-weight: 500"
+                      >Adéquation</span
+                    >
+                    <div style="flex-grow: 1; position: relative">
+                      <div class="track">
+                        <div
+                          style="width: 50%; height: 4px; background: #294b8a; border-radius: 2px"
+                        ></div>
+                      </div>
+                      <span class="knob" style="left: calc(50% - 8px)"></span>
+                    </div>
+                    <span
+                      class="num"
+                      style="width: 42px; text-align: right; font-size: 13.5px; font-weight: 500"
+                      >0,50</span
+                    >
+                    <span
+                      class="num"
+                      style="
+                        width: 54px;
+                        text-align: right;
+                        font-size: 13px;
+                        color: #294b8a;
+                        font-weight: 500;
+                      "
+                      >50 %</span
+                    >
+                  </div>
+
+                  <div style="display: flex; align-items: center; gap: 18px">
+                    <span style="width: 132px; font-size: 13.5px; font-weight: 500">Clarté</span>
+                    <div style="flex-grow: 1; position: relative">
+                      <div class="track">
+                        <div
+                          style="width: 25%; height: 4px; background: #294b8a; border-radius: 2px"
+                        ></div>
+                      </div>
+                      <span class="knob" style="left: calc(25% - 8px)"></span>
+                    </div>
+                    <span
+                      class="num"
+                      style="width: 42px; text-align: right; font-size: 13.5px; font-weight: 500"
+                      >0,25</span
+                    >
+                    <span
+                      class="num"
+                      style="
+                        width: 54px;
+                        text-align: right;
+                        font-size: 13px;
+                        color: #294b8a;
+                        font-weight: 500;
+                      "
+                      >25 %</span
+                    >
+                  </div>
+
+                  <div style="display: flex; align-items: center; gap: 18px">
+                    <span style="width: 132px; font-size: 13.5px; font-weight: 500"
+                      >Qualité formelle</span
+                    >
+                    <div style="flex-grow: 1; position: relative">
+                      <div class="track">
+                        <div
+                          style="width: 25%; height: 4px; background: #294b8a; border-radius: 2px"
+                        ></div>
+                      </div>
+                      <span class="knob" style="left: calc(25% - 8px)"></span>
+                    </div>
+                    <span
+                      class="num"
+                      style="width: 42px; text-align: right; font-size: 13.5px; font-weight: 500"
+                      >0,25</span
+                    >
+                    <span
+                      class="num"
+                      style="
+                        width: 54px;
+                        text-align: right;
+                        font-size: 13px;
+                        color: #294b8a;
+                        font-weight: 500;
+                      "
+                      >25 %</span
+                    >
+                  </div>
+
+                  <!-- Poids relatif, rendu visible -->
+                  <div style="display: flex; flex-direction: column; gap: 8px; padding-top: 4px">
+                    <span
+                      style="
+                        font-size: 11px;
+                        font-weight: 600;
+                        letter-spacing: 0.07em;
+                        text-transform: uppercase;
+                        color: #6c757f;
+                      "
+                      >Poids relatif réel</span
+                    >
+                    <div
+                      style="
+                        display: flex;
+                        height: 26px;
+                        border-radius: 4px;
+                        overflow: hidden;
+                        border: 1px solid #d7dbe0;
+                      "
+                    >
+                      <div
+                        style="
+                          width: 50%;
+                          background: #294b8a;
+                          display: flex;
+                          align-items: center;
+                          justify-content: center;
+                          font-size: 11.5px;
+                          font-weight: 500;
+                          color: #ffffff;
+                        "
+                      >
+                        Adéquation 50 %
+                      </div>
+                      <div
+                        style="
+                          width: 25%;
+                          background: #5b7bb8;
+                          display: flex;
+                          align-items: center;
+                          justify-content: center;
+                          font-size: 11.5px;
+                          font-weight: 500;
+                          color: #ffffff;
+                        "
+                      >
+                        Clarté 25 %
+                      </div>
+                      <div
+                        style="
+                          width: 25%;
+                          background: #93a9ce;
+                          display: flex;
+                          align-items: center;
+                          justify-content: center;
+                          font-size: 11.5px;
+                          font-weight: 500;
+                          color: #1b2027;
+                        "
+                      >
+                        Qualité 25 %
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Colonne latérale : seuil + aperçu -->
+            <div
+              style="width: 372px; flex-shrink: 0; display: flex; flex-direction: column; gap: 20px"
+            >
+              <div class="card">
+                <div class="cardhead">
+                  <h2 class="cardtitle">Seuil de confiance</h2>
+                  <p class="cardhint">
+                    En dessous de ce seuil, le système considère qu'il ne sait pas de quel document
+                    il s'agit : le document est marqué atypique et n'est pas scoré.
+                  </p>
+                </div>
+                <div style="padding: 18px 20px; display: flex; flex-direction: column; gap: 16px">
+                  <div style="display: flex; align-items: baseline; gap: 8px">
+                    <span
+                      class="num"
+                      style="font-size: 34px; font-weight: 500; letter-spacing: -0.02em"
+                      >70</span
+                    >
+                    <span style="font-size: 15px; color: #6c757f">%</span>
+                    <div style="flex-grow: 1"></div>
+                    <span style="font-size: 12px; color: #9aa1a9">Valeur par défaut</span>
+                  </div>
+                  <div style="position: relative">
+                    <div class="track">
+                      <div
+                        style="width: 70%; height: 4px; background: #294b8a; border-radius: 2px"
+                      ></div>
+                    </div>
+                    <span class="knob" style="left: calc(70% - 8px)"></span>
+                  </div>
+                  <div
+                    style="
+                      display: flex;
+                      justify-content: space-between;
+                      font-size: 11.5px;
+                      color: #9aa1a9;
+                    "
+                  >
+                    <span class="num">0 — tout est accepté</span>
+                    <span class="num">100</span>
+                  </div>
+                  <div
+                    style="
+                      padding: 11px 13px;
+                      background: #fcfcfb;
+                      border-radius: 5px;
+                      font-size: 12.5px;
+                      line-height: 1.55;
+                      color: #545c66;
+                    "
+                  >
+                    Une confiance <strong style="font-weight: 600; color: #14181d">égale</strong> au
+                    seuil est acceptée. Le seuil est un minimum atteignable, pas une barre à
+                    dépasser.
+                  </div>
+                </div>
+              </div>
+
+              <!-- Aperçu de l'effet -->
+              <div class="card" style="border-color: #d7dbe0">
+                <div class="cardhead" style="background: #fcfcfb">
+                  <h2 class="cardtitle">Aperçu sur un document réel</h2>
+                  <p class="cardhint">Effet des réglages ci-contre sur un document déjà analysé.</p>
+                </div>
+                <div style="padding: 16px 20px; display: flex; flex-direction: column; gap: 14px">
+                  <div style="display: flex; align-items: center; gap: 9px">
+                    <svg
+                      width="16"
+                      height="16"
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      stroke="#6C757F"
+                      stroke-width="1.8"
+                      stroke-linecap="round"
+                      stroke-linejoin="round"
+                    >
+                      <path d="M14 3H7a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V8z" />
+                      <path d="M14 3v5h5" />
+                    </svg>
+                    <span style="font-size: 13px; font-weight: 500">rousseau_camille_cv.pdf</span>
+                  </div>
+
+                  <div style="display: flex; flex-direction: column; gap: 9px">
+                    <div style="display: flex; align-items: center; gap: 10px; font-size: 12.5px">
+                      <span style="width: 108px; color: #545c66">Adéquation</span>
+                      <span
+                        style="
+                          flex-grow: 1;
+                          height: 4px;
+                          background: #e7eaee;
+                          border-radius: 2px;
+                          overflow: hidden;
+                        "
+                        ><span
+                          style="display: block; width: 94%; height: 4px; background: #294b8a"
+                        ></span
+                      ></span>
+                      <span class="num" style="width: 24px; text-align: right; font-weight: 500"
+                        >94</span
+                      >
+                    </div>
+                    <div style="display: flex; align-items: center; gap: 10px; font-size: 12.5px">
+                      <span style="width: 108px; color: #545c66">Clarté</span>
+                      <span
+                        style="
+                          flex-grow: 1;
+                          height: 4px;
+                          background: #e7eaee;
+                          border-radius: 2px;
+                          overflow: hidden;
+                        "
+                        ><span
+                          style="display: block; width: 88%; height: 4px; background: #294b8a"
+                        ></span
+                      ></span>
+                      <span class="num" style="width: 24px; text-align: right; font-weight: 500"
+                        >88</span
+                      >
+                    </div>
+                    <div style="display: flex; align-items: center; gap: 10px; font-size: 12.5px">
+                      <span style="width: 108px; color: #545c66">Qualité formelle</span>
+                      <span
+                        style="
+                          flex-grow: 1;
+                          height: 4px;
+                          background: #e7eaee;
+                          border-radius: 2px;
+                          overflow: hidden;
+                        "
+                        ><span
+                          style="display: block; width: 90%; height: 4px; background: #294b8a"
+                        ></span
+                      ></span>
+                      <span class="num" style="width: 24px; text-align: right; font-weight: 500"
+                        >90</span
+                      >
+                    </div>
+                  </div>
+
+                  <div
+                    style="
+                      padding-top: 12px;
+                      border-top: 1px solid #eaecef;
+                      display: flex;
+                      flex-direction: column;
+                      gap: 7px;
+                    "
+                  >
+                    <div class="num" style="font-size: 11.5px; color: #6c757f">
+                      (94 × 0,50) + (88 × 0,25) + (90 × 0,25) = 91,5
+                    </div>
+                    <div style="display: flex; align-items: baseline; gap: 9px">
+                      <span style="font-size: 12.5px; color: #545c66">Score du document</span>
+                      <div style="flex-grow: 1"></div>
+                      <span class="num" style="font-size: 22px; font-weight: 500">92</span>
+                      <span style="font-size: 12px; color: #6c757f"
+                        >au lieu de <span class="num">91</span></span
+                      >
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </x-dc>
+  </body>
+</html>

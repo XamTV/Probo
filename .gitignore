@@ -22,6 +22,10 @@ credentials/
 # Stockage local des documents candidats (données personnelles)
 storage/
 
+# Canvas de maquettes assemblé : 2 Mo d'éditeur embarqué, régénéré depuis
+# docs/maquettage/artboards/
+docs/maquettage/*.html
+
 # Tests
 coverage/
 .nyc_output/

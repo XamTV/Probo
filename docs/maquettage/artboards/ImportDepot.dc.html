@@ -1,0 +1,609 @@
+<!doctype html>
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <script src="./support.js"></script>
+  </head>
+  <body>
+    <x-dc>
+      <helmet>
+        <link
+          rel="stylesheet"
+          href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;450;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap"
+        />
+        <style>
+          * {
+            box-sizing: border-box;
+          }
+          body {
+            margin: 0;
+          }
+          a {
+            color: #294b8a;
+            text-decoration: none;
+          }
+          a:hover {
+            color: #1b3565;
+            text-decoration: underline;
+          }
+          .num {
+            font-family: 'IBM Plex Mono', ui-monospace, monospace;
+            font-variant-numeric: tabular-nums;
+          }
+          .field {
+            font-size: 11px;
+            font-weight: 600;
+            letter-spacing: 0.07em;
+            text-transform: uppercase;
+            color: #6c757f;
+            display: block;
+            margin-bottom: 7px;
+          }
+          .navitem {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            height: 34px;
+            padding: 0 10px;
+            border-radius: 4px;
+            font-size: 13.5px;
+            color: #d4d8de;
+            cursor: pointer;
+          }
+          .navitem:hover {
+            background: #262c34;
+          }
+          .navitem.on {
+            background: #313a45;
+            color: #ffffff;
+            font-weight: 500;
+          }
+          .navsec {
+            padding: 18px 10px 7px;
+            font-size: 10.5px;
+            font-weight: 600;
+            letter-spacing: 0.09em;
+            text-transform: uppercase;
+            color: #7c858f;
+          }
+        </style>
+      </helmet>
+
+      <div
+        style="
+          width: 1440px;
+          min-height: 860px;
+          background: #fbfbfa;
+          font-family: 'IBM Plex Sans', 'Segoe UI', system-ui, sans-serif;
+          color: #14181d;
+          display: flex;
+        "
+      >
+        <!-- Coquille de navigation, identique sur tous les écrans -->
+        <nav
+          style="
+            width: 232px;
+            flex-shrink: 0;
+            background: #1b2027;
+            display: flex;
+            flex-direction: column;
+            padding: 0 12px 14px;
+          "
+        >
+          <div style="display: flex; align-items: center; height: 56px; padding: 0 10px">
+            <span
+              style="
+                font-family: 'IBM Plex Mono', monospace;
+                font-size: 14px;
+                font-weight: 500;
+                letter-spacing: 0.14em;
+                color: #ffffff;
+              "
+              >PROBO</span
+            >
+          </div>
+          <div
+            style="
+              padding: 10px 11px 11px;
+              background: #262c34;
+              border: 1px solid #333b45;
+              border-radius: 5px;
+            "
+          >
+            <div
+              style="
+                font-size: 10.5px;
+                font-weight: 600;
+                letter-spacing: 0.09em;
+                text-transform: uppercase;
+                color: #7c858f;
+                margin-bottom: 7px;
+              "
+            >
+              Campagne
+            </div>
+            <div style="display: flex; align-items: flex-start; gap: 7px; cursor: pointer">
+              <span style="font-size: 13px; font-weight: 500; color: #ffffff; line-height: 1.35"
+                >Mastère Marketing Digital — Rentrée 2026</span
+              >
+              <svg
+                width="12"
+                height="12"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="#9AA1A9"
+                stroke-width="2.2"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                style="margin-top: 4px; flex-shrink: 0"
+              >
+                <path d="M6 9l6 6 6-6" />
+              </svg>
+            </div>
+            <div
+              style="
+                display: flex;
+                align-items: center;
+                gap: 7px;
+                margin-top: 9px;
+                padding-top: 9px;
+                border-top: 1px solid #333b45;
+              "
+            >
+              <span
+                style="
+                  display: inline-flex;
+                  align-items: center;
+                  padding: 2px 7px;
+                  background: #21402f;
+                  border-radius: 3px;
+                  font-size: 10.5px;
+                  font-weight: 600;
+                  letter-spacing: 0.04em;
+                  text-transform: uppercase;
+                  color: #7bc49b;
+                "
+                >Active</span
+              >
+              <div style="flex-grow: 1"></div>
+              <a
+                href="#"
+                style="
+                  display: inline-flex;
+                  align-items: center;
+                  gap: 5px;
+                  font-size: 12px;
+                  color: #a9bcde;
+                "
+              >
+                <svg
+                  width="12"
+                  height="12"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="#A9BCDE"
+                  stroke-width="2"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                >
+                  <circle cx="12" cy="12" r="3" />
+                  <path d="M4 12h2" />
+                  <path d="M18 12h2" />
+                  <path d="M12 4v2" />
+                  <path d="M12 18v2" />
+                </svg>
+                Réglages
+              </a>
+            </div>
+          </div>
+          <div class="navsec">Candidatures</div>
+          <div class="navitem">
+            <svg
+              width="16"
+              height="16"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="1.9"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+            >
+              <path d="M4 6h16" />
+              <path d="M4 12h11" />
+              <path d="M4 18h7" /></svg
+            >Classement
+          </div>
+          <div class="navitem on">
+            <svg
+              width="16"
+              height="16"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="1.9"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+            >
+              <path d="M12 19V7" />
+              <path d="M7 12l5-5 5 5" />
+              <path d="M4 20h16" /></svg
+            >Importer un lot
+          </div>
+          <div class="navsec">Administration</div>
+          <div class="navitem">
+            <svg
+              width="16"
+              height="16"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="1.9"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+            >
+              <rect x="3" y="4" width="18" height="16" rx="2" />
+              <path d="M3 9h18" /></svg
+            >Campagnes
+          </div>
+          <div class="navitem">
+            <svg
+              width="16"
+              height="16"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="1.9"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+            >
+              <circle cx="9" cy="8" r="3.2" />
+              <path d="M3.5 19a5.5 5.5 0 0 1 11 0" />
+              <path d="M17 8.5h4" />
+              <path d="M19 6.5v4" /></svg
+            >Comptes
+          </div>
+          <div class="navitem">
+            <svg
+              width="16"
+              height="16"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="1.9"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+            >
+              <path d="M12 3l7 3v6c0 4.2-2.9 7.6-7 9-4.1-1.4-7-4.8-7-9V6z" />
+              <path d="M9.5 12l1.8 1.8 3.4-3.6" /></svg
+            >Journal d'audit
+          </div>
+          <div style="flex-grow: 1"></div>
+          <div
+            style="
+              padding: 12px 10px 10px;
+              border-top: 1px solid #2c333c;
+              display: flex;
+              flex-direction: column;
+              gap: 11px;
+            "
+          >
+            <div style="display: flex; align-items: center; gap: 9px">
+              <span
+                style="
+                  display: inline-flex;
+                  align-items: center;
+                  justify-content: center;
+                  width: 27px;
+                  height: 27px;
+                  border-radius: 50%;
+                  background: #333b45;
+                  font-size: 11px;
+                  font-weight: 600;
+                  color: #d4d8de;
+                "
+                >CF</span
+              >
+              <div style="display: flex; flex-direction: column">
+                <span style="font-size: 12.5px; color: #ffffff">Claire Fontaine</span>
+                <span style="font-size: 11px; color: #7c858f">Chargée d'admission</span>
+              </div>
+            </div>
+            <div style="display: flex; align-items: center; gap: 8px">
+              <div
+                style="
+                  display: flex;
+                  border: 1px solid #3b434d;
+                  border-radius: 4px;
+                  overflow: hidden;
+                "
+              >
+                <span
+                  style="
+                    padding: 3px 8px;
+                    font-size: 11.5px;
+                    font-weight: 500;
+                    background: #313a45;
+                    color: #ffffff;
+                  "
+                  >FR</span
+                >
+                <span style="padding: 3px 8px; font-size: 11.5px; color: #9aa1a9">EN</span>
+              </div>
+              <div style="flex-grow: 1"></div>
+              <a href="#" style="font-size: 12px; color: #9aa1a9">Déconnexion</a>
+            </div>
+          </div>
+        </nav>
+        <div
+          style="
+            flex-grow: 1;
+            padding: 28px 32px 44px;
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+          "
+        >
+          <div style="display: flex; flex-direction: column; gap: 7px">
+            <h1 style="margin: 0; font-size: 24px; font-weight: 600; letter-spacing: -0.01em">
+              Importer un lot
+            </h1>
+            <p style="margin: 0; font-size: 13px; color: #545c66">
+              L'archive ZIP est le seul canal d'entrée. Aucun compte tiers à connecter, aucune
+              autorisation à demander à votre DSI.
+            </p>
+          </div>
+
+          <div style="display: flex; gap: 20px; align-items: flex-start">
+            <div style="flex-grow: 1; display: flex; flex-direction: column; gap: 18px">
+              <div
+                style="
+                  background: #ffffff;
+                  border: 1px solid #e2e5e9;
+                  border-radius: 6px;
+                  padding: 18px 20px;
+                "
+              >
+                <span class="field">Campagne de destination</span>
+                <div
+                  style="
+                    display: flex;
+                    align-items: center;
+                    gap: 10px;
+                    height: 38px;
+                    padding: 0 12px;
+                    background: #ffffff;
+                    border: 1px solid #d7dbe0;
+                    border-radius: 4px;
+                  "
+                >
+                  <span style="font-size: 13.5px">Mastère Marketing Digital — Rentrée 2026</span>
+                  <span
+                    style="
+                      padding: 2px 7px;
+                      background: #e4f0ea;
+                      border-radius: 3px;
+                      font-size: 10.5px;
+                      font-weight: 600;
+                      letter-spacing: 0.04em;
+                      text-transform: uppercase;
+                      color: #24614a;
+                    "
+                    >Active</span
+                  >
+                  <div style="flex-grow: 1"></div>
+                  <svg
+                    width="13"
+                    height="13"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="#6C757F"
+                    stroke-width="2.2"
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                  >
+                    <path d="M6 9l6 6 6-6" />
+                  </svg>
+                </div>
+                <p style="margin: 9px 0 0; font-size: 12.5px; color: #6c757f">
+                  Une campagne au statut brouillon n'accepte aucun import.
+                </p>
+              </div>
+
+              <!-- Zone de dépôt -->
+              <div
+                style="
+                  display: flex;
+                  flex-direction: column;
+                  align-items: center;
+                  justify-content: center;
+                  gap: 18px;
+                  padding: 68px 32px;
+                  background: #ffffff;
+                  border: 2px dashed #a9b8d6;
+                  border-radius: 8px;
+                "
+              >
+                <svg
+                  width="54"
+                  height="54"
+                  viewBox="0 0 48 48"
+                  fill="none"
+                  stroke="#7F9BC9"
+                  stroke-width="1.5"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                >
+                  <path d="M6 16.5l4-6.5h28l4 6.5" />
+                  <path d="M6 16.5v19a2.5 2.5 0 0 0 2.5 2.5h31a2.5 2.5 0 0 0 2.5-2.5v-19z" />
+                  <path d="M20 16.5h8" />
+                  <path d="M24 32v-9" />
+                  <path d="M20 27l4-4 4 4" />
+                </svg>
+                <div style="display: flex; flex-direction: column; align-items: center; gap: 7px">
+                  <span style="font-size: 16px; font-weight: 600"
+                    >Déposez votre archive ZIP ici</span
+                  >
+                  <span style="font-size: 13px; color: #6c757f">ou</span>
+                </div>
+                <button
+                  type="button"
+                  style="
+                    height: 38px;
+                    padding: 0 18px;
+                    background: #294b8a;
+                    border: 1px solid #294b8a;
+                    border-radius: 4px;
+                    font: inherit;
+                    font-size: 13.5px;
+                    font-weight: 500;
+                    color: #ffffff;
+                    cursor: pointer;
+                  "
+                >
+                  Choisir un fichier
+                </button>
+              </div>
+
+              <!-- Comment le regroupement est déduit -->
+              <div
+                style="
+                  background: #ffffff;
+                  border: 1px solid #e2e5e9;
+                  border-radius: 6px;
+                  overflow: hidden;
+                "
+              >
+                <div style="padding: 14px 20px; border-bottom: 1px solid #eaecef">
+                  <h2 style="margin: 0; font-size: 14.5px; font-weight: 600">
+                    Comment vos fichiers seront regroupés par candidat
+                  </h2>
+                  <p style="margin: 4px 0 0; font-size: 12.5px; color: #6c757f">
+                    Aucune réorganisation n'est demandée : les deux structures ci-dessous
+                    fonctionnent.
+                  </p>
+                </div>
+                <div style="display: flex; gap: 0">
+                  <div style="flex: 1; padding: 16px 20px; border-right: 1px solid #eaecef">
+                    <span
+                      style="
+                        display: inline-flex;
+                        align-items: center;
+                        gap: 7px;
+                        margin-bottom: 11px;
+                        font-size: 12px;
+                        font-weight: 600;
+                        color: #24614a;
+                      "
+                    >
+                      <svg
+                        width="14"
+                        height="14"
+                        viewBox="0 0 24 24"
+                        fill="none"
+                        stroke="#2F7D5E"
+                        stroke-width="2.6"
+                        stroke-linecap="round"
+                        stroke-linejoin="round"
+                      >
+                        <path d="M5 12.5l5 5 9-10" />
+                      </svg>
+                      Un sous-dossier par candidat
+                    </span>
+                    <div class="num" style="font-size: 12px; line-height: 1.85; color: #545c66">
+                      candidatures.zip<br />
+                      &nbsp;&nbsp;├── benali_yasmine/<br />
+                      &nbsp;&nbsp;│&nbsp;&nbsp;&nbsp;├── cv.pdf<br />
+                      &nbsp;&nbsp;│&nbsp;&nbsp;&nbsp;└── lettre.pdf<br />
+                      &nbsp;&nbsp;└── rousseau_camille/<br />
+                      &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;└── cv.pdf
+                    </div>
+                  </div>
+                  <div style="flex: 1; padding: 16px 20px">
+                    <span
+                      style="
+                        display: inline-flex;
+                        align-items: center;
+                        gap: 7px;
+                        margin-bottom: 11px;
+                        font-size: 12px;
+                        font-weight: 600;
+                        color: #24614a;
+                      "
+                    >
+                      <svg
+                        width="14"
+                        height="14"
+                        viewBox="0 0 24 24"
+                        fill="none"
+                        stroke="#2F7D5E"
+                        stroke-width="2.6"
+                        stroke-linecap="round"
+                        stroke-linejoin="round"
+                      >
+                        <path d="M5 12.5l5 5 9-10" />
+                      </svg>
+                      À défaut, le préfixe du nom de fichier
+                    </span>
+                    <div class="num" style="font-size: 12px; line-height: 1.85; color: #545c66">
+                      candidatures.zip<br />
+                      &nbsp;&nbsp;├── benali_yasmine_cv.pdf<br />
+                      &nbsp;&nbsp;├── benali_yasmine_lettre.pdf<br />
+                      &nbsp;&nbsp;└── rousseau_camille_cv.pdf
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Garde-fous annoncés avant, pas découverts au rejet -->
+            <div
+              style="
+                width: 348px;
+                flex-shrink: 0;
+                background: #ffffff;
+                border: 1px solid #e2e5e9;
+                border-radius: 6px;
+                overflow: hidden;
+              "
+            >
+              <div style="padding: 14px 18px; border-bottom: 1px solid #eaecef">
+                <h2 style="margin: 0; font-size: 14.5px; font-weight: 600">Ce qui sera accepté</h2>
+              </div>
+              <div style="padding: 16px 18px; display: flex; flex-direction: column; gap: 13px">
+                <div style="display: flex; align-items: baseline; gap: 10px; font-size: 13px">
+                  <span style="width: 158px; color: #545c66">Format des documents</span>
+                  <span style="font-weight: 500">PDF uniquement</span>
+                </div>
+                <div style="display: flex; align-items: baseline; gap: 10px; font-size: 13px">
+                  <span style="width: 158px; color: #545c66">Taille par fichier</span>
+                  <span class="num" style="font-weight: 500">20 Mo</span>
+                </div>
+                <div style="display: flex; align-items: baseline; gap: 10px; font-size: 13px">
+                  <span style="width: 158px; color: #545c66">Fichiers par archive</span>
+                  <span class="num" style="font-weight: 500">500</span>
+                </div>
+                <div style="display: flex; align-items: baseline; gap: 10px; font-size: 13px">
+                  <span style="width: 158px; color: #545c66">Taille de l'archive</span>
+                  <span class="num" style="font-weight: 500">500 Mo</span>
+                </div>
+                <div
+                  style="
+                    padding-top: 13px;
+                    border-top: 1px solid #eaecef;
+                    font-size: 12.5px;
+                    line-height: 1.6;
+                    color: #6c757f;
+                    text-wrap: pretty;
+                  "
+                >
+                  Un fichier hors de ces limites est refusé et listé avec son motif. Le reste du lot
+                  est traité normalement.
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </x-dc>
+  </body>
+</html>

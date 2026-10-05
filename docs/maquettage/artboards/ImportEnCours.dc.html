@@ -1,0 +1,739 @@
+<!doctype html>
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <script src="./support.js"></script>
+  </head>
+  <body>
+    <x-dc>
+      <helmet>
+        <link
+          rel="stylesheet"
+          href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;450;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap"
+        />
+        <style>
+          * {
+            box-sizing: border-box;
+          }
+          body {
+            margin: 0;
+          }
+          a {
+            color: #294b8a;
+            text-decoration: none;
+          }
+          a:hover {
+            color: #1b3565;
+            text-decoration: underline;
+          }
+          .num {
+            font-family: 'IBM Plex Mono', ui-monospace, monospace;
+            font-variant-numeric: tabular-nums;
+          }
+          .row {
+            display: flex;
+            align-items: center;
+            gap: 14px;
+            padding: 10px 18px;
+            border-bottom: 1px solid #eaecef;
+            font-size: 13px;
+          }
+          .navitem {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            height: 34px;
+            padding: 0 10px;
+            border-radius: 4px;
+            font-size: 13.5px;
+            color: #d4d8de;
+            cursor: pointer;
+          }
+          .navitem:hover {
+            background: #262c34;
+          }
+          .navitem.on {
+            background: #313a45;
+            color: #ffffff;
+            font-weight: 500;
+          }
+          .navsec {
+            padding: 18px 10px 7px;
+            font-size: 10.5px;
+            font-weight: 600;
+            letter-spacing: 0.09em;
+            text-transform: uppercase;
+            color: #7c858f;
+          }
+        </style>
+      </helmet>
+
+      <div
+        style="
+          width: 1440px;
+          min-height: 940px;
+          background: #fbfbfa;
+          font-family: 'IBM Plex Sans', 'Segoe UI', system-ui, sans-serif;
+          color: #14181d;
+          display: flex;
+        "
+      >
+        <!-- Coquille de navigation, identique sur tous les écrans -->
+        <nav
+          style="
+            width: 232px;
+            flex-shrink: 0;
+            background: #1b2027;
+            display: flex;
+            flex-direction: column;
+            padding: 0 12px 14px;
+          "
+        >
+          <div style="display: flex; align-items: center; height: 56px; padding: 0 10px">
+            <span
+              style="
+                font-family: 'IBM Plex Mono', monospace;
+                font-size: 14px;
+                font-weight: 500;
+                letter-spacing: 0.14em;
+                color: #ffffff;
+              "
+              >PROBO</span
+            >
+          </div>
+          <div
+            style="
+              padding: 10px 11px 11px;
+              background: #262c34;
+              border: 1px solid #333b45;
+              border-radius: 5px;
+            "
+          >
+            <div
+              style="
+                font-size: 10.5px;
+                font-weight: 600;
+                letter-spacing: 0.09em;
+                text-transform: uppercase;
+                color: #7c858f;
+                margin-bottom: 7px;
+              "
+            >
+              Campagne
+            </div>
+            <div style="display: flex; align-items: flex-start; gap: 7px; cursor: pointer">
+              <span style="font-size: 13px; font-weight: 500; color: #ffffff; line-height: 1.35"
+                >Mastère Marketing Digital — Rentrée 2026</span
+              >
+              <svg
+                width="12"
+                height="12"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="#9AA1A9"
+                stroke-width="2.2"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                style="margin-top: 4px; flex-shrink: 0"
+              >
+                <path d="M6 9l6 6 6-6" />
+              </svg>
+            </div>
+            <div
+              style="
+                display: flex;
+                align-items: center;
+                gap: 7px;
+                margin-top: 9px;
+                padding-top: 9px;
+                border-top: 1px solid #333b45;
+              "
+            >
+              <span
+                style="
+                  display: inline-flex;
+                  align-items: center;
+                  padding: 2px 7px;
+                  background: #21402f;
+                  border-radius: 3px;
+                  font-size: 10.5px;
+                  font-weight: 600;
+                  letter-spacing: 0.04em;
+                  text-transform: uppercase;
+                  color: #7bc49b;
+                "
+                >Active</span
+              >
+              <div style="flex-grow: 1"></div>
+              <a
+                href="#"
+                style="
+                  display: inline-flex;
+                  align-items: center;
+                  gap: 5px;
+                  font-size: 12px;
+                  color: #a9bcde;
+                "
+              >
+                <svg
+                  width="12"
+                  height="12"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="#A9BCDE"
+                  stroke-width="2"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                >
+                  <circle cx="12" cy="12" r="3" />
+                  <path d="M4 12h2" />
+                  <path d="M18 12h2" />
+                  <path d="M12 4v2" />
+                  <path d="M12 18v2" />
+                </svg>
+                Réglages
+              </a>
+            </div>
+          </div>
+          <div class="navsec">Candidatures</div>
+          <div class="navitem">
+            <svg
+              width="16"
+              height="16"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="1.9"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+            >
+              <path d="M4 6h16" />
+              <path d="M4 12h11" />
+              <path d="M4 18h7" /></svg
+            >Classement
+          </div>
+          <div class="navitem on">
+            <svg
+              width="16"
+              height="16"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="1.9"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+            >
+              <path d="M12 19V7" />
+              <path d="M7 12l5-5 5 5" />
+              <path d="M4 20h16" /></svg
+            >Importer un lot
+          </div>
+          <div class="navsec">Administration</div>
+          <div class="navitem">
+            <svg
+              width="16"
+              height="16"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="1.9"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+            >
+              <rect x="3" y="4" width="18" height="16" rx="2" />
+              <path d="M3 9h18" /></svg
+            >Campagnes
+          </div>
+          <div class="navitem">
+            <svg
+              width="16"
+              height="16"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="1.9"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+            >
+              <circle cx="9" cy="8" r="3.2" />
+              <path d="M3.5 19a5.5 5.5 0 0 1 11 0" />
+              <path d="M17 8.5h4" />
+              <path d="M19 6.5v4" /></svg
+            >Comptes
+          </div>
+          <div class="navitem">
+            <svg
+              width="16"
+              height="16"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="1.9"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+            >
+              <path d="M12 3l7 3v6c0 4.2-2.9 7.6-7 9-4.1-1.4-7-4.8-7-9V6z" />
+              <path d="M9.5 12l1.8 1.8 3.4-3.6" /></svg
+            >Journal d'audit
+          </div>
+          <div style="flex-grow: 1"></div>
+          <div
+            style="
+              padding: 12px 10px 10px;
+              border-top: 1px solid #2c333c;
+              display: flex;
+              flex-direction: column;
+              gap: 11px;
+            "
+          >
+            <div style="display: flex; align-items: center; gap: 9px">
+              <span
+                style="
+                  display: inline-flex;
+                  align-items: center;
+                  justify-content: center;
+                  width: 27px;
+                  height: 27px;
+                  border-radius: 50%;
+                  background: #333b45;
+                  font-size: 11px;
+                  font-weight: 600;
+                  color: #d4d8de;
+                "
+                >CF</span
+              >
+              <div style="display: flex; flex-direction: column">
+                <span style="font-size: 12.5px; color: #ffffff">Claire Fontaine</span>
+                <span style="font-size: 11px; color: #7c858f">Chargée d'admission</span>
+              </div>
+            </div>
+            <div style="display: flex; align-items: center; gap: 8px">
+              <div
+                style="
+                  display: flex;
+                  border: 1px solid #3b434d;
+                  border-radius: 4px;
+                  overflow: hidden;
+                "
+              >
+                <span
+                  style="
+                    padding: 3px 8px;
+                    font-size: 11.5px;
+                    font-weight: 500;
+                    background: #313a45;
+                    color: #ffffff;
+                  "
+                  >FR</span
+                >
+                <span style="padding: 3px 8px; font-size: 11.5px; color: #9aa1a9">EN</span>
+              </div>
+              <div style="flex-grow: 1"></div>
+              <a href="#" style="font-size: 12px; color: #9aa1a9">Déconnexion</a>
+            </div>
+          </div>
+        </nav>
+        <div
+          style="
+            flex-grow: 1;
+            padding: 28px 32px 44px;
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+          "
+        >
+          <div style="display: flex; flex-direction: column; gap: 7px">
+            <h1 style="margin: 0; font-size: 24px; font-weight: 600; letter-spacing: -0.01em">
+              Import en cours
+            </h1>
+            <p class="num" style="margin: 0; font-size: 13px; color: #545c66">
+              candidatures_mmd_2026.zip · 118 Mo · déposé à 09:14
+            </p>
+          </div>
+
+          <!-- Les deux temps de l'import, distingués -->
+          <div
+            style="
+              background: #ffffff;
+              border: 1px solid #c9d6ee;
+              border-left: 3px solid #294b8a;
+              border-radius: 6px;
+              padding: 20px 22px;
+              display: flex;
+              flex-direction: column;
+              gap: 20px;
+            "
+          >
+            <div style="display: flex; gap: 36px">
+              <!-- Étape 1 : décompression, terminée -->
+              <div style="flex: 1; display: flex; gap: 13px">
+                <span
+                  style="
+                    display: inline-flex;
+                    align-items: center;
+                    justify-content: center;
+                    width: 26px;
+                    height: 26px;
+                    border-radius: 50%;
+                    background: #e4f0ea;
+                    flex-shrink: 0;
+                  "
+                >
+                  <svg
+                    width="14"
+                    height="14"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="#2F7D5E"
+                    stroke-width="2.8"
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                  >
+                    <path d="M5 12.5l5 5 9-10" />
+                  </svg>
+                </span>
+                <div style="flex-grow: 1; display: flex; flex-direction: column; gap: 8px">
+                  <div style="display: flex; align-items: baseline; gap: 10px">
+                    <span style="font-size: 14px; font-weight: 600">Décompression</span>
+                    <span style="font-size: 12.5px; color: #24614a">Terminée</span>
+                  </div>
+                  <div
+                    style="height: 5px; background: #e7eaee; border-radius: 3px; overflow: hidden"
+                  >
+                    <div style="width: 100%; height: 5px; background: #2f7d5e"></div>
+                  </div>
+                  <span style="font-size: 12.5px; color: #545c66"
+                    ><span class="num" style="color: #14181d; font-weight: 500">1 248</span>
+                    documents extraits ·
+                    <span class="num" style="color: #8a5b14; font-weight: 500">7</span> entrées
+                    refusées</span
+                  >
+                </div>
+              </div>
+
+              <!-- Étape 2 : réconciliation, franchie -->
+              <div style="flex: 1; display: flex; gap: 13px">
+                <span
+                  style="
+                    display: inline-flex;
+                    align-items: center;
+                    justify-content: center;
+                    width: 26px;
+                    height: 26px;
+                    border-radius: 50%;
+                    background: #e4f0ea;
+                    flex-shrink: 0;
+                  "
+                >
+                  <svg
+                    width="14"
+                    height="14"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="#2F7D5E"
+                    stroke-width="2.8"
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                  >
+                    <path d="M5 12.5l5 5 9-10" />
+                  </svg>
+                </span>
+                <div style="flex-grow: 1; display: flex; flex-direction: column; gap: 8px">
+                  <div style="display: flex; align-items: baseline; gap: 10px">
+                    <span style="font-size: 14px; font-weight: 600">Réconciliation</span>
+                    <span style="font-size: 12.5px; color: #24614a">Aucun arbitrage requis</span>
+                  </div>
+                  <div
+                    style="height: 5px; background: #e7eaee; border-radius: 3px; overflow: hidden"
+                  >
+                    <div style="width: 100%; height: 5px; background: #2f7d5e"></div>
+                  </div>
+                  <span style="font-size: 12.5px; color: #545c66"
+                    >Identité lue dans
+                    <span class="num" style="color: #14181d; font-weight: 500">412</span>
+                    candidatures · <a href="#" style="font-size: 12.5px">revoir le détail</a></span
+                  >
+                </div>
+              </div>
+              <!-- Étape 3 : analyse, en cours -->
+              <div style="flex: 1; display: flex; gap: 13px">
+                <span
+                  style="
+                    display: inline-flex;
+                    align-items: center;
+                    justify-content: center;
+                    width: 26px;
+                    height: 26px;
+                    border-radius: 50%;
+                    background: #e7edf7;
+                    flex-shrink: 0;
+                  "
+                >
+                  <svg
+                    width="14"
+                    height="14"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="#294B8A"
+                    stroke-width="2.4"
+                    stroke-linecap="round"
+                  >
+                    <path d="M12 3a9 9 0 1 0 9 9" />
+                  </svg>
+                </span>
+                <div style="flex-grow: 1; display: flex; flex-direction: column; gap: 8px">
+                  <div style="display: flex; align-items: baseline; gap: 10px">
+                    <span style="font-size: 14px; font-weight: 600">Analyse des documents</span>
+                    <span style="font-size: 12.5px; color: #294b8a">En cours</span>
+                    <div style="flex-grow: 1"></div>
+                    <span class="num" style="font-size: 12.5px; color: #545c66">487 / 1 248</span>
+                  </div>
+                  <div
+                    style="height: 5px; background: #e7eaee; border-radius: 3px; overflow: hidden"
+                  >
+                    <div style="width: 39%; height: 5px; background: #294b8a"></div>
+                  </div>
+                  <span style="font-size: 12.5px; color: #545c66"
+                    >Environ
+                    <span style="color: #14181d; font-weight: 500">6 minutes</span> restantes</span
+                  >
+                </div>
+              </div>
+            </div>
+
+            <div
+              style="
+                display: flex;
+                align-items: center;
+                gap: 14px;
+                padding-top: 16px;
+                border-top: 1px solid #eaecef;
+              "
+            >
+              <span
+                style="
+                  display: inline-flex;
+                  align-items: center;
+                  gap: 8px;
+                  font-size: 12.5px;
+                  color: #545c66;
+                "
+              >
+                <svg
+                  width="15"
+                  height="15"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="#2F7D5E"
+                  stroke-width="1.9"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                >
+                  <path d="M5 13l4 4L19 7" />
+                </svg>
+                Vous pouvez fermer cet écran, l'analyse continue sur le serveur.
+              </span>
+              <div style="flex-grow: 1"></div>
+              <button
+                type="button"
+                style="
+                  height: 32px;
+                  padding: 0 13px;
+                  background: #ffffff;
+                  border: 1px solid #a9b1ba;
+                  border-radius: 4px;
+                  font: inherit;
+                  font-size: 12.5px;
+                  color: #14181d;
+                  cursor: pointer;
+                "
+              >
+                Interrompre l'analyse
+              </button>
+              <button
+                type="button"
+                style="
+                  height: 32px;
+                  padding: 0 13px;
+                  background: #ffffff;
+                  border: 1px solid #a9b1ba;
+                  border-radius: 4px;
+                  font: inherit;
+                  font-size: 12.5px;
+                  color: #14181d;
+                  cursor: pointer;
+                "
+              >
+                Voir le classement provisoire
+              </button>
+            </div>
+          </div>
+
+          <!-- Avancement document par document -->
+          <div
+            style="
+              background: #ffffff;
+              border: 1px solid #e2e5e9;
+              border-radius: 6px;
+              overflow: hidden;
+            "
+          >
+            <div
+              style="
+                display: flex;
+                align-items: center;
+                gap: 14px;
+                padding: 14px 18px;
+                border-bottom: 1px solid #eaecef;
+              "
+            >
+              <h2 style="margin: 0; font-size: 14.5px; font-weight: 600">Document par document</h2>
+              <div style="flex-grow: 1"></div>
+              <span
+                style="
+                  display: inline-flex;
+                  align-items: center;
+                  gap: 7px;
+                  font-size: 12.5px;
+                  color: #545c66;
+                "
+                ><span
+                  style="width: 7px; height: 7px; border-radius: 50%; background: #2f7d5e"
+                ></span
+                ><span class="num" style="color: #14181d; font-weight: 500">462</span>
+                analysés</span
+              >
+              <span
+                style="
+                  display: inline-flex;
+                  align-items: center;
+                  gap: 7px;
+                  font-size: 12.5px;
+                  color: #545c66;
+                "
+                ><span
+                  style="width: 7px; height: 7px; border-radius: 50%; background: #b07818"
+                ></span
+                ><span class="num" style="color: #14181d; font-weight: 500">21</span>
+                atypiques</span
+              >
+              <span
+                style="
+                  display: inline-flex;
+                  align-items: center;
+                  gap: 7px;
+                  font-size: 12.5px;
+                  color: #545c66;
+                "
+                ><span
+                  style="width: 7px; height: 7px; border-radius: 50%; background: #a32b22"
+                ></span
+                ><span class="num" style="color: #14181d; font-weight: 500">4</span> en erreur</span
+              >
+            </div>
+
+            <div class="row">
+              <span class="num" style="width: 250px; font-size: 12.5px">benali_yasmine_cv.pdf</span>
+              <span style="width: 200px; color: #545c66">CV · confiance 96 %</span>
+              <div style="flex-grow: 1"></div>
+              <span style="display: inline-flex; align-items: center; gap: 7px; color: #24614a"
+                ><svg
+                  width="14"
+                  height="14"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="#2F7D5E"
+                  stroke-width="2.6"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                >
+                  <path d="M5 12.5l5 5 9-10" /></svg
+                >Analysé — score 92</span
+              >
+            </div>
+
+            <div class="row">
+              <span class="num" style="width: 250px; font-size: 12.5px"
+                >benali_yasmine_book.pdf</span
+              >
+              <span style="width: 200px; color: #545c66">Portfolio · confiance 91 %</span>
+              <div style="flex-grow: 1"></div>
+              <span style="display: inline-flex; align-items: center; gap: 7px; color: #8a5b14"
+                ><span
+                  style="width: 7px; height: 7px; border-radius: 50%; background: #b07818"
+                ></span
+                >Atypique — type non attendu</span
+              >
+            </div>
+
+            <div class="row">
+              <span class="num" style="width: 250px; font-size: 12.5px">kaci_sarah_cv.pdf</span>
+              <span style="width: 200px; color: #545c66">—</span>
+              <div style="flex-grow: 1"></div>
+              <span style="display: inline-flex; align-items: center; gap: 7px; color: #8a5b14"
+                ><span
+                  style="width: 7px; height: 7px; border-radius: 50%; background: #b07818"
+                ></span
+                >Atypique — document illisible</span
+              >
+            </div>
+
+            <div class="row">
+              <span class="num" style="width: 250px; font-size: 12.5px">nguyen_thomas_lm.pdf</span>
+              <span style="width: 200px; color: #6c757f">Évaluation de l'adéquation</span>
+              <div style="flex-grow: 1"></div>
+              <span style="display: inline-flex; align-items: center; gap: 9px; color: #294b8a">
+                <span
+                  style="
+                    width: 72px;
+                    height: 4px;
+                    background: #e7eaee;
+                    border-radius: 2px;
+                    overflow: hidden;
+                  "
+                  ><span style="display: block; width: 62%; height: 4px; background: #294b8a"></span
+                ></span>
+                En cours
+              </span>
+            </div>
+
+            <div class="row">
+              <span class="num" style="width: 250px; font-size: 12.5px"
+                >alonso_pierre_dossier.pdf</span
+              >
+              <span style="width: 200px; color: #545c66">—</span>
+              <div style="flex-grow: 1"></div>
+              <span style="display: inline-flex; align-items: center; gap: 7px; color: #8a241d"
+                ><svg
+                  width="14"
+                  height="14"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="#A32B22"
+                  stroke-width="2.2"
+                  stroke-linecap="round"
+                >
+                  <path d="M6 6l12 12" />
+                  <path d="M18 6L6 18" /></svg
+                >Erreur — quota du modèle, nouvelle tentative dans 40 s</span
+              >
+            </div>
+
+            <div class="row" style="border-bottom: none; color: #9aa1a9">
+              <span class="num" style="width: 250px; font-size: 12.5px; color: #14181d"
+                >marchand_lea_cv.pdf</span
+              >
+              <span style="width: 200px">En attente</span>
+              <div style="flex-grow: 1"></div>
+              <span>—</span>
+            </div>
+
+            <div style="padding: 12px 18px; background: #fcfcfb; font-size: 12.5px; color: #6c757f">
+              <span class="num">761</span> documents restants dans la file
+            </div>
+          </div>
+        </div>
+      </div>
+    </x-dc>
+  </body>
+</html>

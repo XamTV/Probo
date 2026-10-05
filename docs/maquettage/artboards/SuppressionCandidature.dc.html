@@ -1,0 +1,317 @@
+<!doctype html>
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <script src="./support.js"></script>
+  </head>
+  <body>
+    <x-dc>
+      <helmet>
+        <link
+          rel="stylesheet"
+          href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;450;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap"
+        />
+        <style>
+          * {
+            box-sizing: border-box;
+          }
+          body {
+            margin: 0;
+          }
+          a {
+            color: #294b8a;
+            text-decoration: none;
+          }
+          .num {
+            font-family: 'IBM Plex Mono', ui-monospace, monospace;
+            font-variant-numeric: tabular-nums;
+          }
+        </style>
+      </helmet>
+
+      <div
+        style="
+          position: relative;
+          width: 1180px;
+          min-height: 720px;
+          background: #fbfbfa;
+          font-family: 'IBM Plex Sans', 'Segoe UI', system-ui, sans-serif;
+          color: #14181d;
+          overflow: hidden;
+        "
+      >
+        <!-- Écran de candidature, assombri -->
+        <div
+          style="
+            padding: 30px 34px;
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+            filter: blur(1px);
+          "
+        >
+          <div style="display: flex; align-items: center; gap: 14px">
+            <h1 style="margin: 0; font-size: 23px; font-weight: 600; color: #6c757f">
+              Yasmine Benali
+            </h1>
+            <span
+              style="
+                padding: 3px 9px;
+                background: #edf0f4;
+                border-radius: 3px;
+                font-size: 12px;
+                color: #9aa1a9;
+              "
+              >Rang 3 sur 396</span
+            >
+          </div>
+          <div
+            style="height: 88px; background: #ffffff; border: 1px solid #e2e5e9; border-radius: 6px"
+          ></div>
+          <div
+            style="
+              height: 210px;
+              background: #ffffff;
+              border: 1px solid #e2e5e9;
+              border-radius: 6px;
+            "
+          ></div>
+          <div
+            style="
+              height: 130px;
+              background: #ffffff;
+              border: 1px solid #e8d5ae;
+              border-radius: 6px;
+            "
+          ></div>
+        </div>
+
+        <div style="position: absolute; inset: 0; background: rgba(20, 24, 29, 0.42)"></div>
+
+        <!-- Dialogue de confirmation -->
+        <div
+          style="
+            position: absolute;
+            top: 118px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 588px;
+            background: #ffffff;
+            border-radius: 8px;
+            box-shadow: 0 16px 44px rgba(20, 24, 29, 0.26);
+            overflow: hidden;
+          "
+        >
+          <div style="display: flex; align-items: flex-start; gap: 14px; padding: 22px 24px 18px">
+            <span
+              style="
+                display: inline-flex;
+                align-items: center;
+                justify-content: center;
+                width: 38px;
+                height: 38px;
+                border-radius: 50%;
+                background: #fcf2f1;
+                flex-shrink: 0;
+              "
+            >
+              <svg
+                width="19"
+                height="19"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="#A32B22"
+                stroke-width="1.9"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+              >
+                <path d="M4 7h16" />
+                <path d="M9 7V5h6v2" />
+                <path d="M6 7l1 13h10l1-13" />
+                <path d="M10 11v6" />
+                <path d="M14 11v6" />
+              </svg>
+            </span>
+            <div style="display: flex; flex-direction: column; gap: 7px">
+              <h2 style="margin: 0; font-size: 17px; font-weight: 600">
+                Supprimer la candidature de Yasmine Benali ?
+              </h2>
+              <p
+                style="
+                  margin: 0;
+                  font-size: 13.5px;
+                  line-height: 1.6;
+                  color: #545c66;
+                  text-wrap: pretty;
+                "
+              >
+                Vous répondez à une demande d'effacement. Cette action est
+                <strong style="font-weight: 600; color: #14181d">définitive</strong> et ne peut pas
+                être annulée.
+              </p>
+            </div>
+          </div>
+
+          <!-- Ce qui sera détruit, énoncé exactement -->
+          <div
+            style="
+              margin: 0 24px;
+              padding: 15px 17px;
+              background: #fcfcfb;
+              border: 1px solid #eaecef;
+              border-radius: 6px;
+            "
+          >
+            <span
+              style="
+                display: block;
+                margin-bottom: 10px;
+                font-size: 11px;
+                font-weight: 600;
+                letter-spacing: 0.07em;
+                text-transform: uppercase;
+                color: #6c757f;
+              "
+              >Seront détruits</span
+            >
+            <div
+              style="
+                display: flex;
+                flex-direction: column;
+                gap: 8px;
+                font-size: 13px;
+                color: #14181d;
+              "
+            >
+              <span style="display: flex; align-items: center; gap: 9px"
+                ><svg
+                  width="14"
+                  height="14"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="#A32B22"
+                  stroke-width="2.4"
+                  stroke-linecap="round"
+                >
+                  <path d="M6 6l12 12" />
+                  <path d="M18 6L6 18" /></svg
+                >La candidature et son score</span
+              >
+              <span style="display: flex; align-items: center; gap: 9px"
+                ><svg
+                  width="14"
+                  height="14"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="#A32B22"
+                  stroke-width="2.4"
+                  stroke-linecap="round"
+                >
+                  <path d="M6 6l12 12" />
+                  <path d="M18 6L6 18" /></svg
+                ><span class="num">4</span> documents et les fichiers stockés sur le serveur</span
+              >
+              <span style="display: flex; align-items: center; gap: 9px"
+                ><svg
+                  width="14"
+                  height="14"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="#A32B22"
+                  stroke-width="2.4"
+                  stroke-linecap="round"
+                >
+                  <path d="M6 6l12 12" />
+                  <path d="M18 6L6 18" /></svg
+                >Les textes extraits et les <span class="num">3</span> analyses produites</span
+              >
+            </div>
+          </div>
+
+          <!-- Ce qui survit -->
+          <div
+            style="
+              margin: 12px 24px 0;
+              padding: 13px 17px;
+              background: #f4f6fa;
+              border: 1px solid #c9d6ee;
+              border-radius: 6px;
+              display: flex;
+              align-items: flex-start;
+              gap: 11px;
+            "
+          >
+            <svg
+              width="16"
+              height="16"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="#294B8A"
+              stroke-width="1.9"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              style="margin-top: 1px; flex-shrink: 0"
+            >
+              <path d="M12 3l7 3v6c0 4.2-2.9 7.6-7 9-4.1-1.4-7-4.8-7-9V6z" />
+              <path d="M9.5 12l1.8 1.8 3.4-3.6" />
+            </svg>
+            <span style="font-size: 12.5px; line-height: 1.55; color: #1f3663; text-wrap: pretty"
+              ><strong style="font-weight: 600">L'entrée au journal d'audit est conservée</strong>
+              et survit à la suppression : elle enregistre qui a supprimé quoi et quand, sans
+              conserver les données du candidat. C'est ce qui vous permet de prouver que la demande
+              a été honorée.</span
+            >
+          </div>
+
+          <div
+            style="
+              display: flex;
+              align-items: center;
+              gap: 11px;
+              padding: 20px 24px;
+              margin-top: 18px;
+              background: #fcfcfb;
+              border-top: 1px solid #eaecef;
+            "
+          >
+            <span style="font-size: 12px; color: #9aa1a9">Action réservée à l'administrateur</span>
+            <div style="flex-grow: 1"></div>
+            <button
+              type="button"
+              style="
+                height: 36px;
+                padding: 0 16px;
+                background: #ffffff;
+                border: 1px solid #a9b1ba;
+                border-radius: 4px;
+                font: inherit;
+                font-size: 13.5px;
+                color: #14181d;
+                cursor: pointer;
+              "
+            >
+              Annuler
+            </button>
+            <button
+              type="button"
+              style="
+                height: 36px;
+                padding: 0 16px;
+                background: #a32b22;
+                border: 1px solid #a32b22;
+                border-radius: 4px;
+                font: inherit;
+                font-size: 13.5px;
+                font-weight: 500;
+                color: #ffffff;
+                cursor: pointer;
+              "
+            >
+              Supprimer définitivement
+            </button>
+          </div>
+        </div>
+      </div>
+    </x-dc>
+  </body>
+</html>

@@ -1,0 +1,858 @@
+<!doctype html>
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <script src="./support.js"></script>
+  </head>
+  <body>
+    <x-dc>
+      <helmet>
+        <link
+          rel="stylesheet"
+          href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;450;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap"
+        />
+        <style>
+          * {
+            box-sizing: border-box;
+          }
+          body {
+            margin: 0;
+          }
+          a {
+            color: #294b8a;
+            text-decoration: none;
+          }
+          a:hover {
+            color: #1b3565;
+            text-decoration: underline;
+          }
+          .num {
+            font-family: 'IBM Plex Mono', ui-monospace, monospace;
+            font-variant-numeric: tabular-nums;
+          }
+          .cas {
+            background: #ffffff;
+            border: 1px solid #e2e5e9;
+            border-radius: 6px;
+            overflow: hidden;
+          }
+          .cashead {
+            display: flex;
+            align-items: center;
+            gap: 11px;
+            padding: 13px 18px;
+            border-bottom: 1px solid #eaecef;
+          }
+          .cascorps {
+            display: flex;
+            gap: 0;
+          }
+          .source {
+            flex: 1;
+            padding: 16px 18px;
+          }
+          .srclabel {
+            display: block;
+            margin-bottom: 9px;
+            font-size: 11px;
+            font-weight: 600;
+            letter-spacing: 0.07em;
+            text-transform: uppercase;
+            color: #6c757f;
+          }
+          .extrait {
+            padding: 11px 13px;
+            background: #fcfcfb;
+            border: 1px solid #eaecef;
+            border-radius: 5px;
+            font-size: 12.5px;
+            line-height: 1.65;
+            color: #3c444e;
+          }
+          .actions {
+            display: flex;
+            align-items: center;
+            gap: 11px;
+            padding: 13px 18px;
+            background: #fcfcfb;
+            border-top: 1px solid #eaecef;
+          }
+          .btn {
+            height: 32px;
+            padding: 0 13px;
+            background: #ffffff;
+            border: 1px solid #a9b1ba;
+            border-radius: 4px;
+            font: inherit;
+            font-size: 12.5px;
+            color: #14181d;
+            cursor: pointer;
+          }
+          .btnp {
+            height: 32px;
+            padding: 0 14px;
+            background: #294b8a;
+            border: 1px solid #294b8a;
+            border-radius: 4px;
+            font: inherit;
+            font-size: 12.5px;
+            font-weight: 500;
+            color: #ffffff;
+            cursor: pointer;
+          }
+          .navitem {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            height: 34px;
+            padding: 0 10px;
+            border-radius: 4px;
+            font-size: 13.5px;
+            color: #d4d8de;
+            cursor: pointer;
+          }
+          .navitem:hover {
+            background: #262c34;
+          }
+          .navitem.on {
+            background: #313a45;
+            color: #ffffff;
+            font-weight: 500;
+          }
+          .navsec {
+            padding: 18px 10px 7px;
+            font-size: 10.5px;
+            font-weight: 600;
+            letter-spacing: 0.09em;
+            text-transform: uppercase;
+            color: #7c858f;
+          }
+        </style>
+      </helmet>
+
+      <div
+        style="
+          width: 1440px;
+          min-height: 1420px;
+          background: #fbfbfa;
+          font-family: 'IBM Plex Sans', 'Segoe UI', system-ui, sans-serif;
+          color: #14181d;
+          display: flex;
+        "
+      >
+        <!-- Coquille de navigation, identique sur tous les écrans -->
+        <nav
+          style="
+            width: 232px;
+            flex-shrink: 0;
+            background: #1b2027;
+            display: flex;
+            flex-direction: column;
+            padding: 0 12px 14px;
+          "
+        >
+          <div style="display: flex; align-items: center; height: 56px; padding: 0 10px">
+            <span
+              style="
+                font-family: 'IBM Plex Mono', monospace;
+                font-size: 14px;
+                font-weight: 500;
+                letter-spacing: 0.14em;
+                color: #ffffff;
+              "
+              >PROBO</span
+            >
+          </div>
+          <div
+            style="
+              padding: 10px 11px 11px;
+              background: #262c34;
+              border: 1px solid #333b45;
+              border-radius: 5px;
+            "
+          >
+            <div
+              style="
+                font-size: 10.5px;
+                font-weight: 600;
+                letter-spacing: 0.09em;
+                text-transform: uppercase;
+                color: #7c858f;
+                margin-bottom: 7px;
+              "
+            >
+              Campagne
+            </div>
+            <div style="display: flex; align-items: flex-start; gap: 7px; cursor: pointer">
+              <span style="font-size: 13px; font-weight: 500; color: #ffffff; line-height: 1.35"
+                >Mastère Marketing Digital — Rentrée 2026</span
+              >
+              <svg
+                width="12"
+                height="12"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="#9AA1A9"
+                stroke-width="2.2"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                style="margin-top: 4px; flex-shrink: 0"
+              >
+                <path d="M6 9l6 6 6-6" />
+              </svg>
+            </div>
+            <div
+              style="
+                display: flex;
+                align-items: center;
+                gap: 7px;
+                margin-top: 9px;
+                padding-top: 9px;
+                border-top: 1px solid #333b45;
+              "
+            >
+              <span
+                style="
+                  display: inline-flex;
+                  align-items: center;
+                  padding: 2px 7px;
+                  background: #21402f;
+                  border-radius: 3px;
+                  font-size: 10.5px;
+                  font-weight: 600;
+                  letter-spacing: 0.04em;
+                  text-transform: uppercase;
+                  color: #7bc49b;
+                "
+                >Active</span
+              >
+              <div style="flex-grow: 1"></div>
+              <a
+                href="#"
+                style="
+                  display: inline-flex;
+                  align-items: center;
+                  gap: 5px;
+                  font-size: 12px;
+                  color: #a9bcde;
+                "
+              >
+                <svg
+                  width="12"
+                  height="12"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="#A9BCDE"
+                  stroke-width="2"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                >
+                  <circle cx="12" cy="12" r="3" />
+                  <path d="M4 12h2" />
+                  <path d="M18 12h2" />
+                  <path d="M12 4v2" />
+                  <path d="M12 18v2" />
+                </svg>
+                Réglages
+              </a>
+            </div>
+          </div>
+          <div class="navsec">Candidatures</div>
+          <div class="navitem">
+            <svg
+              width="16"
+              height="16"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="1.9"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+            >
+              <path d="M4 6h16" />
+              <path d="M4 12h11" />
+              <path d="M4 18h7" /></svg
+            >Classement
+          </div>
+          <div class="navitem on">
+            <svg
+              width="16"
+              height="16"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="1.9"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+            >
+              <path d="M12 19V7" />
+              <path d="M7 12l5-5 5 5" />
+              <path d="M4 20h16" /></svg
+            >Importer un lot
+          </div>
+          <div class="navsec">Administration</div>
+          <div class="navitem">
+            <svg
+              width="16"
+              height="16"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="1.9"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+            >
+              <rect x="3" y="4" width="18" height="16" rx="2" />
+              <path d="M3 9h18" /></svg
+            >Campagnes
+          </div>
+          <div class="navitem">
+            <svg
+              width="16"
+              height="16"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="1.9"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+            >
+              <circle cx="9" cy="8" r="3.2" />
+              <path d="M3.5 19a5.5 5.5 0 0 1 11 0" />
+              <path d="M17 8.5h4" />
+              <path d="M19 6.5v4" /></svg
+            >Comptes
+          </div>
+          <div class="navitem">
+            <svg
+              width="16"
+              height="16"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="1.9"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+            >
+              <path d="M12 3l7 3v6c0 4.2-2.9 7.6-7 9-4.1-1.4-7-4.8-7-9V6z" />
+              <path d="M9.5 12l1.8 1.8 3.4-3.6" /></svg
+            >Journal d'audit
+          </div>
+          <div style="flex-grow: 1"></div>
+          <div
+            style="
+              padding: 12px 10px 10px;
+              border-top: 1px solid #2c333c;
+              display: flex;
+              flex-direction: column;
+              gap: 11px;
+            "
+          >
+            <div style="display: flex; align-items: center; gap: 9px">
+              <span
+                style="
+                  display: inline-flex;
+                  align-items: center;
+                  justify-content: center;
+                  width: 27px;
+                  height: 27px;
+                  border-radius: 50%;
+                  background: #333b45;
+                  font-size: 11px;
+                  font-weight: 600;
+                  color: #d4d8de;
+                "
+                >CF</span
+              >
+              <div style="display: flex; flex-direction: column">
+                <span style="font-size: 12.5px; color: #ffffff">Claire Fontaine</span>
+                <span style="font-size: 11px; color: #7c858f">Chargée d'admission</span>
+              </div>
+            </div>
+            <div style="display: flex; align-items: center; gap: 8px">
+              <div
+                style="
+                  display: flex;
+                  border: 1px solid #3b434d;
+                  border-radius: 4px;
+                  overflow: hidden;
+                "
+              >
+                <span
+                  style="
+                    padding: 3px 8px;
+                    font-size: 11.5px;
+                    font-weight: 500;
+                    background: #313a45;
+                    color: #ffffff;
+                  "
+                  >FR</span
+                >
+                <span style="padding: 3px 8px; font-size: 11.5px; color: #9aa1a9">EN</span>
+              </div>
+              <div style="flex-grow: 1"></div>
+              <a href="#" style="font-size: 12px; color: #9aa1a9">Déconnexion</a>
+            </div>
+          </div>
+        </nav>
+        <div
+          style="
+            flex-grow: 1;
+            padding: 28px 32px 44px;
+            display: flex;
+            flex-direction: column;
+            gap: 18px;
+          "
+        >
+          <div style="display: flex; align-items: flex-start; gap: 24px">
+            <div style="display: flex; flex-direction: column; gap: 7px">
+              <h1 style="margin: 0; font-size: 24px; font-weight: 600; letter-spacing: -0.01em">
+                Réconcilier les candidats
+              </h1>
+              <p class="num" style="margin: 0; font-size: 13px; color: #545c66">
+                candidatures_mmd_2026.zip · 1 248 documents · déposé le 4 septembre à 09:14
+              </p>
+            </div>
+            <div style="flex-grow: 1"></div>
+            <button
+              type="button"
+              style="
+                height: 36px;
+                padding: 0 16px;
+                background: #edeef0;
+                border: 1px solid #d7dbe0;
+                border-radius: 4px;
+                font: inherit;
+                font-size: 13.5px;
+                font-weight: 500;
+                color: #9aa1a9;
+                cursor: not-allowed;
+              "
+            >
+              Lancer l'analyse
+            </button>
+          </div>
+
+          <!-- Pourquoi cet écran existe -->
+          <div
+            style="
+              display: flex;
+              align-items: flex-start;
+              gap: 12px;
+              padding: 15px 18px;
+              background: #ffffff;
+              border: 1px solid #c9d6ee;
+              border-left: 3px solid #294b8a;
+              border-radius: 6px;
+            "
+          >
+            <svg
+              width="18"
+              height="18"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="#294B8A"
+              stroke-width="1.9"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              style="margin-top: 1px; flex-shrink: 0"
+            >
+              <circle cx="12" cy="12" r="9" />
+              <path d="M12 16v-5" />
+              <path d="M12 8h.01" />
+            </svg>
+            <div style="display: flex; flex-direction: column; gap: 5px">
+              <span style="font-size: 13.5px; font-weight: 600; color: #1f3663"
+                >L'analyse ne démarrera pas tant que ces trois cas ne sont pas tranchés.</span
+              >
+              <span
+                style="
+                  font-size: 13px;
+                  line-height: 1.6;
+                  color: #1f3663;
+                  max-width: 940px;
+                  text-wrap: pretty;
+                "
+                >Probo lit l'identité du candidat
+                <strong style="font-weight: 600">dans le texte de chaque document</strong>, pas dans
+                son nom de fichier. Quand les deux se contredisent, personne ne peut trancher à
+                votre place : un document attribué au mauvais candidat fausse
+                <strong style="font-weight: 600">deux</strong> scores, et rien ne le signalerait
+                ensuite.</span
+              >
+            </div>
+          </div>
+
+          <!-- Ce qui a été résolu sans intervention -->
+          <div style="display: flex; gap: 14px">
+            <div
+              style="
+                flex: 1;
+                padding: 15px 18px;
+                background: #ffffff;
+                border: 1px solid #b6d8c7;
+                border-left: 3px solid #2f7d5e;
+                border-radius: 6px;
+                display: flex;
+                align-items: center;
+                gap: 14px;
+              "
+            >
+              <svg
+                width="19"
+                height="19"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="#2F7D5E"
+                stroke-width="2.4"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                style="flex-shrink: 0"
+              >
+                <path d="M5 12.5l5 5 9-10" />
+              </svg>
+              <div style="display: flex; flex-direction: column; gap: 3px">
+                <span style="font-size: 13.5px"
+                  ><span class="num" style="font-weight: 600">409</span> candidatures regroupées
+                  sans intervention</span
+                >
+                <span style="font-size: 12.5px; color: #6c757f"
+                  >Nom de fichier et contenu concordent — rien à vérifier</span
+                >
+              </div>
+            </div>
+            <div
+              style="
+                flex: 1;
+                padding: 15px 18px;
+                background: #ffffff;
+                border: 1px solid #e8d5ae;
+                border-left: 3px solid #b07818;
+                border-radius: 6px;
+                display: flex;
+                align-items: center;
+                gap: 14px;
+              "
+            >
+              <span
+                style="
+                  width: 9px;
+                  height: 9px;
+                  border-radius: 50%;
+                  background: #b07818;
+                  flex-shrink: 0;
+                "
+              ></span>
+              <div style="display: flex; flex-direction: column; gap: 3px">
+                <span style="font-size: 13.5px"
+                  ><span class="num" style="font-weight: 600">3</span> cas à arbitrer</span
+                >
+                <span style="font-size: 12.5px; color: #6c757f"
+                  >Une contradiction, une identité illisible, une homonymie</span
+                >
+              </div>
+            </div>
+          </div>
+
+          <!-- CAS 1 — le nom de fichier contredit le contenu -->
+          <div class="cas">
+            <div class="cashead">
+              <span
+                class="num"
+                style="
+                  display: inline-flex;
+                  align-items: center;
+                  justify-content: center;
+                  width: 24px;
+                  height: 24px;
+                  border-radius: 50%;
+                  background: #fbf3e4;
+                  font-size: 12px;
+                  font-weight: 600;
+                  color: #8a5b14;
+                "
+                >1</span
+              >
+              <h2 style="margin: 0; font-size: 14.5px; font-weight: 600">
+                Le nom de fichier contredit le contenu
+              </h2>
+              <div style="flex-grow: 1"></div>
+              <span class="num" style="font-size: 12.5px; color: #6c757f"
+                >benali_yasmine_cv2.pdf</span
+              >
+            </div>
+            <div class="cascorps">
+              <div class="source" style="border-right: 1px solid #eaecef">
+                <span class="srclabel">Ce que dit le nom de fichier</span>
+                <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 11px">
+                  <svg
+                    width="17"
+                    height="17"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="#9AA1A9"
+                    stroke-width="1.9"
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                  >
+                    <path d="M4 6h16" />
+                    <path d="M4 12h11" />
+                    <path d="M4 18h7" />
+                  </svg>
+                  <span style="font-size: 15px; font-weight: 500">Yasmine Benali</span>
+                  <span
+                    style="
+                      padding: 2px 8px;
+                      background: #f2f3f5;
+                      border-radius: 3px;
+                      font-size: 11.5px;
+                      color: #6c757f;
+                    "
+                    >préfixe du nom</span
+                  >
+                </div>
+                <div
+                  class="extrait"
+                  style="font-family: 'IBM Plex Mono', monospace; font-size: 12px"
+                >
+                  candidatures_mmd_2026.zip<br />&nbsp;&nbsp;└──
+                  <strong style="font-weight: 500; color: #14181d">benali_yasmine</strong>_cv2.pdf
+                </div>
+              </div>
+              <div class="source" style="background: #fcfcfb">
+                <span class="srclabel">Ce que dit le contenu du document</span>
+                <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 11px">
+                  <svg
+                    width="17"
+                    height="17"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="#2F7D5E"
+                    stroke-width="1.9"
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                  >
+                    <path d="M14 3H7a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V8z" />
+                    <path d="M14 3v5h5" />
+                  </svg>
+                  <span style="font-size: 15px; font-weight: 500">Camille Rousseau</span>
+                  <span
+                    style="
+                      padding: 2px 8px;
+                      background: #e4f0ea;
+                      border-radius: 3px;
+                      font-size: 11.5px;
+                      color: #24614a;
+                    "
+                    >confiance <span class="num">97 %</span></span
+                  >
+                </div>
+                <div class="extrait">
+                  <strong style="font-weight: 600; color: #14181d">CAMILLE ROUSSEAU</strong><br />18
+                  rue des Capucins, 69001 Lyon<br />camille.rousseau@example.fr — 06 12 34 56 78<br /><span
+                    style="color: #9aa1a9"
+                    >— FORMATION —</span
+                  ><br />2023-2026 · Licence information-communication…
+                </div>
+              </div>
+            </div>
+            <div class="actions">
+              <span style="font-size: 12.5px; color: #6c757f"
+                >Un fichier probablement renommé depuis le dossier d'un autre candidat.</span
+              >
+              <div style="flex-grow: 1"></div>
+              <button type="button" class="btn">Créer une candidature</button>
+              <button type="button" class="btn">Garder « Yasmine Benali »</button>
+              <button type="button" class="btnp">Rattacher à Camille Rousseau</button>
+            </div>
+          </div>
+
+          <!-- CAS 2 — identité illisible -->
+          <div class="cas">
+            <div class="cashead">
+              <span
+                class="num"
+                style="
+                  display: inline-flex;
+                  align-items: center;
+                  justify-content: center;
+                  width: 24px;
+                  height: 24px;
+                  border-radius: 50%;
+                  background: #fbf3e4;
+                  font-size: 12px;
+                  font-weight: 600;
+                  color: #8a5b14;
+                "
+                >2</span
+              >
+              <h2 style="margin: 0; font-size: 14.5px; font-weight: 600">
+                Aucune identité lisible
+              </h2>
+              <div style="flex-grow: 1"></div>
+              <span class="num" style="font-size: 12.5px; color: #6c757f"
+                >document_final_v2.pdf</span
+              >
+            </div>
+            <div class="cascorps">
+              <div class="source" style="border-right: 1px solid #eaecef">
+                <span class="srclabel">Ce que dit le nom de fichier</span>
+                <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 11px">
+                  <svg
+                    width="17"
+                    height="17"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="#A9B1BA"
+                    stroke-width="1.9"
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                  >
+                    <path d="M6 6l12 12" />
+                    <path d="M18 6L6 18" />
+                  </svg>
+                  <span style="font-size: 15px; color: #9aa1a9">Aucun nom déductible</span>
+                </div>
+                <div
+                  class="extrait"
+                  style="font-family: 'IBM Plex Mono', monospace; font-size: 12px; color: #9aa1a9"
+                >
+                  candidatures_mmd_2026.zip<br />&nbsp;&nbsp;└── document_final_v2.pdf<br /><span
+                    style="color: #c3c8ce"
+                    >— à la racine, hors de tout sous-dossier</span
+                  >
+                </div>
+              </div>
+              <div class="source" style="background: #fcfcfb">
+                <span class="srclabel">Ce que dit le contenu du document</span>
+                <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 11px">
+                  <svg
+                    width="17"
+                    height="17"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="#B07818"
+                    stroke-width="1.9"
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                  >
+                    <path d="M12 3l9 16H3z" />
+                    <path d="M12 9v5" />
+                    <path d="M12 17h.01" />
+                  </svg>
+                  <span style="font-size: 15px; font-weight: 500">Martin D.</span>
+                  <span
+                    style="
+                      padding: 2px 8px;
+                      background: #fbf3e4;
+                      border-radius: 3px;
+                      font-size: 11.5px;
+                      color: #8a5b14;
+                    "
+                    >confiance <span class="num">42 %</span> — sous le seuil</span
+                  >
+                </div>
+                <div class="extrait">
+                  Madame, Monsieur,<br />Actuellement en dernière année de licence, je souhaite…<br /><span
+                    style="color: #9aa1a9"
+                    >[…]</span
+                  ><br />Veuillez agréer mes salutations distinguées.<br /><strong
+                    style="font-weight: 600; color: #14181d"
+                    >Martin D.</strong
+                  >
+                </div>
+              </div>
+            </div>
+            <div class="actions">
+              <span style="font-size: 12.5px; color: #6c757f"
+                >La lettre n'est signée que d'une initiale. Deux candidatures du lot commencent par
+                « Martin D ».</span
+              >
+              <div style="flex-grow: 1"></div>
+              <button type="button" class="btn">Écarter du lot</button>
+              <button type="button" class="btn">Ouvrir le document</button>
+              <button type="button" class="btnp">Choisir une candidature…</button>
+            </div>
+          </div>
+
+          <!-- CAS 3 — homonymie -->
+          <div class="cas">
+            <div class="cashead">
+              <span
+                class="num"
+                style="
+                  display: inline-flex;
+                  align-items: center;
+                  justify-content: center;
+                  width: 24px;
+                  height: 24px;
+                  border-radius: 50%;
+                  background: #fbf3e4;
+                  font-size: 12px;
+                  font-weight: 600;
+                  color: #8a5b14;
+                "
+                >3</span
+              >
+              <h2 style="margin: 0; font-size: 14.5px; font-weight: 600">
+                Deux candidatures portent le même nom
+              </h2>
+              <div style="flex-grow: 1"></div>
+              <span style="font-size: 12.5px; color: #6c757f">Martin Dubois</span>
+            </div>
+            <div class="cascorps">
+              <div class="source" style="border-right: 1px solid #eaecef">
+                <span class="srclabel">Candidature A — 3 documents</span>
+                <div style="display: flex; flex-direction: column; gap: 7px; margin-bottom: 11px">
+                  <span style="font-size: 15px; font-weight: 500">Martin Dubois</span>
+                  <span class="num" style="font-size: 12.5px; color: #545c66"
+                    >martin.dubois@example.fr</span
+                  >
+                </div>
+                <div
+                  class="extrait"
+                  style="font-family: 'IBM Plex Mono', monospace; font-size: 12px"
+                >
+                  dubois_martin/cv.pdf<br />dubois_martin/lettre.pdf<br />dubois_martin/recommandation.pdf
+                </div>
+              </div>
+              <div class="source" style="background: #fcfcfb">
+                <span class="srclabel">Candidature B — 2 documents</span>
+                <div style="display: flex; flex-direction: column; gap: 7px; margin-bottom: 11px">
+                  <span style="font-size: 15px; font-weight: 500">Martin Dubois</span>
+                  <span class="num" style="font-size: 12.5px; color: #545c66"
+                    >m.dubois.pro@example.fr</span
+                  >
+                </div>
+                <div
+                  class="extrait"
+                  style="font-family: 'IBM Plex Mono', monospace; font-size: 12px"
+                >
+                  martin_dubois_cv.pdf<br />martin_dubois_lm.pdf
+                </div>
+              </div>
+            </div>
+            <div class="actions">
+              <span style="font-size: 12.5px; color: #6c757f"
+                >Les adresses diffèrent : ce sont probablement deux personnes, mais fusionner à tort
+                supprimerait un candidat du classement.</span
+              >
+              <div style="flex-grow: 1"></div>
+              <button type="button" class="btn">Fusionner en une candidature</button>
+              <button type="button" class="btnp">Garder deux candidatures</button>
+            </div>
+          </div>
+
+          <div style="display: flex; align-items: center; gap: 12px; padding-top: 4px">
+            <span style="font-size: 12.5px; color: #6c757f"
+              >Chaque arbitrage est inscrit au journal d'audit et fixe l'origine de l'identité à «
+              manuelle ».</span
+            >
+            <div style="flex-grow: 1"></div>
+            <span class="num" style="font-size: 12.5px; color: #6c757f">0 / 3 tranchés</span>
+          </div>
+        </div>
+      </div>
+    </x-dc>
+  </body>
+</html>

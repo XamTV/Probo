@@ -1,0 +1,743 @@
+<!doctype html>
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <script src="./support.js"></script>
+  </head>
+  <body>
+    <x-dc>
+      <helmet>
+        <link
+          rel="stylesheet"
+          href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;450;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap"
+        />
+        <style>
+          * {
+            box-sizing: border-box;
+          }
+          body {
+            margin: 0;
+          }
+          a {
+            color: #294b8a;
+            text-decoration: none;
+          }
+          a:hover {
+            color: #1b3565;
+            text-decoration: underline;
+          }
+          table {
+            border-collapse: collapse;
+            width: 100%;
+          }
+          th,
+          td {
+            text-align: left;
+            border-bottom: 1px solid #eaecef;
+          }
+          th {
+            padding: 13px 18px 8px;
+            font-size: 11px;
+            font-weight: 600;
+            letter-spacing: 0.07em;
+            text-transform: uppercase;
+            color: #6c757f;
+            border-bottom: 1px solid #d7dbe0;
+          }
+          td {
+            padding: 12px 18px;
+            font-size: 13.5px;
+            color: #14181d;
+          }
+          .num {
+            font-family: 'IBM Plex Mono', ui-monospace, monospace;
+            font-variant-numeric: tabular-nums;
+          }
+          .role {
+            display: inline-flex;
+            align-items: center;
+            padding: 3px 9px;
+            border-radius: 3px;
+            font-size: 11.5px;
+            font-weight: 500;
+          }
+          .navitem {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            height: 34px;
+            padding: 0 10px;
+            border-radius: 4px;
+            font-size: 13.5px;
+            color: #d4d8de;
+            cursor: pointer;
+          }
+          .navitem:hover {
+            background: #262c34;
+          }
+          .navitem.on {
+            background: #313a45;
+            color: #ffffff;
+            font-weight: 500;
+          }
+          .navsec {
+            padding: 18px 10px 7px;
+            font-size: 10.5px;
+            font-weight: 600;
+            letter-spacing: 0.09em;
+            text-transform: uppercase;
+            color: #7c858f;
+          }
+        </style>
+      </helmet>
+
+      <div
+        style="
+          width: 1440px;
+          min-height: 900px;
+          background: #fbfbfa;
+          font-family: 'IBM Plex Sans', 'Segoe UI', system-ui, sans-serif;
+          color: #14181d;
+          display: flex;
+        "
+      >
+        <!-- Coquille de navigation, identique sur tous les écrans -->
+        <nav
+          style="
+            width: 232px;
+            flex-shrink: 0;
+            background: #1b2027;
+            display: flex;
+            flex-direction: column;
+            padding: 0 12px 14px;
+          "
+        >
+          <div style="display: flex; align-items: center; height: 56px; padding: 0 10px">
+            <span
+              style="
+                font-family: 'IBM Plex Mono', monospace;
+                font-size: 14px;
+                font-weight: 500;
+                letter-spacing: 0.14em;
+                color: #ffffff;
+              "
+              >PROBO</span
+            >
+          </div>
+          <div
+            style="
+              padding: 10px 11px 11px;
+              background: #262c34;
+              border: 1px solid #333b45;
+              border-radius: 5px;
+            "
+          >
+            <div
+              style="
+                font-size: 10.5px;
+                font-weight: 600;
+                letter-spacing: 0.09em;
+                text-transform: uppercase;
+                color: #7c858f;
+                margin-bottom: 7px;
+              "
+            >
+              Campagne
+            </div>
+            <div style="display: flex; align-items: flex-start; gap: 7px; cursor: pointer">
+              <span style="font-size: 13px; font-weight: 500; color: #ffffff; line-height: 1.35"
+                >Mastère Marketing Digital — Rentrée 2026</span
+              >
+              <svg
+                width="12"
+                height="12"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="#9AA1A9"
+                stroke-width="2.2"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                style="margin-top: 4px; flex-shrink: 0"
+              >
+                <path d="M6 9l6 6 6-6" />
+              </svg>
+            </div>
+            <div
+              style="
+                display: flex;
+                align-items: center;
+                gap: 7px;
+                margin-top: 9px;
+                padding-top: 9px;
+                border-top: 1px solid #333b45;
+              "
+            >
+              <span
+                style="
+                  display: inline-flex;
+                  align-items: center;
+                  padding: 2px 7px;
+                  background: #21402f;
+                  border-radius: 3px;
+                  font-size: 10.5px;
+                  font-weight: 600;
+                  letter-spacing: 0.04em;
+                  text-transform: uppercase;
+                  color: #7bc49b;
+                "
+                >Active</span
+              >
+              <div style="flex-grow: 1"></div>
+              <a
+                href="#"
+                style="
+                  display: inline-flex;
+                  align-items: center;
+                  gap: 5px;
+                  font-size: 12px;
+                  color: #a9bcde;
+                "
+              >
+                <svg
+                  width="12"
+                  height="12"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="#A9BCDE"
+                  stroke-width="2"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                >
+                  <circle cx="12" cy="12" r="3" />
+                  <path d="M4 12h2" />
+                  <path d="M18 12h2" />
+                  <path d="M12 4v2" />
+                  <path d="M12 18v2" />
+                </svg>
+                Réglages
+              </a>
+            </div>
+          </div>
+          <div class="navsec">Candidatures</div>
+          <div class="navitem">
+            <svg
+              width="16"
+              height="16"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="1.9"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+            >
+              <path d="M4 6h16" />
+              <path d="M4 12h11" />
+              <path d="M4 18h7" /></svg
+            >Classement
+          </div>
+          <div class="navitem">
+            <svg
+              width="16"
+              height="16"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="1.9"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+            >
+              <path d="M12 19V7" />
+              <path d="M7 12l5-5 5 5" />
+              <path d="M4 20h16" /></svg
+            >Importer un lot
+          </div>
+          <div class="navsec">Administration</div>
+          <div class="navitem">
+            <svg
+              width="16"
+              height="16"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="1.9"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+            >
+              <rect x="3" y="4" width="18" height="16" rx="2" />
+              <path d="M3 9h18" /></svg
+            >Campagnes
+          </div>
+          <div class="navitem on">
+            <svg
+              width="16"
+              height="16"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="1.9"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+            >
+              <circle cx="9" cy="8" r="3.2" />
+              <path d="M3.5 19a5.5 5.5 0 0 1 11 0" />
+              <path d="M17 8.5h4" />
+              <path d="M19 6.5v4" /></svg
+            >Comptes
+          </div>
+          <div class="navitem">
+            <svg
+              width="16"
+              height="16"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="1.9"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+            >
+              <path d="M12 3l7 3v6c0 4.2-2.9 7.6-7 9-4.1-1.4-7-4.8-7-9V6z" />
+              <path d="M9.5 12l1.8 1.8 3.4-3.6" /></svg
+            >Journal d'audit
+          </div>
+          <div style="flex-grow: 1"></div>
+          <div
+            style="
+              padding: 12px 10px 10px;
+              border-top: 1px solid #2c333c;
+              display: flex;
+              flex-direction: column;
+              gap: 11px;
+            "
+          >
+            <div style="display: flex; align-items: center; gap: 9px">
+              <span
+                style="
+                  display: inline-flex;
+                  align-items: center;
+                  justify-content: center;
+                  width: 27px;
+                  height: 27px;
+                  border-radius: 50%;
+                  background: #333b45;
+                  font-size: 11px;
+                  font-weight: 600;
+                  color: #d4d8de;
+                "
+                >MD</span
+              >
+              <div style="display: flex; flex-direction: column">
+                <span style="font-size: 12.5px; color: #ffffff">Marc Delaunay</span>
+                <span style="font-size: 11px; color: #7c858f">Administrateur</span>
+              </div>
+            </div>
+            <div style="display: flex; align-items: center; gap: 8px">
+              <div
+                style="
+                  display: flex;
+                  border: 1px solid #3b434d;
+                  border-radius: 4px;
+                  overflow: hidden;
+                "
+              >
+                <span
+                  style="
+                    padding: 3px 8px;
+                    font-size: 11.5px;
+                    font-weight: 500;
+                    background: #313a45;
+                    color: #ffffff;
+                  "
+                  >FR</span
+                >
+                <span style="padding: 3px 8px; font-size: 11.5px; color: #9aa1a9">EN</span>
+              </div>
+              <div style="flex-grow: 1"></div>
+              <a href="#" style="font-size: 12px; color: #9aa1a9">Déconnexion</a>
+            </div>
+          </div>
+        </nav>
+        <div
+          style="
+            flex-grow: 1;
+            padding: 28px 32px 44px;
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+          "
+        >
+          <div style="display: flex; align-items: flex-start; gap: 24px">
+            <div style="display: flex; flex-direction: column; gap: 7px">
+              <h1 style="margin: 0; font-size: 24px; font-weight: 600; letter-spacing: -0.01em">
+                Comptes
+              </h1>
+              <p style="margin: 0; font-size: 13px; color: #545c66">
+                École Supérieure de Management de Lyon · <span class="num">5</span> comptes
+              </p>
+            </div>
+            <div style="flex-grow: 1"></div>
+            <button
+              type="button"
+              style="
+                display: inline-flex;
+                align-items: center;
+                gap: 8px;
+                height: 34px;
+                padding: 0 15px;
+                background: #294b8a;
+                border: 1px solid #294b8a;
+                border-radius: 4px;
+                font: inherit;
+                font-size: 13px;
+                font-weight: 500;
+                color: #ffffff;
+                cursor: pointer;
+              "
+            >
+              <svg
+                width="15"
+                height="15"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="#FFFFFF"
+                stroke-width="2.2"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+              >
+                <path d="M12 5v14" />
+                <path d="M5 12h14" />
+              </svg>
+              Créer un compte
+            </button>
+          </div>
+
+          <!-- Ce que chaque rôle peut faire, dit une fois -->
+          <div style="display: flex; gap: 14px">
+            <div
+              style="
+                flex: 1;
+                padding: 15px 18px;
+                background: #ffffff;
+                border: 1px solid #e2e5e9;
+                border-radius: 6px;
+              "
+            >
+              <span class="role" style="background: #edf0f4; color: #3c444e; margin-bottom: 10px"
+                >Chargé d'admission</span
+              >
+              <div
+                style="
+                  display: flex;
+                  flex-direction: column;
+                  gap: 6px;
+                  margin-top: 10px;
+                  font-size: 12.5px;
+                  color: #545c66;
+                "
+              >
+                <span style="display: flex; align-items: center; gap: 8px"
+                  ><svg
+                    width="13"
+                    height="13"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="#2F7D5E"
+                    stroke-width="2.6"
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                  >
+                    <path d="M5 12.5l5 5 9-10" /></svg
+                  >Importer des lots et consulter les classements</span
+                >
+                <span style="display: flex; align-items: center; gap: 8px"
+                  ><svg
+                    width="13"
+                    height="13"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="#A9B1BA"
+                    stroke-width="2.4"
+                    stroke-linecap="round"
+                  >
+                    <path d="M6 6l12 12" />
+                    <path d="M18 6L6 18" /></svg
+                  >Ne peut ni créer de compte ni modifier une campagne</span
+                >
+              </div>
+            </div>
+            <div
+              style="
+                flex: 1;
+                padding: 15px 18px;
+                background: #ffffff;
+                border: 1px solid #e2e5e9;
+                border-radius: 6px;
+              "
+            >
+              <span class="role" style="background: #e7edf7; color: #1f3663; margin-bottom: 10px"
+                >Administrateur</span
+              >
+              <div
+                style="
+                  display: flex;
+                  flex-direction: column;
+                  gap: 6px;
+                  margin-top: 10px;
+                  font-size: 12.5px;
+                  color: #545c66;
+                "
+              >
+                <span style="display: flex; align-items: center; gap: 8px"
+                  ><svg
+                    width="13"
+                    height="13"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="#2F7D5E"
+                    stroke-width="2.6"
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                  >
+                    <path d="M5 12.5l5 5 9-10" /></svg
+                  >Tout ce que fait un chargé d'admission</span
+                >
+                <span style="display: flex; align-items: center; gap: 8px"
+                  ><svg
+                    width="13"
+                    height="13"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="#2F7D5E"
+                    stroke-width="2.6"
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                  >
+                    <path d="M5 12.5l5 5 9-10" /></svg
+                  >Comptes, campagnes, suppressions et journal d'audit</span
+                >
+              </div>
+            </div>
+          </div>
+
+          <div
+            style="
+              background: #ffffff;
+              border: 1px solid #e2e5e9;
+              border-radius: 6px;
+              overflow: hidden;
+            "
+          >
+            <table>
+              <thead>
+                <tr>
+                  <th scope="col">Nom</th>
+                  <th scope="col" style="width: 268px">Adresse email</th>
+                  <th scope="col" style="width: 178px">Rôle</th>
+                  <th scope="col" style="width: 172px">Dernière connexion</th>
+                  <th scope="col" style="width: 130px">État</th>
+                  <th scope="col" style="width: 96px"></th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td style="font-weight: 500">
+                    Marc Delaunay
+                    <span
+                      style="margin-left: 6px; font-size: 11.5px; font-weight: 400; color: #9aa1a9"
+                      >— vous</span
+                    >
+                  </td>
+                  <td class="num" style="font-size: 12.5px; color: #545c66">
+                    marc.delaunay@esm-lyon.fr
+                  </td>
+                  <td>
+                    <span class="role" style="background: #e7edf7; color: #1f3663"
+                      >Administrateur</span
+                    >
+                  </td>
+                  <td class="num" style="font-size: 12.5px; color: #545c66">Aujourd'hui, 08:40</td>
+                  <td>
+                    <span
+                      style="
+                        display: inline-flex;
+                        align-items: center;
+                        gap: 7px;
+                        font-size: 12.5px;
+                        color: #24614a;
+                      "
+                      ><span
+                        style="width: 7px; height: 7px; border-radius: 50%; background: #2f7d5e"
+                      ></span
+                      >Actif</span
+                    >
+                  </td>
+                  <td><a href="#" style="font-size: 12.5px">Modifier</a></td>
+                </tr>
+                <tr>
+                  <td style="font-weight: 500">Claire Fontaine</td>
+                  <td class="num" style="font-size: 12.5px; color: #545c66">
+                    claire.fontaine@esm-lyon.fr
+                  </td>
+                  <td>
+                    <span class="role" style="background: #edf0f4; color: #3c444e"
+                      >Chargée d'admission</span
+                    >
+                  </td>
+                  <td class="num" style="font-size: 12.5px; color: #545c66">Aujourd'hui, 09:14</td>
+                  <td>
+                    <span
+                      style="
+                        display: inline-flex;
+                        align-items: center;
+                        gap: 7px;
+                        font-size: 12.5px;
+                        color: #24614a;
+                      "
+                      ><span
+                        style="width: 7px; height: 7px; border-radius: 50%; background: #2f7d5e"
+                      ></span
+                      >Actif</span
+                    >
+                  </td>
+                  <td><a href="#" style="font-size: 12.5px">Modifier</a></td>
+                </tr>
+                <tr>
+                  <td style="font-weight: 500">Sofiane Hamdi</td>
+                  <td class="num" style="font-size: 12.5px; color: #545c66">
+                    sofiane.hamdi@esm-lyon.fr
+                  </td>
+                  <td>
+                    <span class="role" style="background: #edf0f4; color: #3c444e"
+                      >Chargé d'admission</span
+                    >
+                  </td>
+                  <td style="font-size: 12.5px; color: #9aa1a9">Jamais connecté</td>
+                  <td>
+                    <span
+                      style="
+                        display: inline-flex;
+                        align-items: center;
+                        gap: 7px;
+                        font-size: 12.5px;
+                        color: #545c66;
+                      "
+                      ><span
+                        style="
+                          width: 7px;
+                          height: 7px;
+                          border-radius: 50%;
+                          border: 1.5px solid #a9b1ba;
+                        "
+                      ></span
+                      >Invitation envoyée</span
+                    >
+                  </td>
+                  <td><a href="#" style="font-size: 12.5px">Relancer</a></td>
+                </tr>
+                <tr>
+                  <td style="font-weight: 500">Nadia Roux</td>
+                  <td class="num" style="font-size: 12.5px; color: #545c66">
+                    nadia.roux@esm-lyon.fr
+                  </td>
+                  <td>
+                    <span class="role" style="background: #edf0f4; color: #3c444e"
+                      >Chargée d'admission</span
+                    >
+                  </td>
+                  <td class="num" style="font-size: 12.5px; color: #545c66">28/08/2026, 15:02</td>
+                  <td>
+                    <span
+                      style="
+                        display: inline-flex;
+                        align-items: center;
+                        gap: 7px;
+                        font-size: 12.5px;
+                        color: #24614a;
+                      "
+                      ><span
+                        style="width: 7px; height: 7px; border-radius: 50%; background: #2f7d5e"
+                      ></span
+                      >Actif</span
+                    >
+                  </td>
+                  <td><a href="#" style="font-size: 12.5px">Modifier</a></td>
+                </tr>
+                <!-- Compte désactivé : ses lots restent visibles et attribués -->
+                <tr style="background: #fcfcfb">
+                  <td style="font-weight: 500; color: #6c757f">Julien Payet</td>
+                  <td class="num" style="font-size: 12.5px; color: #9aa1a9">
+                    julien.payet@esm-lyon.fr
+                  </td>
+                  <td>
+                    <span class="role" style="background: #f2f3f5; color: #9aa1a9"
+                      >Chargé d'admission</span
+                    >
+                  </td>
+                  <td class="num" style="font-size: 12.5px; color: #9aa1a9">12/06/2026, 10:31</td>
+                  <td>
+                    <span
+                      style="
+                        display: inline-flex;
+                        align-items: center;
+                        gap: 7px;
+                        font-size: 12.5px;
+                        color: #6c757f;
+                      "
+                      ><span
+                        style="width: 7px; height: 7px; border-radius: 50%; background: #a9b1ba"
+                      ></span
+                      >Désactivé</span
+                    >
+                  </td>
+                  <td><a href="#" style="font-size: 12.5px">Réactiver</a></td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+
+          <div
+            style="
+              display: flex;
+              align-items: flex-start;
+              gap: 11px;
+              padding: 14px 18px;
+              background: #ffffff;
+              border: 1px solid #e2e5e9;
+              border-radius: 6px;
+            "
+          >
+            <svg
+              width="16"
+              height="16"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="#6C757F"
+              stroke-width="1.9"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              style="margin-top: 1px; flex-shrink: 0"
+            >
+              <circle cx="12" cy="12" r="9" />
+              <path d="M12 16v-5" />
+              <path d="M12 8h.01" />
+            </svg>
+            <div style="display: flex; flex-direction: column; gap: 5px">
+              <span style="font-size: 13px; line-height: 1.55; color: #14181d"
+                ><strong style="font-weight: 600"
+                  >Un compte se désactive, il ne se supprime pas.</strong
+                >
+                Julien Payet ne peut plus se connecter, mais les <span class="num">3</span> lots
+                qu'il a importés restent visibles et lui restent attribués.</span
+              >
+              <span style="font-size: 12.5px; color: #6c757f"
+                >Supprimer le compte effacerait cette attribution et rendrait le journal d'audit
+                incompréhensible.</span
+              >
+            </div>
+            <div style="flex-grow: 1"></div>
+            <a href="#" style="font-size: 12.5px; white-space: nowrap">Voir ses lots</a>
+          </div>
+        </div>
+      </div>
+    </x-dc>
+  </body>
+</html>

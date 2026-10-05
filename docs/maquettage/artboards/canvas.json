@@ -1,0 +1,307 @@
+{
+  "pages": [
+    {
+      "id": "page-1",
+      "name": "Parcours — consultation"
+    },
+    {
+      "id": "page-2",
+      "name": "Import et réconciliation"
+    },
+    {
+      "id": "page-3",
+      "name": "Administration"
+    }
+  ],
+  "artboards": [
+    {
+      "file": "Connexion.dc.html",
+      "title": "CU-01 · Connexion",
+      "page": "page-1",
+      "x": 0,
+      "y": 0,
+      "w": 1180,
+      "h": 760
+    },
+    {
+      "file": "Main.dc.html",
+      "title": "CU-08 · Classement — liste pleine",
+      "page": "page-1",
+      "x": 1300,
+      "y": 0,
+      "w": 1440,
+      "h": 1120
+    },
+    {
+      "file": "AnalyseEnCours.dc.html",
+      "title": "CU-08 · Classement — analyse en cours",
+      "page": "page-1",
+      "x": 2860,
+      "y": 0,
+      "w": 1440,
+      "h": 980
+    },
+    {
+      "file": "ListeVide.dc.html",
+      "title": "CU-08 · Classement — liste vide",
+      "page": "page-1",
+      "x": 4420,
+      "y": 0,
+      "w": 1440,
+      "h": 760
+    },
+    {
+      "file": "DetailCandidature.dc.html",
+      "title": "Écran 2 · Détail d'une candidature",
+      "page": "page-1",
+      "x": 0,
+      "y": 1300,
+      "w": 1440,
+      "h": 1040
+    },
+    {
+      "file": "SuppressionCandidature.dc.html",
+      "title": "CU-12 · Supprimer une candidature",
+      "page": "page-1",
+      "x": 1560,
+      "y": 1300,
+      "w": 1180,
+      "h": 720
+    },
+    {
+      "file": "DetailDocument.dc.html",
+      "title": "CU-09 · Détail document — cas normal",
+      "page": "page-1",
+      "x": 2860,
+      "y": 1300,
+      "w": 1440,
+      "h": 1080
+    },
+    {
+      "file": "DetailDocumentAtypique.dc.html",
+      "title": "CU-09 · Détail document — cas ATYPIQUE",
+      "page": "page-1",
+      "x": 4420,
+      "y": 1300,
+      "w": 1440,
+      "h": 1000
+    },
+    {
+      "file": "ImportDepot.dc.html",
+      "title": "CU-04 · Import — avant dépôt",
+      "page": "page-2",
+      "x": 0,
+      "y": 0,
+      "w": 1440,
+      "h": 860
+    },
+    {
+      "file": "ImportEnCours.dc.html",
+      "title": "CU-04 · Import — en cours",
+      "page": "page-2",
+      "x": 1560,
+      "y": 0,
+      "w": 1440,
+      "h": 880
+    },
+    {
+      "file": "Reconciliation.dc.html",
+      "title": "CU-15 · Réconciliation — 3 cas à arbitrer",
+      "page": "page-2",
+      "x": 3120,
+      "y": 0,
+      "w": 1440,
+      "h": 1420
+    },
+    {
+      "file": "ReconciliationVide.dc.html",
+      "title": "CU-15 · Réconciliation — rien à arbitrer",
+      "page": "page-2",
+      "x": 4680,
+      "y": 0,
+      "w": 1440,
+      "h": 780
+    },
+    {
+      "file": "ImportTermine.dc.html",
+      "title": "CU-04 · Import — terminé avec rejets",
+      "page": "page-2",
+      "x": 6240,
+      "y": 0,
+      "w": 1440,
+      "h": 920
+    },
+    {
+      "file": "ImportRefuse.dc.html",
+      "title": "CU-04 · Import — archive refusée",
+      "page": "page-2",
+      "x": 7800,
+      "y": 0,
+      "w": 1440,
+      "h": 800
+    },
+    {
+      "file": "Shell.dc.html",
+      "title": "Coquille de navigation",
+      "page": "page-3",
+      "x": 0,
+      "y": 0,
+      "w": 1180,
+      "h": 700
+    },
+    {
+      "file": "ConfigCampagne.dc.html",
+      "title": "CU-03 · Réglages de la campagne",
+      "page": "page-3",
+      "x": 1300,
+      "y": 0,
+      "w": 1440,
+      "h": 1320
+    },
+    {
+      "file": "Comptes.dc.html",
+      "title": "CU-02 · Gestion des comptes",
+      "page": "page-3",
+      "x": 4420,
+      "y": 0,
+      "w": 1440,
+      "h": 900
+    },
+    {
+      "file": "JournalAudit.dc.html",
+      "title": "CU-13 · Journal d'audit",
+      "page": "page-3",
+      "x": 5980,
+      "y": 0,
+      "w": 1440,
+      "h": 1000
+    },
+    {
+      "file": "Referentiel.dc.html",
+      "title": "RG-08 · Référentiel de comparaison — la candidature type",
+      "page": "page-3",
+      "x": 2860,
+      "y": 0,
+      "w": 1440,
+      "h": 1180
+    }
+  ],
+  "annotations": [
+    {
+      "id": "couverture",
+      "page": "page-1",
+      "x": 0,
+      "y": -250,
+      "w": 520,
+      "text": "19 artboards, 15 cas d'utilisation couverts\nCU-01 connexion · CU-02 comptes · CU-03 campagne · CU-04 import · CU-08 classement · CU-09 détail document · CU-10 export · CU-12 suppression · CU-13 audit · CU-15 réconciliation.\n\nCU-05, CU-06, CU-07 et CU-14 sont des cas SYSTÈME — analyse, signalement, calcul du score, purge. Ils n'ont pas d'écran propre : leurs effets se lisent sur les écrans ci-dessus."
+    },
+    {
+      "id": "probleme-2",
+      "page": "page-1",
+      "x": 1300,
+      "y": -250,
+      "w": 470,
+      "text": "Problème n°2 — « pas de score » n'est pas « mauvais score »\nLes non évaluables sortent du classement dans une section à part, avec la raison en clair. Aucun zéro nulle part. C'est la distinction la plus importante de l'interface."
+    },
+    {
+      "id": "probleme-1",
+      "page": "page-1",
+      "x": 1830,
+      "y": -250,
+      "w": 460,
+      "text": "Problème n°1 — signaler l'atypique sans dramatiser\nFilet ocre de 2 px en bord de ligne, plus le compte chiffré.\n\nRGAA : le chiffre porte l'information, la couleur ne fait que la redoubler."
+    },
+    {
+      "id": "probleme-5",
+      "page": "page-1",
+      "x": 2860,
+      "y": -250,
+      "w": 470,
+      "text": "Problème n°5 — suivre un lot de 200+ documents\nClassement annoncé provisoire, décompte analysés / atypiques / erreurs, et « vous pouvez fermer cet écran »."
+    },
+    {
+      "id": "probleme-3",
+      "page": "page-1",
+      "x": 2860,
+      "y": 1070,
+      "w": 500,
+      "text": "Problèmes n°3 et n°4 — l'écran différenciant\nLes deux niveaux sont deux blocs successifs reliés par une flèche qui ÉNONCE la dépendance : « le niveau 1 ayant validé, le niveau 2 a été exécuté ». Sur l'artboard voisin, la flèche est pointillée et rompue.\n\nChiffres à gauche pour se comparer d'un coup d'œil, justifications à droite pour se lire : deux besoins, deux traitements."
+    },
+    {
+      "id": "cas-atypique",
+      "page": "page-1",
+      "x": 4420,
+      "y": 1070,
+      "w": 480,
+      "text": "Cas ATYPIQUE — le verdict est en tête, pas à déduire.\nLe motif est nommé, et on explique que la confiance est ÉLEVÉE (91 %) : le problème n'est pas l'incertitude, c'est le type. Le bloc niveau 2 est présent mais visiblement non exécuté, avec ses trois tirets."
+    },
+    {
+      "id": "suppression",
+      "page": "page-1",
+      "x": 1560,
+      "y": 2060,
+      "w": 460,
+      "text": "CU-12 — action de conformité, discrète dans la page, explicite dans la confirmation.\nElle énonce exactement ce qui sera détruit, et rappelle que l'entrée d'audit SURVIT à la suppression : c'est ce qui prouve que la demande a été honorée."
+    },
+    {
+      "id": "import-securite",
+      "page": "page-2",
+      "x": 0,
+      "y": -250,
+      "w": 500,
+      "text": "Deux moments, deux natures de problème — la distinction que l'écran « terminé » doit rendre évidente.\n\nREFUSÉ À LA DÉCOMPRESSION : l'entrée n'est jamais entrée dans le lot. Mauvais format, chemin dangereux, trop volumineuse. C'est RG-07, et les plafonds sont annoncés avant le dépôt plutôt que découverts au rejet.\n\nATYPIQUE APRÈS ANALYSE : le document a bien été importé, puis le niveau 1 a constaté qu'il n'était pas exploitable — illisible, type non attendu, nature incertaine. C'est RG-01 à RG-03.\n\nLes deux sont listés séparément, jamais mélangés."
+    },
+    {
+      "id": "reconciliation",
+      "page": "page-2",
+      "x": 3120,
+      "y": -250,
+      "w": 520,
+      "text": "CU-15 · RG-09 — l'étape qui manquait\nProbo existe parce que les noms de fichiers mentent sur ce QU'EST un document. Le regroupement leur faisait pourtant confiance sur À QUI il appartient.\n\nL'identité est désormais lue dans le texte. Chaque cas montre côte à côte ce que dit le nom de fichier et ce que dit le contenu, extrait à l'appui : c'est ce qui permet de trancher sans ouvrir le PDF.\n\nRien ne s'analyse tant que les trois cas ne sont pas tranchés — un document mal attribué fausse DEUX scores, en silence."
+    },
+    {
+      "id": "reconciliation-vide",
+      "page": "page-2",
+      "x": 4680,
+      "y": -250,
+      "w": 470,
+      "text": "Le cas le plus fréquent, et donc celui à réussir : rien à arbitrer.\nL'écran ne se contente pas de disparaître — il rend compte de la vérification qui a bien eu lieu, en disant par quel moyen chacune des 412 candidatures a été regroupée."
+    },
+    {
+      "id": "archive-refusee",
+      "page": "page-2",
+      "x": 7800,
+      "y": -250,
+      "w": 470,
+      "text": "Archive refusée en bloc — aucune liste de fichiers, puisque rien n'a été extrait.\nLe rapport de décompression constaté est affiché face au plafond, et l'écran ne laisse pas l'utilisateur sans issue : trois pistes concrètes."
+    },
+    {
+      "id": "coquille",
+      "page": "page-3",
+      "x": 0,
+      "y": -250,
+      "w": 470,
+      "text": "Coquille de navigation — ajoutée après relecture.\nL'écran 1 avait d'abord été livré sans navigation. Elle est isolée ici et reprise à l'identique sur les dix-huit autres artboards.\n\nLes entrées Administration sont masquées, non grisées, pour un chargé d'admission."
+    },
+    {
+      "id": "referentiel",
+      "page": "page-3",
+      "x": 2860,
+      "y": -250,
+      "w": 520,
+      "text": "RG-08 — LA CANDIDATURE TYPE, c'est ici.\nUn bloc par type attendu, deux formes exclusives : profil décrit ou document déposé. Les trois états sont montrés ensemble — texte rempli, fichier déposé, et MANQUANT, qui bloque l'enregistrement.\n\nL'écran de réglages voisin n'en garde qu'un résumé de trois lignes : l'édition mérite sa propre page, sans quoi elle disparaît au fond d'un formulaire.\n\nL'avertissement sur le biais est en tête, pas en note de bas de page. Le produit ne peut pas empêcher techniquement le dépôt d'un CV réel ; il peut le dire au bon moment."
+    },
+    {
+      "id": "audit-inalterable",
+      "page": "page-3",
+      "x": 5980,
+      "y": -250,
+      "w": 490,
+      "text": "Journal d'audit — l'inaltérabilité doit SE VOIR.\nAucune action de modification, pas même grisée : c'est ce qui lui donne sa valeur devant un contrôle.\n\nUne entrée qui désigne une ressource déjà supprimée est le cas NORMAL après une suppression ou une purge — marquée comme telle, jamais comme une donnée manquante."
+    }
+  ],
+  "launch": {
+    "view": "focused",
+    "file": "Referentiel.dc.html"
+  }
+}

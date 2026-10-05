@@ -1,0 +1,778 @@
+<!doctype html>
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <script src="./support.js"></script>
+  </head>
+  <body>
+    <x-dc>
+      <helmet>
+        <link
+          rel="stylesheet"
+          href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;450;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap"
+        />
+        <style>
+          * {
+            box-sizing: border-box;
+          }
+          body {
+            margin: 0;
+          }
+          a {
+            color: #294b8a;
+            text-decoration: none;
+          }
+          a:hover {
+            color: #1b3565;
+            text-decoration: underline;
+          }
+          table {
+            border-collapse: collapse;
+            width: 100%;
+          }
+          th,
+          td {
+            text-align: left;
+            border-bottom: 1px solid #eaecef;
+          }
+          th {
+            padding: 13px 18px 8px;
+            font-size: 11px;
+            font-weight: 600;
+            letter-spacing: 0.07em;
+            text-transform: uppercase;
+            color: #6c757f;
+            border-bottom: 1px solid #d7dbe0;
+          }
+          td {
+            padding: 11px 18px;
+            font-size: 13px;
+            color: #14181d;
+            vertical-align: top;
+          }
+          .num {
+            font-family: 'IBM Plex Mono', ui-monospace, monospace;
+            font-variant-numeric: tabular-nums;
+          }
+          .filtre {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            height: 32px;
+            padding: 0 11px;
+            background: #ffffff;
+            border: 1px solid #d7dbe0;
+            border-radius: 4px;
+            font-size: 13px;
+            color: #14181d;
+          }
+          .navitem {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            height: 34px;
+            padding: 0 10px;
+            border-radius: 4px;
+            font-size: 13.5px;
+            color: #d4d8de;
+            cursor: pointer;
+          }
+          .navitem:hover {
+            background: #262c34;
+          }
+          .navitem.on {
+            background: #313a45;
+            color: #ffffff;
+            font-weight: 500;
+          }
+          .navsec {
+            padding: 18px 10px 7px;
+            font-size: 10.5px;
+            font-weight: 600;
+            letter-spacing: 0.09em;
+            text-transform: uppercase;
+            color: #7c858f;
+          }
+        </style>
+      </helmet>
+
+      <div
+        style="
+          width: 1440px;
+          min-height: 1000px;
+          background: #fbfbfa;
+          font-family: 'IBM Plex Sans', 'Segoe UI', system-ui, sans-serif;
+          color: #14181d;
+          display: flex;
+        "
+      >
+        <!-- Coquille de navigation, identique sur tous les écrans -->
+        <nav
+          style="
+            width: 232px;
+            flex-shrink: 0;
+            background: #1b2027;
+            display: flex;
+            flex-direction: column;
+            padding: 0 12px 14px;
+          "
+        >
+          <div style="display: flex; align-items: center; height: 56px; padding: 0 10px">
+            <span
+              style="
+                font-family: 'IBM Plex Mono', monospace;
+                font-size: 14px;
+                font-weight: 500;
+                letter-spacing: 0.14em;
+                color: #ffffff;
+              "
+              >PROBO</span
+            >
+          </div>
+          <div
+            style="
+              padding: 10px 11px 11px;
+              background: #262c34;
+              border: 1px solid #333b45;
+              border-radius: 5px;
+            "
+          >
+            <div
+              style="
+                font-size: 10.5px;
+                font-weight: 600;
+                letter-spacing: 0.09em;
+                text-transform: uppercase;
+                color: #7c858f;
+                margin-bottom: 7px;
+              "
+            >
+              Campagne
+            </div>
+            <div style="display: flex; align-items: flex-start; gap: 7px; cursor: pointer">
+              <span style="font-size: 13px; font-weight: 500; color: #ffffff; line-height: 1.35"
+                >Mastère Marketing Digital — Rentrée 2026</span
+              >
+              <svg
+                width="12"
+                height="12"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="#9AA1A9"
+                stroke-width="2.2"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                style="margin-top: 4px; flex-shrink: 0"
+              >
+                <path d="M6 9l6 6 6-6" />
+              </svg>
+            </div>
+            <div
+              style="
+                display: flex;
+                align-items: center;
+                gap: 7px;
+                margin-top: 9px;
+                padding-top: 9px;
+                border-top: 1px solid #333b45;
+              "
+            >
+              <span
+                style="
+                  display: inline-flex;
+                  align-items: center;
+                  padding: 2px 7px;
+                  background: #21402f;
+                  border-radius: 3px;
+                  font-size: 10.5px;
+                  font-weight: 600;
+                  letter-spacing: 0.04em;
+                  text-transform: uppercase;
+                  color: #7bc49b;
+                "
+                >Active</span
+              >
+              <div style="flex-grow: 1"></div>
+              <a
+                href="#"
+                style="
+                  display: inline-flex;
+                  align-items: center;
+                  gap: 5px;
+                  font-size: 12px;
+                  color: #a9bcde;
+                "
+              >
+                <svg
+                  width="12"
+                  height="12"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="#A9BCDE"
+                  stroke-width="2"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                >
+                  <circle cx="12" cy="12" r="3" />
+                  <path d="M4 12h2" />
+                  <path d="M18 12h2" />
+                  <path d="M12 4v2" />
+                  <path d="M12 18v2" />
+                </svg>
+                Réglages
+              </a>
+            </div>
+          </div>
+          <div class="navsec">Candidatures</div>
+          <div class="navitem">
+            <svg
+              width="16"
+              height="16"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="1.9"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+            >
+              <path d="M4 6h16" />
+              <path d="M4 12h11" />
+              <path d="M4 18h7" /></svg
+            >Classement
+          </div>
+          <div class="navitem">
+            <svg
+              width="16"
+              height="16"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="1.9"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+            >
+              <path d="M12 19V7" />
+              <path d="M7 12l5-5 5 5" />
+              <path d="M4 20h16" /></svg
+            >Importer un lot
+          </div>
+          <div class="navsec">Administration</div>
+          <div class="navitem">
+            <svg
+              width="16"
+              height="16"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="1.9"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+            >
+              <rect x="3" y="4" width="18" height="16" rx="2" />
+              <path d="M3 9h18" /></svg
+            >Campagnes
+          </div>
+          <div class="navitem">
+            <svg
+              width="16"
+              height="16"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="1.9"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+            >
+              <circle cx="9" cy="8" r="3.2" />
+              <path d="M3.5 19a5.5 5.5 0 0 1 11 0" />
+              <path d="M17 8.5h4" />
+              <path d="M19 6.5v4" /></svg
+            >Comptes
+          </div>
+          <div class="navitem on">
+            <svg
+              width="16"
+              height="16"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="1.9"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+            >
+              <path d="M12 3l7 3v6c0 4.2-2.9 7.6-7 9-4.1-1.4-7-4.8-7-9V6z" />
+              <path d="M9.5 12l1.8 1.8 3.4-3.6" /></svg
+            >Journal d'audit
+          </div>
+          <div style="flex-grow: 1"></div>
+          <div
+            style="
+              padding: 12px 10px 10px;
+              border-top: 1px solid #2c333c;
+              display: flex;
+              flex-direction: column;
+              gap: 11px;
+            "
+          >
+            <div style="display: flex; align-items: center; gap: 9px">
+              <span
+                style="
+                  display: inline-flex;
+                  align-items: center;
+                  justify-content: center;
+                  width: 27px;
+                  height: 27px;
+                  border-radius: 50%;
+                  background: #333b45;
+                  font-size: 11px;
+                  font-weight: 600;
+                  color: #d4d8de;
+                "
+                >MD</span
+              >
+              <div style="display: flex; flex-direction: column">
+                <span style="font-size: 12.5px; color: #ffffff">Marc Delaunay</span>
+                <span style="font-size: 11px; color: #7c858f">Administrateur</span>
+              </div>
+            </div>
+            <div style="display: flex; align-items: center; gap: 8px">
+              <div
+                style="
+                  display: flex;
+                  border: 1px solid #3b434d;
+                  border-radius: 4px;
+                  overflow: hidden;
+                "
+              >
+                <span
+                  style="
+                    padding: 3px 8px;
+                    font-size: 11.5px;
+                    font-weight: 500;
+                    background: #313a45;
+                    color: #ffffff;
+                  "
+                  >FR</span
+                >
+                <span style="padding: 3px 8px; font-size: 11.5px; color: #9aa1a9">EN</span>
+              </div>
+              <div style="flex-grow: 1"></div>
+              <a href="#" style="font-size: 12px; color: #9aa1a9">Déconnexion</a>
+            </div>
+          </div>
+        </nav>
+        <div
+          style="
+            flex-grow: 1;
+            padding: 28px 32px 44px;
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+          "
+        >
+          <div style="display: flex; align-items: flex-start; gap: 24px">
+            <div style="display: flex; flex-direction: column; gap: 7px">
+              <h1 style="margin: 0; font-size: 24px; font-weight: 600; letter-spacing: -0.01em">
+                Journal d'audit
+              </h1>
+              <p
+                style="
+                  margin: 0;
+                  font-size: 13px;
+                  color: #545c66;
+                  max-width: 780px;
+                  text-wrap: pretty;
+                "
+              >
+                Toutes les opérations effectuées sur les données de votre établissement. Réservé aux
+                administrateurs.
+              </p>
+            </div>
+            <div style="flex-grow: 1"></div>
+            <div
+              style="
+                display: flex;
+                flex-direction: column;
+                align-items: flex-end;
+                gap: 4px;
+                padding: 11px 16px;
+                background: #ffffff;
+                border: 1px solid #e2e5e9;
+                border-radius: 6px;
+              "
+            >
+              <span
+                style="
+                  font-size: 11px;
+                  font-weight: 600;
+                  letter-spacing: 0.07em;
+                  text-transform: uppercase;
+                  color: #6c757f;
+                "
+                >Conservation en vigueur</span
+              >
+              <span class="num" style="font-size: 17px; font-weight: 500">90 jours</span>
+            </div>
+          </div>
+
+          <!-- L'inaltérabilité doit se voir : aucune action, pas même grisée -->
+          <div
+            style="
+              display: flex;
+              align-items: flex-start;
+              gap: 12px;
+              padding: 14px 18px;
+              background: #ffffff;
+              border: 1px solid #c9d6ee;
+              border-left: 3px solid #294b8a;
+              border-radius: 6px;
+            "
+          >
+            <svg
+              width="18"
+              height="18"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="#294B8A"
+              stroke-width="1.8"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              style="margin-top: 1px; flex-shrink: 0"
+            >
+              <rect x="5" y="11" width="14" height="9" rx="2" />
+              <path d="M8 11V8a4 4 0 0 1 8 0v3" />
+            </svg>
+            <span style="font-size: 13px; line-height: 1.55; color: #1f3663; text-wrap: pretty"
+              ><strong style="font-weight: 600">Ce journal est en lecture seule.</strong> Aucune
+              entrée ne peut être modifiée ni supprimée depuis l'interface, et il n'est pas emporté
+              par la purge des candidatures — c'est ce qui lui donne sa valeur devant un
+              contrôle.</span
+            >
+          </div>
+
+          <!-- Filtres -->
+          <div
+            style="
+              display: flex;
+              align-items: center;
+              gap: 12px;
+              padding: 12px 14px;
+              background: #ffffff;
+              border: 1px solid #e2e5e9;
+              border-radius: 6px;
+            "
+          >
+            <span class="filtre" style="width: 224px">
+              <svg
+                width="14"
+                height="14"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="#6C757F"
+                stroke-width="1.9"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+              >
+                <rect x="3" y="5" width="18" height="16" rx="2" />
+                <path d="M3 10h18" />
+                <path d="M8 3v4" />
+                <path d="M16 3v4" />
+              </svg>
+              <span class="num">01/09/2026 – 03/09/2026</span>
+            </span>
+            <span class="filtre" style="width: 190px">
+              Tous les utilisateurs
+              <div style="flex-grow: 1"></div>
+              <svg
+                width="12"
+                height="12"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="#6C757F"
+                stroke-width="2.2"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+              >
+                <path d="M6 9l6 6 6-6" />
+              </svg>
+            </span>
+            <span class="filtre" style="width: 190px">
+              Toutes les actions
+              <div style="flex-grow: 1"></div>
+              <svg
+                width="12"
+                height="12"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="#6C757F"
+                stroke-width="2.2"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+              >
+                <path d="M6 9l6 6 6-6" />
+              </svg>
+            </span>
+            <div style="flex-grow: 1"></div>
+            <span style="font-size: 12.5px; color: #6c757f"
+              ><span class="num" style="color: #14181d; font-weight: 500">64</span> entrées</span
+            >
+            <a href="#" style="font-size: 12.5px">Exporter (CSV)</a>
+          </div>
+
+          <div
+            style="
+              background: #ffffff;
+              border: 1px solid #e2e5e9;
+              border-radius: 6px;
+              overflow: hidden;
+            "
+          >
+            <table>
+              <thead>
+                <tr>
+                  <th scope="col" style="width: 158px">Horodatage</th>
+                  <th scope="col" style="width: 188px">Utilisateur</th>
+                  <th scope="col" style="width: 232px">Action</th>
+                  <th scope="col" style="width: 188px">Ressource</th>
+                  <th scope="col">Référence</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td class="num" style="color: #545c66">03/09/2026 14:07</td>
+                  <td>Claire Fontaine</td>
+                  <td>
+                    <span style="display: inline-flex; align-items: center; gap: 7px"
+                      ><span
+                        style="width: 6px; height: 6px; border-radius: 50%; background: #a32b22"
+                      ></span
+                      >Import refusé</span
+                    >
+                  </td>
+                  <td style="color: #545c66">Lot d'import</td>
+                  <td class="num" style="font-size: 12px; color: #6c757f">
+                    archive_complete.zip — rapport de décompression × 148
+                  </td>
+                </tr>
+                <tr>
+                  <td class="num" style="color: #545c66">03/09/2026 09:16</td>
+                  <td>Claire Fontaine</td>
+                  <td>
+                    <span style="display: inline-flex; align-items: center; gap: 7px"
+                      ><span
+                        style="width: 6px; height: 6px; border-radius: 50%; background: #b07818"
+                      ></span
+                      >Entrée d'archive refusée</span
+                    >
+                  </td>
+                  <td style="color: #545c66">Lot d'import</td>
+                  <td class="num" style="font-size: 12px; color: #6c757f">
+                    ../../etc/cron.d/tache — chemin sortant
+                  </td>
+                </tr>
+                <tr>
+                  <td class="num" style="color: #545c66">03/09/2026 09:14</td>
+                  <td>Claire Fontaine</td>
+                  <td>
+                    <span style="display: inline-flex; align-items: center; gap: 7px"
+                      ><span
+                        style="width: 6px; height: 6px; border-radius: 50%; background: #2f7d5e"
+                      ></span
+                      >Lot importé</span
+                    >
+                  </td>
+                  <td style="color: #545c66">Lot d'import</td>
+                  <td class="num" style="font-size: 12px; color: #6c757f">
+                    candidatures_mmd_2026.zip — 1 248 documents
+                  </td>
+                </tr>
+                <!-- Ressource supprimée : cas normal, pas une anomalie -->
+                <tr>
+                  <td class="num" style="color: #545c66">02/09/2026 17:41</td>
+                  <td>Marc Delaunay</td>
+                  <td>
+                    <span style="display: inline-flex; align-items: center; gap: 7px"
+                      ><span
+                        style="width: 6px; height: 6px; border-radius: 50%; background: #a32b22"
+                      ></span
+                      >Candidature supprimée</span
+                    >
+                  </td>
+                  <td style="color: #545c66">Candidature</td>
+                  <td>
+                    <span class="num" style="font-size: 12px; color: #6c757f">MMD-2026-0092</span>
+                    <span
+                      style="
+                        display: inline-block;
+                        margin-left: 8px;
+                        padding: 1px 7px;
+                        background: #f2f3f5;
+                        border-radius: 3px;
+                        font-size: 11px;
+                        color: #6c757f;
+                      "
+                      >ressource supprimée</span
+                    >
+                  </td>
+                </tr>
+                <tr>
+                  <td class="num" style="color: #545c66">02/09/2026 11:23</td>
+                  <td>Marc Delaunay</td>
+                  <td>
+                    <span style="display: inline-flex; align-items: center; gap: 7px"
+                      ><span
+                        style="width: 6px; height: 6px; border-radius: 50%; background: #294b8a"
+                      ></span
+                      >Réglages de campagne modifiés</span
+                    >
+                  </td>
+                  <td style="color: #545c66">Campagne</td>
+                  <td class="num" style="font-size: 12px; color: #6c757f">
+                    Seuil de confiance 65 → 70
+                  </td>
+                </tr>
+                <tr>
+                  <td class="num" style="color: #545c66">02/09/2026 09:02</td>
+                  <td style="color: #6c757f">Système</td>
+                  <td>
+                    <span style="display: inline-flex; align-items: center; gap: 7px"
+                      ><span
+                        style="width: 6px; height: 6px; border-radius: 50%; background: #6c757f"
+                      ></span
+                      >Purge automatique</span
+                    >
+                  </td>
+                  <td style="color: #545c66">Candidatures</td>
+                  <td>
+                    <span style="font-size: 12.5px; color: #6c757f"
+                      >18 candidatures échues à 90 jours</span
+                    >
+                    <span
+                      style="
+                        display: inline-block;
+                        margin-left: 8px;
+                        padding: 1px 7px;
+                        background: #f2f3f5;
+                        border-radius: 3px;
+                        font-size: 11px;
+                        color: #6c757f;
+                      "
+                      >ressources supprimées</span
+                    >
+                  </td>
+                </tr>
+                <tr>
+                  <td class="num" style="color: #545c66">01/09/2026 16:35</td>
+                  <td>Marc Delaunay</td>
+                  <td>
+                    <span style="display: inline-flex; align-items: center; gap: 7px"
+                      ><span
+                        style="width: 6px; height: 6px; border-radius: 50%; background: #294b8a"
+                      ></span
+                      >Compte créé</span
+                    >
+                  </td>
+                  <td style="color: #545c66">Utilisateur</td>
+                  <td class="num" style="font-size: 12px; color: #6c757f">
+                    sofiane.hamdi@esm-lyon.fr — chargé d'admission
+                  </td>
+                </tr>
+                <tr>
+                  <td class="num" style="color: #545c66">01/09/2026 08:12</td>
+                  <td>Claire Fontaine</td>
+                  <td>
+                    <span style="display: inline-flex; align-items: center; gap: 7px"
+                      ><span
+                        style="width: 6px; height: 6px; border-radius: 50%; background: #6c757f"
+                      ></span
+                      >Connexion</span
+                    >
+                  </td>
+                  <td style="color: #545c66">Session</td>
+                  <td class="num" style="font-size: 12px; color: #6c757f">192.168.24.11</td>
+                </tr>
+                <tr>
+                  <td class="num" style="color: #545c66">01/09/2026 08:11</td>
+                  <td style="color: #6c757f">—</td>
+                  <td>
+                    <span style="display: inline-flex; align-items: center; gap: 7px"
+                      ><span
+                        style="width: 6px; height: 6px; border-radius: 50%; background: #a32b22"
+                      ></span
+                      >Échec de connexion</span
+                    >
+                  </td>
+                  <td style="color: #545c66">Session</td>
+                  <td class="num" style="font-size: 12px; color: #6c757f">
+                    192.168.24.11 — 2ᵉ tentative
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+            <div
+              style="
+                display: flex;
+                align-items: center;
+                gap: 12px;
+                padding: 12px 18px;
+                background: #fcfcfb;
+              "
+            >
+              <span style="font-size: 12.5px; color: #6c757f"
+                ><span class="num">1–9</span> sur <span class="num">64</span></span
+              >
+              <div style="flex-grow: 1"></div>
+              <button
+                type="button"
+                style="
+                  height: 28px;
+                  padding: 0 11px;
+                  background: #ffffff;
+                  border: 1px solid #d7dbe0;
+                  border-radius: 4px;
+                  font: inherit;
+                  font-size: 12.5px;
+                  color: #9aa1a9;
+                  cursor: default;
+                "
+              >
+                Précédent
+              </button>
+              <button
+                type="button"
+                style="
+                  height: 28px;
+                  padding: 0 11px;
+                  background: #ffffff;
+                  border: 1px solid #a9b1ba;
+                  border-radius: 4px;
+                  font: inherit;
+                  font-size: 12.5px;
+                  color: #14181d;
+                  cursor: pointer;
+                "
+              >
+                Suivant
+              </button>
+            </div>
+          </div>
+
+          <p
+            style="
+              margin: 0;
+              font-size: 12.5px;
+              line-height: 1.6;
+              color: #9aa1a9;
+              max-width: 900px;
+              text-wrap: pretty;
+            "
+          >
+            Une entrée peut désigner une candidature déjà supprimée ou purgée : c'est le
+            fonctionnement attendu. Le journal conserve la trace de l'opération sans conserver les
+            données du candidat, ce qui permet de prouver qu'une demande d'effacement a été honorée.
+          </p>
+        </div>
+      </div>
+    </x-dc>
+  </body>
+</html>
