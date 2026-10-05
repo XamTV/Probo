@@ -47,6 +47,32 @@ L'assemblage et la publication passent par la compétence de design de Claude Co
 - `charte-graphique.md` — couleurs, typographies, échelle d'espacement, inventaire des composants, à extraire des artboards
 - `accessibilite-rgaa.md` — la position d'accessibilité, à partir des choix effectivement retenus
 
+## Les cinq problèmes de conception
+
+Ce sont les difficultés que le maquettage devait résoudre. Elles ont cadré le travail, et c'est à elles qu'il faut confronter les écrans pour juger s'ils tiennent.
+
+1. **Signaler un document atypique sans dramatiser.** Ce n'est ni une erreur système ni une faute du candidat. Ça doit se voir au premier coup d'œil dans une liste de 400 lignes, sans transformer l'écran en tableau d'alarmes.
+
+2. **Distinguer « pas de score » de « mauvais score ».** Une candidature dont aucun document n'est exploitable n'a **pas** de score ; elle ne vaut pas zéro. Zéro la classerait en dernier et signifierait « mauvaise candidature ». Ces candidatures sortent du classement et forment un groupe à part. **C'est la distinction la plus importante de toute l'interface.**
+
+3. **Présenter deux niveaux d'analyse en séquence.** Sur le détail d'un document, on doit comprendre que le niveau 2 dépend du niveau 1 — et, quand il n'a pas eu lieu, comprendre pourquoi sans avoir à le déduire.
+
+4. **Afficher trois sous-scores et leurs justifications sans saturer.** Les chiffres se comparent d'un coup d'œil, les justifications se lisent. Deux besoins, deux traitements visuels.
+
+5. **Suivre le traitement d'un lot de 200 documents.** Plusieurs minutes, document par document, avec des échecs partiels possibles. Claire doit savoir ce qui avance, ce qui a échoué et pourquoi, sans rester devant l'écran.
+
+Les notes posées sur le canvas rattachent chaque parti pris au problème qu'il résout.
+
+## Ce que porte le dossier de maquettage
+
+| Fichier                                          | Rôle                                                       |
+| ------------------------------------------------ | ---------------------------------------------------------- |
+| [`artboards/`](artboards/)                       | Les 19 écrans, source de vérité                            |
+| [`charte-graphique.md`](charte-graphique.md)     | Couleurs, typographie, composants — extraits des artboards |
+| [`accessibilite-rgaa.md`](accessibilite-rgaa.md) | La position d'accessibilité, et ce qu'elle ne couvre pas   |
+
+Un `prompt-claude-design.md` a existé jusqu'au 05/10/2026 : le cahier des charges qui a produit les écrans. La moitié de son contenu décrivait les écrans un par un, ce que les artboards montrent mieux ; l'autre moitié est devenue les deux documents ci-dessus. Voir le journal de décisions.
+
 ## Décisions visuelles à connaître
 
 - **Thème clair uniquement.** Le thème sombre n'a jamais figuré au périmètre ; le proposer en maquette aurait créé un écart à justifier entre le dessin et l'application.

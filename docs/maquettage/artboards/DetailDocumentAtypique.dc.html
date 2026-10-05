@@ -85,7 +85,7 @@
       <div
         style="
           width: 1440px;
-          min-height: 1000px;
+          min-height: 1230px;
           background: #fbfbfa;
           font-family: 'IBM Plex Sans', 'Segoe UI', system-ui, sans-serif;
           color: #14181d;
@@ -700,6 +700,102 @@
             </div>
           </div>
 
+          <!-- RG-10 : contredire le verdict, là où Claire le conteste -->
+          <div
+            style="
+              background: #ffffff;
+              border: 1px solid #c9d6ee;
+              border-left: 3px solid #294b8a;
+              border-radius: 6px;
+              overflow: hidden;
+            "
+          >
+            <div style="display: flex; align-items: flex-start; gap: 12px; padding: 16px 20px">
+              <svg
+                width="18"
+                height="18"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="#294B8A"
+                stroke-width="1.9"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                style="margin-top: 1px; flex-shrink: 0"
+              >
+                <path d="M9 11l3 3L22 4" />
+                <path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11" />
+              </svg>
+              <div style="display: flex; flex-direction: column; gap: 5px">
+                <h2 style="margin: 0; font-size: 15px; font-weight: 600; color: #1f3663">
+                  Vous n'êtes pas d'accord ?
+                </h2>
+                <p
+                  style="
+                    margin: 0;
+                    font-size: 13px;
+                    line-height: 1.6;
+                    color: #1f3663;
+                    max-width: 900px;
+                    text-wrap: pretty;
+                  "
+                >
+                  Probo ordonne et justifie, il ne tranche pas. Si vous savez que ce document est
+                  bien attendu, dites-le : il entrera dans le calcul des scores, et
+                  <strong style="font-weight: 600"
+                    >le verdict du modèle restera affiché à côté du vôtre</strong
+                  >.
+                </p>
+              </div>
+            </div>
+            <div
+              style="
+                display: flex;
+                align-items: center;
+                gap: 11px;
+                padding: 14px 20px;
+                background: #fcfcfb;
+                border-top: 1px solid #eaecef;
+              "
+            >
+              <span style="font-size: 12.5px; color: #6c757f"
+                >Votre décision sera inscrite au journal d'audit, avec votre nom et la date.</span
+              >
+              <div style="flex-grow: 1"></div>
+              <button
+                type="button"
+                style="
+                  height: 34px;
+                  padding: 0 14px;
+                  background: #ffffff;
+                  border: 1px solid #a9b1ba;
+                  border-radius: 4px;
+                  font: inherit;
+                  font-size: 13px;
+                  color: #14181d;
+                  cursor: pointer;
+                "
+              >
+                Requalifier le type…
+              </button>
+              <button
+                type="button"
+                style="
+                  height: 34px;
+                  padding: 0 16px;
+                  background: #294b8a;
+                  border: 1px solid #294b8a;
+                  border-radius: 4px;
+                  font: inherit;
+                  font-size: 13px;
+                  font-weight: 500;
+                  color: #ffffff;
+                  cursor: pointer;
+                "
+              >
+                Ce document est bien attendu
+              </button>
+            </div>
+          </div>
           <div
             style="display: flex; align-items: center; gap: 18px; font-size: 11.5px; color: #9aa1a9"
           >

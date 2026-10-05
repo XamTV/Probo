@@ -84,7 +84,7 @@
       "x": 4420,
       "y": 1300,
       "w": 1440,
-      "h": 1000
+      "h": 1230
     },
     {
       "file": "ImportDepot.dc.html",
@@ -233,7 +233,7 @@
       "x": 4420,
       "y": 1070,
       "w": 480,
-      "text": "Cas ATYPIQUE — le verdict est en tête, pas à déduire.\nLe motif est nommé, et on explique que la confiance est ÉLEVÉE (91 %) : le problème n'est pas l'incertitude, c'est le type. Le bloc niveau 2 est présent mais visiblement non exécuté, avec ses trois tirets."
+      "text": "Cas ATYPIQUE — le verdict est en tête, pas à déduire.\nLe motif est nommé, et on explique que la confiance est ÉLEVÉE (91 %) : le problème n'est pas l'incertitude, c'est le type. Le bloc niveau 2 est présent mais visiblement non exécuté.\n\nRG-10 — en pied d'écran, Claire peut CONTREDIRE ce verdict. C'est ce qui tient la promesse des personas : un outil qui ordonne et justifie, pas qui tranche. Le verdict du modèle reste affiché à côté de la décision humaine, jamais remplacé."
     },
     {
       "id": "suppression",
@@ -302,6 +302,6 @@
   ],
   "launch": {
     "view": "focused",
-    "file": "Referentiel.dc.html"
+    "file": "DetailDocumentAtypique.dc.html"
   }
 }
