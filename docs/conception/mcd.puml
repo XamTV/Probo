@@ -38,7 +38,7 @@ rectangle "**LOT D'IMPORT**\n--\n<u>id lot</u>\nnom de l'archive\nstatut\nnombre
 rectangle "**CANDIDATURE**\n--\n<u>id candidature</u>\nnom du candidat\nadresse du candidat\nréférence externe\nstatut\norigine de l'identité\nscore global\nnombre de documents atypiques\néchéance de purge" as CANDIDATURE
 rectangle "**DOCUMENT**\n--\n<u>id document</u>\nnom d'origine\ntaille\ntype de fichier\nidentité détectée\nconfiance sur l'identité\nméthode d'extraction\nstatut" as DOCUMENT
 rectangle "**TEXTE EXTRAIT**\n--\n<u>id texte</u>\ncontenu\nnombre de caractères" as TEXTE
-rectangle "**ANALYSE**\n--\n<u>id analyse</u>\ntype détecté\nconfiance\natypique\nmotif d'atypie\njustification niveau 1\nscore adéquation\nscore clarté\nscore qualité formelle\njustification adéquation\njustification clarté\njustification qualité formelle\nscore du document\nversion de prompt\ndate d'analyse" as ANALYSE
+rectangle "**ANALYSE**\n--\n<u>id analyse</u>\ntype détecté\nconfiance\natypique\nmotif d'atypie\njustification niveau 1\nscore adéquation\nscore clarté\nscore qualité formelle\njustification adéquation\njustification clarté\njustification qualité formelle\nscore du document\nversion de prompt\ndate d'analyse\n--\ntype requalifié\nmotif de requalification\ndate de requalification" as ANALYSE
 rectangle "**ENTRÉE D'AUDIT**\n--\n<u>id entrée</u>\naction\ntype de ressource\nréférence de ressource\ndate de survenue" as AUDIT
 
 usecase "EMPLOYER" as EMPLOYER
@@ -53,6 +53,7 @@ usecase "PORTER" as PORTER
 usecase "ÉVALUER" as EVALUER
 usecase "JOURNALISER" as JOURNALISER
 usecase "DÉCLENCHER" as DECLENCHER
+usecase "CONTREDIRE" as CONTREDIRE
 
 ETABLISSEMENT -- EMPLOYER : (1,n)
 EMPLOYER -- UTILISATEUR : (1,1)
@@ -90,10 +91,21 @@ JOURNALISER -- AUDIT : (1,1)
 UTILISATEUR -- DECLENCHER : (0,n)
 DECLENCHER -- AUDIT : (0,1)
 
+UTILISATEUR -- CONTREDIRE : (0,n)
+CONTREDIRE -- ANALYSE : (0,1)
+
 note right of CANDIDATURE
   Le **rang** n'est pas un attribut.
   Il se calcule à la lecture, par
   fonction fenêtre sur le score.
+end note
+
+note bottom of ANALYSE
+  Le verdict du modèle et la décision
+  humaine coexistent : **type détecté**
+  n'est jamais écrasé par **type
+  requalifié** (RG-10). Sans quoi on ne
+  saurait plus qui a décidé.
 end note
 
 note bottom of ANALYSE

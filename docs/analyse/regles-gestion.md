@@ -170,6 +170,28 @@ _US-23 · à implémenter au lot 2_
 
 ---
 
+## RG-10 — Contradiction humaine d'un verdict
+
+**Énoncé.** Un utilisateur peut **contredire le verdict de niveau 1** d'un document atypique, en confirmant sa nature ou en le requalifiant. Le verdict du modèle n'est **jamais écrasé** : la décision humaine est enregistrée à côté, avec son auteur, sa date et son motif. Le document cesse alors d'être atypique et le niveau 2 s'exécute pour lui seul.
+
+Le motif `UNREADABLE` n'est pas contredisible.
+
+**Pourquoi.** Les personas l'exigent en toutes lettres : Claire « acceptera un outil qui **ordonne et justifie**, pas un outil qui tranche », et « elle doit pouvoir contredire l'outil ». Sans cette règle, Probo tranche — il signale un document atypique, l'exclut du calcul, et Claire n'a aucun recours. C'est précisément l'outil que les personas disent qu'elle rejettera.
+
+**Pourquoi `UNREADABLE` fait exception.** Les deux autres motifs portent sur un **jugement** : le modèle pense que c'est un portfolio, Claire sait que c'est un CV de graphiste. Un humain tranche mieux. `UNREADABLE` ne porte sur aucun jugement : il n'y a pas de texte. Aucune décision humaine n'en fait apparaître. Proposer de contredire ce verdict-là serait offrir un bouton qui ne peut rien changer.
+
+**Le verdict du modèle survit à la contradiction.** C'est le point structurant. `detectedType`, `confidence` et `isAtypical` gardent ce que le modèle a dit ; quatre colonnes enregistrent la décision humaine. Un score reste donc explicable jusqu'au bout — y compris lorsque l'explication est « une personne en a décidé autrement, à cette date, pour ce motif ».
+
+Écraser le verdict aurait rendu le produit muet devant la seule question qui compte en cas de contestation : qui a décidé, la machine ou quelqu'un ?
+
+**Où elle s'exerce.** Sur le détail du document, là où Claire lit la justification qu'elle conteste. Pas dans la file de réconciliation : celle-ci **bloque** l'analyse, alors qu'un document atypique ne bloque rien — il est déjà visible, déjà exclu, déjà expliqué.
+
+**Traçabilité.** Toute contradiction est inscrite au journal d'audit sous l'action `ANALYSIS_VERDICT_OVERRIDDEN`.
+
+_US-24 · à implémenter au lot 5_
+
+---
+
 ## Tableau de synthèse
 
 | Règle | Énoncé court                                              | US           | État          |

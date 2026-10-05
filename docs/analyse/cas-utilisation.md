@@ -44,7 +44,10 @@ L'administrateur **généralise** le chargé d'admission : tout ce que le second
       │                   │   ( CU-08  Consulter le classement )         │
       │  ────────────────┼──▶                                            │
       │                   │   ( CU-09  Consulter le détail document )    │
-      │  ────────────────┼──▶                                            │
+      │  ────────────────┼──▶        │                                   │
+      │                   │          │ «extend»                          │
+      │                   │   ( CU-16  Contredire un verdict )           │
+      │                   │                                              │
       │                   │   ( CU-10  Exporter le classement )          │
       │                   │                                              │
       △                   │                                              │
@@ -89,6 +92,7 @@ L'administrateur **généralise** le chargé d'admission : tout ce que le second
 | CU-13 | Consulter le journal d'audit         | Administrateur       | US-21                      |
 | CU-14 | Purger les données échues            | Planificateur        | US-20                      |
 | CU-15 | Réconcilier l'identité des candidats | Chargé d'admission   | US-23                      |
+| CU-16 | Contredire un verdict d'analyse      | Chargé d'admission   | US-24                      |
 
 ---
 

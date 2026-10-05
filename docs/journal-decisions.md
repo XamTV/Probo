@@ -215,3 +215,87 @@ Or **le produit tout entier repose sur le fait que les noms de fichiers mentent.
 ---
 
 **Ce que ces deux entrées disent de la méthode.** Le maquettage n'a pas produit que des écrans : il a produit deux règles de gestion, deux entrées de périmètre, deux user stories et une refonte partielle du schéma. C'est l'argument à donner au jury sur la chaîne `besoins → US → CU → maquettes → MCD` — la preuve, par l'exemple, que faire le MCD avant les maquettes aurait obligé à le refaire.
+
+---
+
+## 2026-10-05 — Trois points en suspens, tranchés ensemble
+
+**Contexte.** Trois décisions traînaient depuis le maquettage, chacune signalée mais aucune arbitrée. Les traiter séparément aurait coûté trois séances ; elles touchent toutes les trois à la même question — ce que le produit garantit, et ce qu'il laisse au code.
+
+---
+
+### Claire doit pouvoir contredire l'outil — RG-10, M-18, US-24
+
+**Le constat.** `personas.md` l'écrit en toutes lettres : Claire « acceptera un outil qui ordonne et justifie, pas un outil qui tranche », et « elle doit pouvoir contredire l'outil ». Or US-11 comptait six critères d'acceptation, **tous passifs** : le motif est affiché, le document est écarté, le signalement est visible partout. Aucune action. Aucun recours.
+
+Probo tranchait.
+
+**Options.** (a) Étendre la file de réconciliation. (b) Un geste sur le détail du document. (c) Reporter en `S-xx`.
+
+**Décision.** (b), dans une portée volontairement minimale.
+
+**Raison, et correction d'une erreur antérieure.** J'avais d'abord proposé d'étendre l'écran de réconciliation. C'était le mauvais endroit : cet écran **bloque** l'analyse, alors qu'un document atypique ne bloque rien — il est déjà visible, déjà exclu, déjà expliqué. Le bon endroit est le détail du document, là où Claire lit la justification qu'elle conteste.
+
+L'asymétrie est la même qu'entre RG-09 et RG-10 : un doute d'identité corrompt deux scores en silence, donc il bloque ; un verdict d'atypie est bruyant et sans conséquence cachée, donc il attend.
+
+**Le verdict du modèle n'est jamais écrasé.** C'est le point structurant. `detectedType`, `confidence` et `isAtypical` gardent ce que le modèle a dit ; quatre colonnes enregistrent la décision humaine à côté. Écraser aurait rendu le produit muet devant la seule question qui compte en cas de contestation : qui a décidé ?
+
+**`UNREADABLE` fait exception et n'est pas contredisible.** Les deux autres motifs portent sur un jugement, qu'un humain tranche mieux. Celui-ci ne porte sur aucun jugement : il n'y a pas de texte. Offrir un bouton qui ne peut rien changer serait mentir sur ce que l'outil sait faire.
+
+**Ce qui reste dehors.** La relance en OCR dépend de `S-01`, et la requalification de masse toucherait des scores déjà calculés. Les deux restent hors périmètre.
+
+---
+
+### Le vocabulaire du journal d'audit devient une énumération
+
+**Le constat.** `audit_entry.action` et `entity_type` étaient des chaînes libres. Les maquettes affichent pourtant « Entrée d'archive refusée », « Purge automatique » — des libellés stables et traduits.
+
+**Décision.** Deux énumérations PostgreSQL : 16 actions, 8 types de ressource.
+
+**Raison.** La règle du projet veut qu'aucune valeur brute n'atteigne un écran. Une chaîne libre garantit l'inverse : l'interface aurait affiché `BATCH_IMPORTED` ou se serait appuyée sur une table de correspondance qu'aucun type ne protège. Le jeu est borné et connaissable — les cas d'utilisation le donnent presque en entier.
+
+**Le prix, assumé.** Une migration à chaque nouvelle action journalisée. C'est le coût d'un vocabulaire que la base garantit, et il est payé une fois par ajout plutôt qu'à chaque lecture.
+
+**Conséquence.** Les deux énumérations existent aussi dans `packages/shared` et portent leurs clés de traduction, comme toutes les autres.
+
+---
+
+### RG-08 cesse de reposer sur le seul code
+
+**Le constat.** RG-08 exige qu'un référentiel porte exactement une de ses deux formes. Prisma ne génère pas de contrainte `CHECK` : la règle ne vivait que dans le code applicatif. C'était l'écart n°10, le **seul** de la liste qualifié de faiblesse plutôt que de choix.
+
+**Décision.** Une contrainte `CHECK` écrite à la main, dans sa propre migration.
+
+**Raison.** Une règle tenue par le seul code se contourne — par un script de reprise, un correctif en production, un second appelant. Une contrainte ne se contourne pas. Vérifié : les deux formes simultanées et l'absence de forme sont refusées, chaque forme seule est acceptée.
+
+**Le prix.** `schema.prisma` ne décrit plus toute la base. Une relecture du seul schéma manquerait cette contrainte, d'où sa mention au MPD, aux écarts et au dictionnaire.
+
+---
+
+**Ce que ces trois décisions ont en commun.** Chacune déplace une garantie du code vers une structure — le verdict humain vers des colonnes, le vocabulaire d'audit vers une énumération, RG-08 vers une contrainte. Le code reste nécessaire ; il n'est plus le seul rempart.
+
+---
+
+## 2026-10-05 — Dissolution du prompt de maquettage
+
+**Contexte.** `maquettage/prompt-claude-design.md` était le cahier des charges rédigé pour produire les écrans. Les écrans sont produits depuis un mois, et le document était toujours entretenu — j'ai encore mis à jour sa description de l'écran 3 le jour même, par réflexe.
+
+**Le constat, chiffré.** 142 de ses 282 lignes décrivaient les écrans un par un. C'est une redescription de ce que les 19 artboards montrent mieux, et une seconde vérité à tenir : toute modification d'écran demandait de toucher les deux.
+
+C'est exactement le motif refusé trois fois ce même jour — pour les images rendues, pour un document de MPD, pour le canvas assemblé. Il n'avait pas été appliqué ici parce que personne, moi compris, n'avait reposé la question de l'utilité du document une fois son but atteint.
+
+**Options.** (a) Le geler, daté, comme preuve de méthode. (b) Le dissoudre dans les livrables qui restaient à produire. (c) Le supprimer sèchement.
+
+**Décision.** (b).
+
+**Raison.** L'autre moitié du document n'était pas morte, elle était **mal rangée**. Direction visuelle, vocabulaire et contraintes techniques sont une charte graphique ; la section accessibilité est une position RGAA. Or `charte-graphique.md` et `accessibilite-rgaa.md` figuraient tous deux à l'index comme « à produire ». Ils étaient déjà écrits, au mauvais endroit, dans un document dont la raison d'être était épuisée.
+
+Le gel se défendait — montrer le cahier des charges qui a engendré les écrans est une preuve de méthode. Mais un document figé qui contredit les écrans actuels devient un passif, et les cinq problèmes de conception qu'il portait sont mieux placés dans le README du maquettage, où ils servent encore à juger les écrans.
+
+**Conséquences.**
+
+- La charte graphique est **extraite des artboards**, pas rédigée de mémoire : couleurs relevées par fréquence d'usage, échelle de tailles réelle, trois graisses, inventaire des composants. Elle porte sa règle de tenue — en cas de divergence, ce sont les artboards qui ont raison.
+- La position RGAA distingue ce que les maquettes **démontrent** de ce qu'elles ne peuvent pas démontrer : le parcours clavier, le piège de focus et le contraste mesuré demandent l'application réelle, et rejoignent le plan de tests. Elle acte aussi qu'aucune déclaration de conformité ne sera produite — la revendiquer sans audit serait invérifiable.
+- Deux livrables « à produire » sont cochés, 142 lignes de doublon disparaissent, et il n'y a plus qu'une description des écrans : les écrans.
+
+**Ce que ça dit de la méthode.** Un livrable a une fin de vie. Celui-ci avait rempli son office et continuait d'être entretenu par habitude — c'est le même mécanisme qui produit un MCD divergent au bout de cinq mois.

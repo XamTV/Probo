@@ -42,6 +42,7 @@ rectangle "Probo" {
   usecase "CU-07\nCalculer le score\nd'une candidature" as CU07
   usecase "CU-08\nConsulter le classement" as CU08
   usecase "CU-09\nConsulter le détail\nd'un document" as CU09
+  usecase "CU-16\nContredire un verdict" as CU16
   usecase "CU-10\nExporter le classement" as CU10
 
   usecase "CU-02\nGérer les comptes" as CU02
@@ -71,6 +72,9 @@ CU05 ..> CU07 : <<include>>
 
 ' Le signalement n'a lieu que si le niveau 1 écarte le document (RG-01 à RG-03)
 CU06 ..> CU05 : <<extend>>
+
+' Contredire un verdict n'arrive que depuis la consultation d'un document atypique (RG-10)
+CU16 ..> CU09 : <<extend>>
 
 actor "Mistral AI" as IA <<système>>
 CU05 --> IA

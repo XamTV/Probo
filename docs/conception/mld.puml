@@ -74,6 +74,8 @@ entity "**TEXTE_EXTRAIT**" as texte {
 
 entity "**ANALYSE**" as analyse {
   <u>#id_document</u>
+  --
+  #id_utilisateur  (nullable)
 }
 
 entity "**ENTREE_AUDIT**" as audit {
@@ -93,6 +95,7 @@ campagne ||--o{ candidature
 
 utilisateur ||--o{ lot
 utilisateur ||--o{ audit
+utilisateur ||--o{ analyse
 
 candidature ||--|{ document
 lot ||--|{ document

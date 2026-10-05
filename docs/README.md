@@ -20,13 +20,12 @@ Deux raisons de ne pas y revenir plus tôt. D'abord, chaque entité doit pouvoir
 | `analyse/cahier-des-charges.md`             | Écrit                                             |
 | `analyse/perimetre.md`                      | Écrit — MoSCoW, refus actés et reports datés      |
 | `analyse/personas.md`                       | Écrit — Claire, Marc, Sofia                       |
-| `analyse/user-stories.md`                   | Écrit — 23 US dont 2 reportées, 6 épopées         |
-| `analyse/regles-gestion.md`                 | Écrit — RG-01 à RG-09, dont 6 sous test           |
-| `analyse/cas-utilisation.md`                | Écrit — 15 CU dont 1 reporté, 2 scénarios         |
-| `maquettage/prompt-claude-design.md`        | Écrit — prompt autoportant, 7 écrans              |
-| `maquettage/artboards/`                     | Écrit — 18 artboards, 15 CU couverts              |
-| `maquettage/charte-graphique.md`            | À extraire des artboards                          |
-| `maquettage/accessibilite-rgaa.md`          | À produire — position RGAA retenue                |
+| `analyse/user-stories.md`                   | Écrit — 24 US dont 2 reportées, 6 épopées         |
+| `analyse/regles-gestion.md`                 | Écrit — RG-01 à RG-10, dont 6 sous test           |
+| `analyse/cas-utilisation.md`                | Écrit — 16 CU dont 1 reporté, 2 scénarios         |
+| `maquettage/artboards/`                     | Écrit — 19 artboards, 16 CU couverts              |
+| `maquettage/charte-graphique.md`            | Écrit — extrait des artboards                     |
+| `maquettage/accessibilite-rgaa.md`          | Écrit — 4 engagements, 5 points à vérifier        |
 | `conception/diagramme-cas-utilisation.puml` | Écrit — 14 CU, CU-11 exclu car reporté            |
 | `conception/mcd.puml`, `mld.md`, `mpd.puml` | Écrit — reconstruits après les maquettes          |
 | `conception/ecarts-mcd-mpd.md`              | Écrit — 10 écarts, dont 1 signalé comme faiblesse |

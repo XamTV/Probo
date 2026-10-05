@@ -151,6 +151,8 @@ Clé primaire partagée avec `document` : un document porte au plus une analyse.
 
 Les six colonnes vides au niveau 2 sont la trace d'un document atypique : RG-04 interdit son exécution.
 
+> **Le verdict du modèle n'est jamais écrasé.** `detected_type`, `confidence` et `is_atypical` conservent ce que le modèle a établi ; les quatre colonnes `override_*` enregistrent la décision humaine à côté. Un score reste donc explicable jusqu'au bout, y compris quand l'explication est « une personne en a décidé autrement » (RG-10).
+
 ## audit_entry — Journal d'audit
 
 Rattaché à l'établissement et non à la candidature : la purge des candidatures laisse la piste intacte.
@@ -168,4 +170,6 @@ Rattaché à l'établissement et non à la candidature : la purge des candidatur
 | `details`        | JSON       | non    | Contenu variable selon l'action                                                      |
 | `occurred_at`    | horodatage | oui    | Date de survenue                                                                     |
 
-> **`action` et `entity_type` sont des chaînes libres**, non des énumérations. C'est un point à trancher : un vocabulaire stable rendrait le filtrage fiable et traduisible, au prix d'une migration à chaque nouvelle action journalisée.
+> **`action` et `entity_type` sont des énumérations** depuis le 05/10/2026. Elles étaient des chaînes libres, ce qui rendait le filtrage approximatif et envoyait des valeurs brutes à l'écran — contre la règle i18n du projet, qui veut qu'aucune valeur brute n'atteigne une interface. Le prix est une migration à chaque nouvelle action journalisée ; le jeu est borné et connaissable d'après les cas d'utilisation.
+>
+> `action` prend 16 valeurs, de `USER_LOGGED_IN` à `RANKING_EXPORTED`. `entity_type` en prend 8, une par entité du modèle plus `SESSION`.

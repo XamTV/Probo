@@ -2,7 +2,7 @@
 
 Le [MCD](mcd.puml) ne porte aucune technique. Le modèle physique, lui, en porte beaucoup. Ce document recense ce que le schéma Prisma ajoute, et pourquoi — de sorte qu'aucun écart ne soit découvert par le jury avant d'être expliqué.
 
-Chaque écart est un choix, pas un oubli.
+Chaque écart est un choix, pas un oubli — et aucun n'est aujourd'hui une faiblesse assumée.
 
 ## 1. `institution_id` dénormalisé jusqu'aux tables profondes
 
@@ -68,10 +68,16 @@ Chaque écart est un choix, pas un oubli.
 
 C'est le seul « écart » qui soit une absence volontaire plutôt qu'un ajout.
 
-## 10. Une contrainte de RG-08 non portée par le schéma
+## 10. Une contrainte écrite à la main, hors de Prisma
 
-**L'écart.** RG-08 exige qu'un référentiel porte **exactement une** des deux formes — profil décrit **ou** document déposé, jamais les deux, jamais aucune. Le schéma rend les quatre colonnes nullables et ne contraint rien.
+**L'écart.** La contrainte `reference_profile_exactly_one_form` existe en base mais pas dans `schema.prisma` : Prisma ne sait pas générer de `CHECK`. Elle vit dans la migration `20261005114043_reference_profile_exactly_one_form`, écrite à la main.
 
-**Pourquoi.** Prisma ne génère pas de contrainte `CHECK`. La règle est donc tenue par le code, dans `packages/shared`, et testée là.
+**Pourquoi.** RG-08 exige qu'un référentiel porte **exactement une** de ses deux formes — profil décrit ou document déposé, jamais les deux, jamais aucune. Les quatre colonnes sont nullables et le schéma seul n'en contraint aucune.
 
-**À faire.** Ajouter la contrainte `CHECK` en SQL dans une migration manuelle. Tant qu'elle n'y est pas, cet écart est une **faiblesse**, pas un choix — c'est le seul de cette liste dans ce cas, et il est signalé comme tel.
+**Ce que ça change.** La base garantit désormais son propre invariant. Une règle tenue par le seul code applicatif se contourne par un script de reprise, un correctif en production ou un second appelant ; une contrainte `CHECK` ne se contourne pas.
+
+**Vérifié.** Les deux formes simultanées et l'absence de forme sont refusées ; chaque forme seule est acceptée.
+
+**Le prix.** `schema.prisma` ne décrit plus toute la base. Une relecture du seul schéma manquerait cette contrainte — d'où sa mention ici et au dictionnaire des données.
+
+**Historique.** Cet écart était le seul de cette liste qualifié de **faiblesse** plutôt que de choix, tant que la règle ne vivait que dans le code. Contrainte ajoutée le 05/10/2026.

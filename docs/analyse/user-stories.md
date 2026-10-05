@@ -168,6 +168,19 @@ _Périmètre : M-06_
 - Un document atypique n'entre dans aucun calcul de score (RG-04)
 - Le signalement est visible **dans toutes les vues** : liste, détail candidature, détail document, et exports
 
+### US-24 · Contredire un verdict d'analyse
+
+**En tant que** Claire, **je veux** pouvoir dire au système qu'il s'est trompé sur la nature d'un document **afin que** mon jugement l'emporte sur le sien.
+_Périmètre : M-18_
+
+- Depuis le détail d'un document atypique, deux gestes : confirmer la nature détectée, ou requalifier le type (RG-10)
+- Le document cesse d'être atypique et son niveau 2 s'exécute ; le score de la candidature est recalculé
+- **Le verdict du modèle reste affiché à côté de la décision humaine** — jamais remplacé
+- L'écran montre qui a contredit, quand, et le motif saisi
+- Un document `UNREADABLE` n'offre pas ces gestes : aucune décision ne fait apparaître du texte
+- La contradiction est inscrite au journal d'audit
+- Une contradiction est réversible : revenir au verdict du modèle est un geste de plus, pas une impasse
+
 ### US-12 · Obtenir un score d'adéquation justifié
 
 **En tant que** Claire, **je veux** trois sous-scores expliqués **afin de** comprendre pourquoi un dossier est bien placé.

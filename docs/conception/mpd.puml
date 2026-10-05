@@ -6,7 +6,7 @@
 ' consultable d'un coup d'œil ce qu'une lecture de 300 lignes donne lentement.
 '
 ' Règle de tenue : se met à jour dans la même séance que la migration.
-' Dernière synchronisation : migration 20261005082559_reference_profile_and_identity.
+' Dernière synchronisation : migration 20261005114043_reference_profile_exactly_one_form.
 '
 ' Ce que le MCD ignore et qui apparaît ici — clés techniques, horodatages,
 ' empreintes, dénormalisation de institution_id, index — est justifié
@@ -82,6 +82,7 @@ entity "**reference_profile**" as reference_profile {
   *updated_at : timestamp
   --
   unique (campaign_id, document_type)
+  check exactly_one_form
 }
 
 entity "**import_batch**" as import_batch {
@@ -168,6 +169,12 @@ entity "**document_analysis**" as document_analysis {
   clarity_rationale : text
   formal_quality_rationale : text
   document_score : float
+  .. contradiction humaine (RG-10) ..
+  overridden_type : document_type
+  overridden_by_id : uuid <<FK>>
+  overridden_at : timestamp
+  override_rationale : text
+  ..
   level1_model : text
   level2_model : text
   *prompt_version : text
@@ -184,8 +191,8 @@ entity "**audit_entry**" as audit_entry {
   --
   *institution_id : uuid <<FK>>
   user_id : uuid <<FK>>
-  *action : text
-  *entity_type : text
+  *action : audit_action
+  *entity_type : audit_entity_type
   entity_id : uuid
   ip_address : text
   user_agent : text
@@ -207,6 +214,7 @@ campaign ||--o{ application : cascade
 
 app_user ||--o{ import_batch : "set null"
 app_user ||--o{ audit_entry : "set null"
+app_user ||--o{ document_analysis : "set null"
 
 import_batch ||--|{ document : cascade
 application ||--|{ document : cascade
@@ -220,6 +228,14 @@ note bottom of document
   par jointure ; il est répété pour que
   tout filtre de cloisonnement tienne
   en une clause auditable (M-11, US-03).
+end note
+
+note left of reference_profile
+  **check exactly_one_form** n'est pas
+  dans schema.prisma : Prisma ne génère
+  pas de CHECK. Elle vit dans une
+  migration écrite à la main — voir
+  l'écart n°10.
 end note
 
 note bottom of document_analysis

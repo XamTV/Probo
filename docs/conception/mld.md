@@ -23,7 +23,7 @@ Convention : <u>clé primaire</u>, _#clé étrangère_.
 
 **TEXTE_EXTRAIT** (<u>_#id_document_</u>, contenu, nombre_caracteres)
 
-**ANALYSE** (<u>_#id_document_</u>, type_detecte, confiance, atypique, motif_atypie, justification_niveau_1, score_adequation, score_clarte, score_qualite_formelle, justification_adequation, justification_clarte, justification_qualite_formelle, score_document, version_prompt, date_analyse)
+**ANALYSE** (<u>_#id_document_</u>, type_detecte, confiance, atypique, motif_atypie, justification_niveau_1, score_adequation, score_clarte, score_qualite_formelle, justification_adequation, justification_clarte, justification_qualite_formelle, score_document, version_prompt, date_analyse, type_requalifie, motif_requalification, date_requalification, _#id_utilisateur_)
 
 **ENTREE_AUDIT** (<u>id_entree</u>, action, type_ressource, reference_ressource, date_survenue, _#id_etablissement_, _#id_utilisateur_)
 
