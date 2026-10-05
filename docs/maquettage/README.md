@@ -6,7 +6,15 @@ Les sources vivent dans [`artboards/`](artboards/) : **un fichier `.dc.html` par
 
 Ce sont des maquettes, pas du code applicatif. Rien ici n'est compilé, importé par Angular, ni couvert par les tests. Elles servent de **spécification visuelle** et de point de départ pour écrire les vrais composants.
 
-Le canvas assemblé est publié comme Artifact — consultable, annoté, exportable en PNG et PDF. Le fichier assemblé lui-même n'est pas versionné : il pèse deux mégaoctets d'éditeur embarqué et se régénère intégralement à partir de `artboards/`.
+## Le canvas en ligne
+
+**https://claude.ai/artifact/DPW5Tby8ZBtNgajbzWsiab**
+
+Les dix-neuf artboards y sont assemblés sur une toile zoomable, répartis en trois pages, avec les notes qui rattachent chaque parti pris au problème de conception qu'il résout. Exportable en PNG par écran et en PDF pour l'ensemble — c'est de là que sortiront les images du dossier.
+
+Il est **privé** : personne ne peut l'ouvrir tant qu'il n'est pas partagé depuis le menu Partager de la page.
+
+> **Les sources font foi, pas le canvas.** Le canvas est un confort de consultation, reconstruit depuis `artboards/`. En cas de divergence, ce sont les fichiers versionnés qui ont raison.
 
 ## Les 18 artboards
 
@@ -40,7 +48,9 @@ cd docs/maquettage/artboards
 python3 injecte-nav.py
 ```
 
-L'assemblage et la publication passent par la compétence de design de Claude Code, qui empaquette `artboards/` en une page unique.
+L'assemblage et la publication passent par la commande `/design` de Claude Code, qui porte les artboards dans l'Artifact ci-dessus.
+
+> **Un premier canvas a existé jusqu'au 05/10/2026**, publié avec une préversion de l'éditeur. Son format empaquetait l'éditeur et le contenu dans un seul fichier de deux mégaoctets, assemblé par un script qui n'a pas survécu à la session. Le canvas actuel conserve son contenu sous forme de fichiers, un par artboard — donc réutilisable et modifiable sans outillage disparu. Le changement a coûté le lien précédent.
 
 ## Reste à produire
 

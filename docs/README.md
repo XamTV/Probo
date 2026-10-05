@@ -14,32 +14,32 @@ Deux raisons de ne pas y revenir plus tôt. D'abord, chaque entité doit pouvoir
 
 ## État des livrables
 
-| Livrable                                    | État                                              |
-| ------------------------------------------- | ------------------------------------------------- |
-| `journal-decisions.md`                      | Écrit, tenu au fil de l'eau                       |
-| `analyse/cahier-des-charges.md`             | Écrit                                             |
-| `analyse/perimetre.md`                      | Écrit — MoSCoW, refus actés et reports datés      |
-| `analyse/personas.md`                       | Écrit — Claire, Marc, Sofia                       |
-| `analyse/user-stories.md`                   | Écrit — 24 US dont 2 reportées, 6 épopées         |
-| `analyse/regles-gestion.md`                 | Écrit — RG-01 à RG-10, dont 6 sous test           |
-| `analyse/cas-utilisation.md`                | Écrit — 16 CU dont 1 reporté, 2 scénarios         |
-| `maquettage/artboards/`                     | Écrit — 19 artboards, 16 CU couverts              |
-| `maquettage/charte-graphique.md`            | Écrit — extrait des artboards                     |
-| `maquettage/accessibilite-rgaa.md`          | Écrit — 4 engagements, 5 points à vérifier        |
-| `conception/diagramme-cas-utilisation.puml` | Écrit — 14 CU, CU-11 exclu car reporté            |
-| `conception/mcd.puml`, `mld.md`, `mpd.puml` | Écrit — reconstruits après les maquettes          |
-| `conception/ecarts-mcd-mpd.md`              | Écrit — 10 écarts, dont 1 signalé comme faiblesse |
-| `conception/dictionnaire-donnees.md`        | Écrit — 11 tables, dérivé de `schema.prisma`      |
-| `conception/diagramme-classes.md`           | À produire                                        |
-| `conception/diagramme-sequence-analyse.md`  | À produire — meilleur atout de soutenance         |
-| `conception/diagramme-deploiement.md`       | À produire                                        |
-| `securite/plan-securisation.md`             | À produire — OWASP Top 10 point par point         |
-| `securite/rgpd.md`                          | À produire                                        |
-| `tests/plan-de-tests.md`                    | À produire                                        |
-| `tests/cahier-de-recettes.md`               | À produire — dérivé des critères d'acceptation    |
-| `tests/jeu-essai/`                          | À constituer — 40 documents réels annotés         |
-| `veille/methode-et-sources.md`              | À produire                                        |
-| `veille/veille-anglophone.md`               | À produire                                        |
+| Livrable                                    | État                                                                 |
+| ------------------------------------------- | -------------------------------------------------------------------- |
+| `journal-decisions.md`                      | Écrit, tenu au fil de l'eau                                          |
+| `analyse/cahier-des-charges.md`             | Écrit                                                                |
+| `analyse/perimetre.md`                      | Écrit — MoSCoW, refus actés et reports datés                         |
+| `analyse/personas.md`                       | Écrit — Claire, Marc, Sofia                                          |
+| `analyse/user-stories.md`                   | Écrit — 24 US dont 2 reportées, 6 épopées                            |
+| `analyse/regles-gestion.md`                 | Écrit — RG-01 à RG-10, dont 6 sous test                              |
+| `analyse/cas-utilisation.md`                | Écrit — 16 CU dont 1 reporté, 2 scénarios                            |
+| `maquettage/artboards/`                     | Écrit — 19 artboards, 16 CU, [canvas en ligne](maquettage/README.md) |
+| `maquettage/charte-graphique.md`            | Écrit — extrait des artboards                                        |
+| `maquettage/accessibilite-rgaa.md`          | Écrit — 4 engagements, 5 points à vérifier                           |
+| `conception/diagramme-cas-utilisation.puml` | Écrit — 14 CU, CU-11 exclu car reporté                               |
+| `conception/mcd.puml`, `mld.md`, `mpd.puml` | Écrit — reconstruits après les maquettes                             |
+| `conception/ecarts-mcd-mpd.md`              | Écrit — 10 écarts, dont 1 signalé comme faiblesse                    |
+| `conception/dictionnaire-donnees.md`        | Écrit — 11 tables, dérivé de `schema.prisma`                         |
+| `conception/diagramme-classes.md`           | À produire                                                           |
+| `conception/diagramme-sequence-analyse.md`  | À produire — meilleur atout de soutenance                            |
+| `conception/diagramme-deploiement.md`       | À produire                                                           |
+| `securite/plan-securisation.md`             | À produire — OWASP Top 10 point par point                            |
+| `securite/rgpd.md`                          | À produire                                                           |
+| `tests/plan-de-tests.md`                    | À produire                                                           |
+| `tests/cahier-de-recettes.md`               | À produire — dérivé des critères d'acceptation                       |
+| `tests/jeu-essai/`                          | À constituer — 40 documents réels annotés                            |
+| `veille/methode-et-sources.md`              | À produire                                                           |
+| `veille/veille-anglophone.md`               | À produire                                                           |
 
 ## Deux règles de travail
 
