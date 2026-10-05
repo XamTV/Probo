@@ -26,6 +26,11 @@ storage/
 # docs/maquettage/artboards/
 docs/maquettage/*.html
 
+# Schémas rendus : régénérés depuis les sources .puml, jamais committés —
+# un SVG à côté de sa source est une seconde vérité à entretenir
+docs/conception/*.svg
+docs/conception/*.png
+
 # Tests
 coverage/
 .nyc_output/

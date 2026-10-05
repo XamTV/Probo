@@ -24,8 +24,10 @@ skinparam arrow {
 
 actor "Chargé\nd'admission" as CA
 actor "Administrateur" as AD
-actor "Mistral AI" as IA <<système>>
 actor "Planificateur" as PL <<système>>
+
+' Acteur secondaire déclaré après le système : PlantUML le place à droite,
+' du côté où il est sollicité, au lieu d'une diagonale en travers du schéma.
 
 ' L'administrateur hérite de tous les cas du chargé d'admission
 AD --|> CA
@@ -70,9 +72,10 @@ CU05 ..> CU07 : <<include>>
 ' Le signalement n'a lieu que si le niveau 1 écarte le document (RG-01 à RG-03)
 CU06 ..> CU05 : <<extend>>
 
+actor "Mistral AI" as IA <<système>>
 CU05 --> IA
 
-note bottom of CU15
+note right of CU15
   RG-09 — bloquant.
   Aucune analyse ne démarre
   tant qu'un regroupement

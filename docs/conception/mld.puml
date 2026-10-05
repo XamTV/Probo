@@ -1,0 +1,127 @@
+@startuml mld
+' Probo — Modèle Logique de Données
+'
+' Traduction du MCD par les règles de passage, et rien d'autre. Ni types, ni
+' index, ni horodatages, ni dénormalisation : tout cela est au MPD, et justifié
+' dans ecarts-mcd-mpd.md.
+'
+' Ce schéma répond à une question que ni le MCD ni le MPD ne traitent :
+' quelles sont les tables, et comment se lient-elles ? Il ne change que si la
+' STRUCTURE change — pas à chaque colonne ajoutée.
+'
+' Forme textuelle de référence : mld.md
+
+hide circle
+skinparam shadowing false
+skinparam defaultFontName Helvetica
+skinparam linetype ortho
+skinparam class {
+  BackgroundColor #FFFFFF
+  BorderColor #294B8A
+  ArrowColor #545C66
+  FontColor #14181D
+  AttributeFontColor #3C444E
+}
+
+entity "**ETABLISSEMENT**" as etablissement {
+  <u>id_etablissement</u>
+}
+
+entity "**UTILISATEUR**" as utilisateur {
+  <u>id_utilisateur</u>
+  --
+  #id_etablissement
+}
+
+entity "**CAMPAGNE**" as campagne {
+  <u>id_campagne</u>
+  --
+  #id_etablissement
+}
+
+entity "**REFERENTIEL**" as referentiel {
+  <u>id_referentiel</u>
+  --
+  #id_campagne
+  type_de_document
+  .. unique ..
+  (#id_campagne, type_de_document)
+}
+
+entity "**LOT_IMPORT**" as lot {
+  <u>id_lot</u>
+  --
+  #id_campagne
+  #id_utilisateur  (nullable)
+}
+
+entity "**CANDIDATURE**" as candidature {
+  <u>id_candidature</u>
+  --
+  #id_campagne
+}
+
+entity "**DOCUMENT**" as document {
+  <u>id_document</u>
+  --
+  #id_candidature
+  #id_lot
+}
+
+entity "**TEXTE_EXTRAIT**" as texte {
+  <u>#id_document</u>
+}
+
+entity "**ANALYSE**" as analyse {
+  <u>#id_document</u>
+}
+
+entity "**ENTREE_AUDIT**" as audit {
+  <u>id_entree</u>
+  --
+  #id_etablissement
+  #id_utilisateur  (nullable)
+}
+
+etablissement ||--|{ utilisateur
+etablissement ||--o{ campagne
+etablissement ||--o{ audit
+
+campagne ||--o{ referentiel
+campagne ||--o{ lot
+campagne ||--o{ candidature
+
+utilisateur ||--o{ lot
+utilisateur ||--o{ audit
+
+candidature ||--|{ document
+lot ||--|{ document
+
+document ||--o| texte
+document ||--o| analyse
+
+note right of texte
+  **Identifiant partagé.**
+  La clé primaire EST la clé
+  étrangère : un document ne
+  peut porter qu'un texte et
+  qu'une analyse. Même règle
+  sur **ANALYSE**.
+end note
+
+note bottom of lot
+  **Clés étrangères facultatives.**
+  La clé #id_utilisateur est nullable ici et
+  sur **ENTREE_AUDIT** : la suppression
+  d'un compte ne doit emporter ni les
+  lots qu'il a importés, ni les traces
+  qu'il a laissées.
+end note
+
+note top of etablissement
+  Aucune table de jonction :
+  le MCD ne comporte aucune
+  association plusieurs-à-plusieurs.
+end note
+
+@enduml

@@ -21,18 +21,21 @@ L'extension PlantUML de VS Code donne un aperçu en direct, utile pendant l'écr
 
 ## État
 
-| Schéma                          | Fichier                           | État                                                            |
-| ------------------------------- | --------------------------------- | --------------------------------------------------------------- |
-| Cas d'utilisation               | `diagramme-cas-utilisation.puml`  | Écrit — 14 CU, CU-11 exclu car reporté                          |
-| MCD Merise                      | `mcd.puml`                        | À produire — **dans la même séance que la prochaine migration** |
-| MLD                             | `mld.md`                          | À produire — dérivé du MCD                                      |
-| Écarts MCD / MPD                | `ecarts-mcd-mpd.md`               | À produire — index, horodatages, empreintes assumés             |
-| Dictionnaire de données         | `dictionnaire-donnees.md`         | À dériver de `schema.prisma`                                    |
-| Diagramme de classes            | `diagramme-classes.puml`          | À produire                                                      |
-| Diagramme de séquence — analyse | `diagramme-sequence-analyse.puml` | À produire **pendant** le lot d'implémentation de l'analyse     |
-| Diagramme de déploiement        | `diagramme-deploiement.puml`      | À produire                                                      |
+| Schéma                          | Fichier                           | État                                                        |
+| ------------------------------- | --------------------------------- | ----------------------------------------------------------- |
+| Cas d'utilisation               | `diagramme-cas-utilisation.puml`  | Écrit — 14 CU, CU-11 exclu car reporté                      |
+| MCD Merise                      | `mcd.puml`                        | Écrit — 10 entités, 12 associations, aucune technique       |
+| MLD                             | `mld.md`, `mld.puml`              | Écrit — 11 relations, sans table de jonction                |
+| MPD                             | `mpd.puml`                        | Écrit — 11 tables, index et comportements de suppression    |
+| Écarts MCD / MPD                | `ecarts-mcd-mpd.md`               | Écrit — 10 écarts, dont 1 signalé comme faiblesse           |
+| Dictionnaire de données         | `dictionnaire-donnees.md`         | Écrit — 11 tables, dérivé de schema.prisma                  |
+| Diagramme de classes            | `diagramme-classes.puml`          | À produire                                                  |
+| Diagramme de séquence — analyse | `diagramme-sequence-analyse.puml` | À produire **pendant** le lot d'implémentation de l'analyse |
+| Diagramme de déploiement        | `diagramme-deploiement.puml`      | À produire                                                  |
 
 ## Deux règles reprises de `docs/README.md`
+
+**Le MPD suit la migration, dans la même séance.** `mpd.puml` est une représentation lisible de `schema.prisma`, pas une seconde source : il porte la date de la migration à laquelle il correspond, et se met à jour avec elle.
 
 **Le MCD ne porte aucune technique.** Entités, associations verbalisées, cardinalités, identifiants — rien d'autre. Les index, horodatages et empreintes n'apparaissent qu'au MLD et au MPD, et les écarts assumés sont consignés dans `ecarts-mcd-mpd.md`.
 

@@ -1,0 +1,232 @@
+@startuml mpd
+' Probo — Modèle Physique de Données
+'
+' Représentation lisible de apps/api/prisma/schema.prisma, qui reste la source
+' de vérité. Ce diagramme ne remplace ni le schéma ni les migrations : il rend
+' consultable d'un coup d'œil ce qu'une lecture de 300 lignes donne lentement.
+'
+' Règle de tenue : se met à jour dans la même séance que la migration.
+' Dernière synchronisation : migration 20261005082559_reference_profile_and_identity.
+'
+' Ce que le MCD ignore et qui apparaît ici — clés techniques, horodatages,
+' empreintes, dénormalisation de institution_id, index — est justifié
+' écart par écart dans ecarts-mcd-mpd.md.
+
+hide circle
+skinparam shadowing false
+skinparam defaultFontName Helvetica
+skinparam linetype ortho
+skinparam class {
+  BackgroundColor #FFFFFF
+  BorderColor #294B8A
+  ArrowColor #545C66
+  FontColor #14181D
+}
+
+entity "**institution**" as institution {
+  *id : uuid <<PK>>
+  --
+  *name : text
+  siret : varchar(14)
+  *is_active : boolean
+  *created_at : timestamp
+  *updated_at : timestamp
+}
+
+entity "**user**" as app_user {
+  *id : uuid <<PK>>
+  --
+  *institution_id : uuid <<FK>>
+  *email : text <<UK>>
+  *password_hash : text
+  *name : text
+  *role : user_role
+  *is_active : boolean
+  last_login_at : timestamp
+  *created_at : timestamp
+  *updated_at : timestamp
+  --
+  idx (institution_id)
+}
+
+entity "**campaign**" as campaign {
+  *id : uuid <<PK>>
+  --
+  *institution_id : uuid <<FK>>
+  *name : text
+  description : text
+  *status : campaign_status
+  *expected_types : document_type[]
+  *confidence_threshold : int
+  *relevance_weight : float
+  *clarity_weight : float
+  *formal_quality_weight : float
+  opens_at : timestamp
+  closes_at : timestamp
+  *created_at : timestamp
+  *updated_at : timestamp
+  --
+  idx (institution_id, status)
+}
+
+entity "**reference_profile**" as reference_profile {
+  *id : uuid <<PK>>
+  --
+  *campaign_id : uuid <<FK>>
+  *document_type : document_type
+  text : text
+  file_name : text
+  storage_key : text
+  extracted_text : text
+  *created_at : timestamp
+  *updated_at : timestamp
+  --
+  unique (campaign_id, document_type)
+}
+
+entity "**import_batch**" as import_batch {
+  *id : uuid <<PK>>
+  --
+  *campaign_id : uuid <<FK>>
+  user_id : uuid <<FK>>
+  *archive_name : text
+  *status : import_batch_status
+  *file_count : int
+  *rejected_file_count : int
+  error_message : text
+  *created_at : timestamp
+  completed_at : timestamp
+  --
+  idx (campaign_id)
+}
+
+entity "**application**" as application {
+  *id : uuid <<PK>>
+  --
+  *campaign_id : uuid <<FK>>
+  *institution_id : uuid <<FK>>
+  *candidate_name : text
+  candidate_email : text
+  external_ref : text
+  *status : application_status
+  *identity_source : identity_source
+  overall_score : float
+  *atypical_document_count : int
+  *purge_due_at : timestamp
+  *created_at : timestamp
+  *updated_at : timestamp
+  --
+  idx (campaign_id, overall_score DESC)
+  idx (purge_due_at)
+  idx (institution_id)
+}
+
+entity "**document**" as document {
+  *id : uuid <<PK>>
+  --
+  *application_id : uuid <<FK>>
+  *import_batch_id : uuid <<FK>>
+  *institution_id : uuid <<FK>>
+  *original_filename : text
+  *storage_key : text
+  *sha256 : char(64)
+  *size_bytes : int
+  *mime_type : text
+  detected_candidate_name : text
+  detected_name_confidence : int
+  extraction_method : extraction_method
+  *status : document_status
+  error_message : text
+  *created_at : timestamp
+  *updated_at : timestamp
+  --
+  idx (application_id)
+  idx (sha256)
+  idx (status)
+}
+
+entity "**document_text**" as document_text {
+  *document_id : uuid <<PK, FK>>
+  --
+  *content : text
+  *char_count : int
+  *created_at : timestamp
+}
+
+entity "**document_analysis**" as document_analysis {
+  *document_id : uuid <<PK, FK>>
+  --
+  detected_type : document_type
+  confidence : int
+  *is_atypical : boolean
+  atypical_reason : atypical_reason
+  level1_rationale : text
+  relevance_score : int
+  clarity_score : int
+  formal_quality_score : int
+  relevance_rationale : text
+  clarity_rationale : text
+  formal_quality_rationale : text
+  document_score : float
+  level1_model : text
+  level2_model : text
+  *prompt_version : text
+  level1_tokens : int
+  level2_tokens : int
+  duration_ms : int
+  *analysed_at : timestamp
+  --
+  idx (is_atypical)
+}
+
+entity "**audit_entry**" as audit_entry {
+  *id : uuid <<PK>>
+  --
+  *institution_id : uuid <<FK>>
+  user_id : uuid <<FK>>
+  *action : text
+  *entity_type : text
+  entity_id : uuid
+  ip_address : text
+  user_agent : text
+  details : jsonb
+  *occurred_at : timestamp
+  --
+  idx (institution_id, occurred_at DESC)
+}
+
+institution ||--|{ app_user : cascade
+institution ||--o{ campaign : cascade
+institution ||--o{ application : cascade
+institution ||--o{ document : cascade
+institution ||--o{ audit_entry : cascade
+
+campaign ||--o{ reference_profile : cascade
+campaign ||--o{ import_batch : cascade
+campaign ||--o{ application : cascade
+
+app_user ||--o{ import_batch : "set null"
+app_user ||--o{ audit_entry : "set null"
+
+import_batch ||--|{ document : cascade
+application ||--|{ document : cascade
+
+document ||--o| document_text : cascade
+document ||--o| document_analysis : cascade
+
+note bottom of document
+  **institution_id** est dénormalisé ici
+  et sur **application**. Il se déduirait
+  par jointure ; il est répété pour que
+  tout filtre de cloisonnement tienne
+  en une clause auditable (M-11, US-03).
+end note
+
+note bottom of document_analysis
+  Clé primaire partagée avec **document** :
+  c'est ce qui interdit structurellement
+  deux analyses pour un même document.
+  Même mécanique sur **document_text**.
+end note
+
+@enduml

@@ -1,0 +1,106 @@
+@startuml mcd
+' Probo — Modèle Conceptuel de Données (Merise)
+'
+' Règle de tenue : ce MCD ne porte AUCUNE technique. Entités, associations
+' verbalisées, cardinalités et identifiants — rien d'autre. Index, horodatages,
+' empreintes et dénormalisations n'apparaissent qu'au MLD et au MPD ; les écarts
+' assumés sont consignés dans ecarts-mcd-mpd.md.
+'
+' Notation : entités en rectangles, associations en ellipses, cardinalités
+' Merise (min,max) portées sur chaque patte. Rendu en PlantUML standard plutôt
+' qu'en @startchen, dont la notation est celle de Chen et non de Merise.
+
+skinparam shadowing false
+skinparam defaultFontName Helvetica
+skinparam rectangle {
+  BackgroundColor #FFFFFF
+  BorderColor #294B8A
+  BorderThickness 1.4
+  FontColor #14181D
+}
+skinparam usecase {
+  BackgroundColor #F4F6FA
+  BorderColor #545C66
+  FontColor #14181D
+  FontSize 12
+}
+skinparam arrow {
+  Color #545C66
+  FontColor #14181D
+  FontSize 12
+}
+
+rectangle "**ÉTABLISSEMENT**\n--\n<u>id établissement</u>\nnom\nsiret\nactif" as ETABLISSEMENT
+rectangle "**UTILISATEUR**\n--\n<u>id utilisateur</u>\nadresse électronique\nmot de passe\nnom\nrôle\nactif\ndernière connexion" as UTILISATEUR
+rectangle "**CAMPAGNE**\n--\n<u>id campagne</u>\nnom\ndescription\nstatut\ntypes attendus\nseuil de confiance\npoids adéquation\npoids clarté\npoids qualité formelle\ndate d'ouverture\ndate de clôture" as CAMPAGNE
+rectangle "**RÉFÉRENTIEL**\n--\n<u>id référentiel</u>\ntype de document\nprofil décrit\ndocument de référence" as REFERENTIEL
+rectangle "**LOT D'IMPORT**\n--\n<u>id lot</u>\nnom de l'archive\nstatut\nnombre de fichiers\nnombre de fichiers refusés\nmessage d'erreur\ndate d'achèvement" as LOT
+rectangle "**CANDIDATURE**\n--\n<u>id candidature</u>\nnom du candidat\nadresse du candidat\nréférence externe\nstatut\norigine de l'identité\nscore global\nnombre de documents atypiques\néchéance de purge" as CANDIDATURE
+rectangle "**DOCUMENT**\n--\n<u>id document</u>\nnom d'origine\ntaille\ntype de fichier\nidentité détectée\nconfiance sur l'identité\nméthode d'extraction\nstatut" as DOCUMENT
+rectangle "**TEXTE EXTRAIT**\n--\n<u>id texte</u>\ncontenu\nnombre de caractères" as TEXTE
+rectangle "**ANALYSE**\n--\n<u>id analyse</u>\ntype détecté\nconfiance\natypique\nmotif d'atypie\njustification niveau 1\nscore adéquation\nscore clarté\nscore qualité formelle\njustification adéquation\njustification clarté\njustification qualité formelle\nscore du document\nversion de prompt\ndate d'analyse" as ANALYSE
+rectangle "**ENTRÉE D'AUDIT**\n--\n<u>id entrée</u>\naction\ntype de ressource\nréférence de ressource\ndate de survenue" as AUDIT
+
+usecase "EMPLOYER" as EMPLOYER
+usecase "OUVRIR" as OUVRIR
+usecase "DÉFINIR" as DEFINIR
+usecase "RECEVOIR" as RECEVOIR
+usecase "DÉPOSER" as DEPOSER
+usecase "REGROUPER" as REGROUPER
+usecase "APPORTER" as APPORTER
+usecase "RASSEMBLER" as RASSEMBLER
+usecase "PORTER" as PORTER
+usecase "ÉVALUER" as EVALUER
+usecase "JOURNALISER" as JOURNALISER
+usecase "DÉCLENCHER" as DECLENCHER
+
+ETABLISSEMENT -- EMPLOYER : (1,n)
+EMPLOYER -- UTILISATEUR : (1,1)
+
+ETABLISSEMENT -- OUVRIR : (0,n)
+OUVRIR -- CAMPAGNE : (1,1)
+
+CAMPAGNE -- DEFINIR : (0,n)
+DEFINIR -- REFERENTIEL : (1,1)
+
+CAMPAGNE -- RECEVOIR : (0,n)
+RECEVOIR -- LOT : (1,1)
+
+UTILISATEUR -- DEPOSER : (0,n)
+DEPOSER -- LOT : (0,1)
+
+CAMPAGNE -- REGROUPER : (0,n)
+REGROUPER -- CANDIDATURE : (1,1)
+
+LOT -- APPORTER : (1,n)
+APPORTER -- DOCUMENT : (1,1)
+
+CANDIDATURE -- RASSEMBLER : (1,n)
+RASSEMBLER -- DOCUMENT : (1,1)
+
+DOCUMENT -- PORTER : (0,1)
+PORTER -- TEXTE : (1,1)
+
+DOCUMENT -- EVALUER : (0,1)
+EVALUER -- ANALYSE : (1,1)
+
+ETABLISSEMENT -- JOURNALISER : (0,n)
+JOURNALISER -- AUDIT : (1,1)
+
+UTILISATEUR -- DECLENCHER : (0,n)
+DECLENCHER -- AUDIT : (0,1)
+
+note right of CANDIDATURE
+  Le **rang** n'est pas un attribut.
+  Il se calcule à la lecture, par
+  fonction fenêtre sur le score.
+end note
+
+note bottom of ANALYSE
+  **version de prompt** figure au MCD :
+  sans elle, impossible d'expliquer
+  deux scores différents pour le même
+  document à deux semaines d'écart.
+end note
+
+@enduml
