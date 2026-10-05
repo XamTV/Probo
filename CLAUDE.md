@@ -49,6 +49,18 @@ Le dépôt ne revendique aucune capacité non implémentée, et le schéma ne po
 
 `npm run lint`, `npm test`, et `npm run format` si des fichiers ont été écrits.
 
+## Mode de travail
+
+Cadré le 05/10/2026.
+
+**Sans demander :** écrire et modifier les livrables et le code, lancer tests, lint, build et migrations.
+
+**Toujours s'arrêter pour :** **tout commit**, qui passe par la relecture et l'accord explicite de l'auteur ; pousser sur `origin` ; tout changement de périmètre — une RG, un M-xx, une entité ; toute opération destructrice sur des données.
+
+**Signaler sans bloquer :** les incohérences trouvées en chemin, en fin de message.
+
 ## Commits
 
-Convention `type(scope): sujet en français` — `feat`, `refactor`, `docs`, `chore`. Le sujet dit ce qui change pour le projet, pas ce qui change dans les fichiers. Ne jamais committer sans demande explicite.
+Convention `type(scope): sujet en anglais` — `feat`, `refactor`, `docs`, `chore`. Le sujet dit ce qui change pour le projet, pas ce qui change dans les fichiers. Le corps explique le pourquoi, pas le quoi.
+
+L'anglais aligne les messages sur le code et la base ; le dossier de conception reste en français.
