@@ -39,5 +39,42 @@
     "eyebrow": "Technical foundation",
     "sharedContracts": "Shared contracts",
     "description": "The front end consumes @probo/shared, which carries the Zod schemas and the business rules. The code is in English, the interface is translated: no raw value ever reaches a screen."
+  },
+  "auditAction": {
+    "USER_LOGGED_IN": "Signed in",
+    "USER_LOGIN_FAILED": "Failed sign-in",
+    "USER_CREATED": "Account created",
+    "USER_UPDATED": "Account updated",
+    "USER_DEACTIVATED": "Account deactivated",
+    "CAMPAIGN_CREATED": "Campaign created",
+    "CAMPAIGN_UPDATED": "Campaign updated",
+    "REFERENCE_PROFILE_UPDATED": "Reference profile updated",
+    "BATCH_IMPORTED": "Batch imported",
+    "BATCH_REJECTED": "Import refused",
+    "ARCHIVE_ENTRY_REJECTED": "Archive entry refused",
+    "IDENTITY_RECONCILED": "Identity arbitrated",
+    "ANALYSIS_VERDICT_OVERRIDDEN": "Verdict overridden",
+    "APPLICATION_DELETED": "Application deleted",
+    "APPLICATION_PURGED": "Automatic purge",
+    "RANKING_EXPORTED": "Ranking exported"
+  },
+  "auditEntityType": {
+    "INSTITUTION": "Institution",
+    "USER": "Account",
+    "CAMPAIGN": "Campaign",
+    "REFERENCE_PROFILE": "Reference profile",
+    "IMPORT_BATCH": "Import batch",
+    "APPLICATION": "Application",
+    "DOCUMENT": "Document",
+    "SESSION": "Session"
+  },
+  "verdict": {
+    "modelVerdict": "Model verdict",
+    "humanDecision": "Human decision",
+    "overriddenBy": "Overridden by",
+    "notOverridable": "This verdict cannot be overridden: there is no text to analyse.",
+    "confirmNature": "Confirm the detected nature",
+    "requalify": "Change the type",
+    "revert": "Revert to the model verdict"
   }
 }

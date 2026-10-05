@@ -39,5 +39,42 @@
     "eyebrow": "Socle technique",
     "sharedContracts": "Contrats partagés",
     "description": "Le front consomme @probo/shared, qui porte les schémas Zod et les règles de gestion. Le code est en anglais, l'interface est traduite : aucune valeur brute n'atteint jamais un écran."
+  },
+  "auditAction": {
+    "USER_LOGGED_IN": "Connexion",
+    "USER_LOGIN_FAILED": "Échec de connexion",
+    "USER_CREATED": "Compte créé",
+    "USER_UPDATED": "Compte modifié",
+    "USER_DEACTIVATED": "Compte désactivé",
+    "CAMPAIGN_CREATED": "Campagne créée",
+    "CAMPAIGN_UPDATED": "Campagne modifiée",
+    "REFERENCE_PROFILE_UPDATED": "Référentiel modifié",
+    "BATCH_IMPORTED": "Lot importé",
+    "BATCH_REJECTED": "Import refusé",
+    "ARCHIVE_ENTRY_REJECTED": "Entrée d'archive refusée",
+    "IDENTITY_RECONCILED": "Identité arbitrée",
+    "ANALYSIS_VERDICT_OVERRIDDEN": "Verdict contredit",
+    "APPLICATION_DELETED": "Candidature supprimée",
+    "APPLICATION_PURGED": "Purge automatique",
+    "RANKING_EXPORTED": "Classement exporté"
+  },
+  "auditEntityType": {
+    "INSTITUTION": "Établissement",
+    "USER": "Compte",
+    "CAMPAIGN": "Campagne",
+    "REFERENCE_PROFILE": "Référentiel",
+    "IMPORT_BATCH": "Lot d'import",
+    "APPLICATION": "Candidature",
+    "DOCUMENT": "Document",
+    "SESSION": "Session"
+  },
+  "verdict": {
+    "modelVerdict": "Verdict du modèle",
+    "humanDecision": "Décision humaine",
+    "overriddenBy": "Contredit par",
+    "notOverridable": "Ce verdict ne peut pas être contredit : il n'y a pas de texte à analyser.",
+    "confirmNature": "Confirmer la nature détectée",
+    "requalify": "Requalifier le type",
+    "revert": "Revenir au verdict du modèle"
   }
 }
