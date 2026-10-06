@@ -34,7 +34,7 @@ Deux raisons de ne pas y revenir plus tôt. D'abord, chaque entité doit pouvoir
 | `conception/diagramme-classes.md`           | À produire                                                           |
 | `conception/diagramme-sequence-analyse.md`  | À produire — meilleur atout de soutenance                            |
 | `conception/diagramme-deploiement.md`       | À produire                                                           |
-| `securite/plan-securisation.md`             | À produire — OWASP Top 10 point par point                            |
+| `securite/plan-securisation.md`             | En cours — A01, A02, A07 écrites ; les autres au lot qui les produit |
 | `securite/rgpd.md`                          | À produire                                                           |
 | `tests/plan-de-tests.md`                    | À produire                                                           |
 | `tests/cahier-de-recettes.md`               | À produire — dérivé des critères d'acceptation                       |
