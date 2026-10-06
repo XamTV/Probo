@@ -23,6 +23,7 @@ Deux raisons de ne pas y revenir plus tôt. D'abord, chaque entité doit pouvoir
 | `analyse/user-stories.md`                   | Écrit — 24 US dont 2 reportées, 6 épopées                            |
 | `analyse/regles-gestion.md`                 | Écrit — RG-01 à RG-10, dont 6 sous test                              |
 | `analyse/cas-utilisation.md`                | Écrit — 16 CU dont 1 reporté, 2 scénarios                            |
+| `analyse/plan-livraison.md`                 | Écrit — 7 lots, ordre et dépendances                                 |
 | `maquettage/artboards/`                     | Écrit — 19 artboards, 16 CU, [canvas en ligne](maquettage/README.md) |
 | `maquettage/charte-graphique.md`            | Écrit — extrait des artboards                                        |
 | `maquettage/accessibilite-rgaa.md`          | Écrit — 4 engagements, 5 points à vérifier                           |

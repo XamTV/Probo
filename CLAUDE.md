@@ -59,6 +59,16 @@ Cadré le 05/10/2026.
 
 **Signaler sans bloquer :** les incohérences trouvées en chemin, en fin de message.
 
+## Branches et livraison
+
+Le découpage en lots, leur ordre et les dépendances qui l'imposent : [`docs/analyse/plan-livraison.md`](docs/analyse/plan-livraison.md). Ne pas le recopier ici.
+
+**Une branche par lot**, `feat/lot-N-slug`. Une pull request vers `main`, fusionnée quand la CI est verte — elle se déclenche sur `pull_request`, c'est tout l'intérêt. Le titre de PR porte les identifiants de périmètre : `feat(api): lot 1 — authentification et cloisonnement (M-01, M-11)`.
+
+**`main` reste toujours déployable.** Pas de `develop`, pas de GitFlow, pas de branche par commit.
+
+Un lot n'est fini que lorsque les critères d'acceptation passent, que ses règles de gestion sont testées sous leur identifiant `RG-xx`, que la CI est verte, et que les livrables de conception qu'il périme sont à jour dans la même séance.
+
 ## Commits
 
 Convention `type(scope): sujet en anglais` — `feat`, `refactor`, `docs`, `chore`. Le sujet dit ce qui change pour le projet, pas ce qui change dans les fichiers. Le corps explique le pourquoi, pas le quoi.

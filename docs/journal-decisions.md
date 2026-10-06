@@ -299,3 +299,29 @@ Le gel se défendait — montrer le cahier des charges qui a engendré les écra
 - Deux livrables « à produire » sont cochés, 142 lignes de doublon disparaissent, et il n'y a plus qu'une description des écrans : les écrans.
 
 **Ce que ça dit de la méthode.** Un livrable a une fin de vie. Celui-ci avait rempli son office et continuait d'être entretenu par habitude — c'est le même mécanisme qui produit un MCD divergent au bout de cinq mois.
+
+---
+
+## 2026-10-06 — Livraison par lots, une branche par lot
+
+**Contexte.** Huit commits, tous poussés directement sur `main`. La CI se déclenche pourtant déjà sur `pull_request` autant que sur `push: main` — elle était prête pour un flux par branches, et n'en servait que la moitié. Aucun document ne disait non plus dans quel ordre livrer les vingt-quatre user stories.
+
+**Options.** (a) Continuer en direct sur `main`. (b) Une branche par user story. (c) Une branche par lot de livraison.
+
+**Décision.** (c), avec sept lots définis dans `analyse/plan-livraison.md`.
+
+**Raison.** L'ordre n'est pas une préférence, il est imposé par des dépendances : rien n'est testable sans authentification et cloisonnement, un import vise une campagne, le niveau 2 compare à un référentiel, la réconciliation s'intercale entre les deux niveaux d'analyse. Écrire ces dépendances était nécessaire indépendamment du flux Git — elles n'existaient que dans une conversation.
+
+Vingt-quatre branches pour un développeur seul seraient de la cérémonie. Le lot regroupe ce qui se teste ensemble et n'a pas de sens séparément.
+
+**Ce que la pull request apporte, et ce qu'elle n'apporte pas.** Pas la revue : se relire par principe, seul, est du théâtre. Elle apporte la CI **avant** la fusion plutôt qu'après, un endroit pour décrire le lot, et un historique qui montre une méthode — ce qu'un jury regarde.
+
+**Ce que ça ne doit pas devenir.** Pas de `develop`, pas de GitFlow, pas de branche par commit. `main` plus une branche de lot vivante. La seule règle non négociable : `main` reste déployable.
+
+**Conséquences.**
+
+- Les vingt-quatre user stories sont ouvertes comme issues GitHub, groupées par jalon de lot, étiquetées par épopée. **Les documents font foi, pas les issues** — une issue est une copie de confort, et elle divergera.
+- Le script d'amorçage qui les a créées n'est pas versionné. Il contenait une copie des user stories, donc une troisième vérité, et son travail est fait. L'information durable — le découpage en lots — est dans le plan de livraison, pas dans un script shell.
+- Un lot n'est fini que lorsque les livrables de conception qu'il périme sont à jour dans la même séance. C'est le point qu'on saute sous pression, et celui qui produit un dossier reconstitué de mémoire au mois six.
+
+**Ce qu'il faut assumer.** Ce cadrage arrive à sept semaines du démarrage, alors que l'application expose encore une seule route. Il ne rattrape pas ce retard — il évite seulement de pousser du rouge sur `main` pendant les quatorze semaines qui restent.
