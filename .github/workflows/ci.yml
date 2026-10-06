@@ -14,6 +14,30 @@ jobs:
     name: Qualité, tests et build
     runs-on: ubuntu-latest
 
+    # Les tests de bout en bout vérifient le cloisonnement contre une vraie
+    # base : la règle vit dans la requête SQL, et un Prisma simulé ne prouverait
+    # rien. Même image majeure que docker-compose.yml.
+    services:
+      postgres:
+        image: postgres:17-alpine
+        env:
+          POSTGRES_USER: probo
+          POSTGRES_PASSWORD: probo
+          POSTGRES_DB: probo
+        ports:
+          - 5433:5432
+        options: >-
+          --health-cmd "pg_isready -U probo -d probo"
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+
+    env:
+      DATABASE_URL: postgresql://probo:probo@localhost:5433/probo?schema=public
+      # Secret d'intégration continue : il ne signe que des sessions de test,
+      # jetées avec le conteneur. Le secret de production vit chez l'hébergeur.
+      JWT_SECRET: ci-secret-de-test-sans-valeur-hors-integration-continue
+
     steps:
       - uses: actions/checkout@v4
 
@@ -40,8 +64,18 @@ jobs:
       - name: Lint
         run: npm run lint
 
+      - name: Appliquer les migrations
+        run: npx prisma migrate deploy
+        working-directory: apps/api
+
       - name: Tests
         run: npm test
+
+      # Sans cette étape, le test qui a attrapé la disparition silencieuse du
+      # cloisonnement ne serait protégé par rien : `npm test` ne lance que les
+      # tests unitaires, dont la racine est src/.
+      - name: Tests de bout en bout
+        run: npm run test:e2e -w @probo/api
 
       - name: Build
         run: npm run build
