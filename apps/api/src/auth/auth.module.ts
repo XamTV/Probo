@@ -1,6 +1,6 @@
 import { Global, Module } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
-import { JwtModule } from '@nestjs/jwt';
+import { JwtModule, type JwtModuleOptions } from '@nestjs/jwt';
 import { AuditService } from '../audit/audit.service';
 import { AuthController } from './auth.controller';
 import { AuthService } from './auth.service';
@@ -18,12 +18,22 @@ const JWT_SECRET_MIN_LENGTH = 32;
     // in the tests that caught it.
     JwtModule.registerAsync({
       inject: [ConfigService],
-      useFactory: (config: ConfigService) => {
+      useFactory: (config: ConfigService): JwtModuleOptions => {
         const secret = config.getOrThrow<string>('JWT_SECRET');
         if (secret.length < JWT_SECRET_MIN_LENGTH) {
           throw new Error(`JWT_SECRET is too short: ${JWT_SECRET_MIN_LENGTH} characters at least.`);
         }
-        return { secret, signOptions: { expiresIn: '12h' } };
+        // jsonwebtoken types expiresIn as a union of string literals ("12h",
+        // "7d"…). A value read from the environment cannot be narrowed to it at
+        // compile time, so the assertion is the honest way to say "this is a
+        // duration, and only the deployment knows which".
+        const ttl = config.get<string>('JWT_TTL') ?? '12h';
+        return {
+          secret,
+          signOptions: {
+            expiresIn: ttl as NonNullable<JwtModuleOptions['signOptions']>['expiresIn'],
+          },
+        };
       },
     }),
   ],

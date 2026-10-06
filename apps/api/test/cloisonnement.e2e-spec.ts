@@ -31,6 +31,7 @@ describe('US-03 — tenant isolation', () => {
 
   let adminA: { id: string; email: string };
   let adminB: { id: string; email: string };
+  let chargeA: { id: string; email: string };
 
   beforeAll(async () => {
     const moduleRef = await Test.createTestingModule({ imports: [AppModule] }).compile();
@@ -53,6 +54,16 @@ describe('US-03 — tenant isolation', () => {
         email: 'admin-a@cloisonnement.test',
         name: 'Admin A',
         role: 'ADMIN',
+        passwordHash: hash,
+      },
+      select: { id: true, email: true },
+    });
+    chargeA = await prisma.user.create({
+      data: {
+        institutionId: A,
+        email: 'charge-a@cloisonnement.test',
+        name: 'Chargé A',
+        role: 'ADMISSIONS_OFFICER',
         passwordHash: hash,
       },
       select: { id: true, email: true },
@@ -124,6 +135,45 @@ describe('US-03 — tenant isolation', () => {
       select: { institutionId: true },
     });
     expect(created?.institutionId).toBe(A);
+  });
+
+  describe('US-02 — an admissions officer manages no account', () => {
+    it('refuses the listing with 403, not 404', async () => {
+      const cookie = await connexion(chargeA.email);
+
+      // 403 and not 404 here, deliberately: the caller is identified and the
+      // resource belongs to their own institution. Its existence is no secret;
+      // only the permission is. US-03's "404, never 403" covers another
+      // institution's data, which is a different question.
+      await request(serveur()).get('/api/users').set('Cookie', cookie).expect(403);
+    });
+
+    it('refuses creating an account', async () => {
+      const cookie = await connexion(chargeA.email);
+
+      await request(serveur())
+        .post('/api/users')
+        .set('Cookie', cookie)
+        .send({ email: 'x@cloisonnement.test', name: 'X', role: 'ADMISSIONS_OFFICER' })
+        .expect(403);
+    });
+
+    it('refuses changing an account, including their own', async () => {
+      const cookie = await connexion(chargeA.email);
+
+      await request(serveur())
+        .patch(`/api/users/${chargeA.id}`)
+        .set('Cookie', cookie)
+        .send({ role: 'ADMIN' })
+        .expect(403);
+    });
+
+    it('still signs in and reads its own session', async () => {
+      const cookie = await connexion(chargeA.email);
+
+      const res = await request(serveur()).get('/api/auth/me').set('Cookie', cookie).expect(200);
+      expect((res.body as { role: string }).role).toBe('ADMISSIONS_OFFICER');
+    });
   });
 
   it('refuses an unauthenticated caller', async () => {
