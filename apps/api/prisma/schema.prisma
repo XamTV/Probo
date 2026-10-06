@@ -70,8 +70,16 @@ model User {
   role          UserRole  @default(ADMISSIONS_OFFICER)
   isActive      Boolean   @default(true) @map("is_active")
   lastLoginAt   DateTime? @map("last_login_at")
-  createdAt     DateTime  @default(now()) @map("created_at")
-  updatedAt     DateTime  @updatedAt @map("updated_at")
+
+  /// US-01 — attempts are delayed after six consecutive failures.
+  ///
+  /// Counted per ACCOUNT, not per IP: an attacker spreads attempts over many
+  /// addresses, and locking by IP would lock out a whole institution sitting
+  /// behind one gateway. Reset to zero on every successful sign-in.
+  failedLoginAttempts Int       @default(0) @map("failed_login_attempts")
+  lockedUntil         DateTime? @map("locked_until")
+  createdAt           DateTime  @default(now()) @map("created_at")
+  updatedAt           DateTime  @updatedAt @map("updated_at")
 
   institution        Institution        @relation(fields: [institutionId], references: [id], onDelete: Cascade)
   importBatches      ImportBatch[]
