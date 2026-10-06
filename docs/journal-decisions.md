@@ -325,3 +325,27 @@ Vingt-quatre branches pour un développeur seul seraient de la cérémonie. Le l
 - Un lot n'est fini que lorsque les livrables de conception qu'il périme sont à jour dans la même séance. C'est le point qu'on saute sous pression, et celui qui produit un dossier reconstitué de mémoire au mois six.
 
 **Ce qu'il faut assumer.** Ce cadrage arrive à sept semaines du démarrage, alors que l'application expose encore une seule route. Il ne rattrape pas ce retard — il évite seulement de pousser du rouge sur `main` pendant les quatorze semaines qui restent.
+
+---
+
+## 2026-10-06 — Invitation par lien transmis, sans envoi de courriel
+
+**Contexte.** Le lot 1 a livré la création de comptes, et a mis au jour un trou dans US-02 : un compte créé reçoit un mot de passe aléatoire inutilisable, et rien ne permet à son propriétaire d'en choisir un. Un administrateur ne peut donc pas réellement donner accès à son équipe.
+
+**Options.** (a) L'administrateur choisit le mot de passe et le communique. (b) Probo envoie un courriel d'invitation. (c) Probo produit un lien d'invitation que l'administrateur transmet lui-même.
+
+**Décision.** (c), avec un lien valable sept jours, à usage unique.
+
+**Pourquoi pas (a).** L'administrateur connaîtrait le mot de passe d'un membre de son équipe. Le journal d'audit cesserait alors de prouver qui a agi : toute action de Claire serait contestable au motif que Marc pouvait se connecter à sa place. C'est le fondement même de la traçabilité qui tomberait.
+
+**Pourquoi pas (b).** Un envoi de courriel suppose un service SMTP : une dépendance à configurer, à surveiller, dont les échecs sont silencieux et la délivrabilité incertaine. Les notifications par courriel sont classées `C-03`, « pourrait être fait » — en introduire une par la petite porte pour l'invitation contredirait cet arbitrage.
+
+C'est aussi la contrainte de Marc : sa DSI instruit lentement toute connexion à un service tiers. Un produit qui n'envoie rien ne demande l'autorisation de personne. Même raisonnement que pour l'abandon de l'import Drive.
+
+**Conséquences.**
+
+- US-02 gagne six critères d'acceptation. Le périmètre est inchangé : c'est M-01 qui se précise, pas un M-xx de plus.
+- Un compte sans mot de passe posé est **invité**, visible comme tel et incapable de se connecter. L'état existe déjà dans les maquettes de l'écran Comptes, sous le libellé « Invitation envoyée » — à corriger, puisque Probo n'envoie rien.
+- Le jeton d'invitation demande une table ou deux colonnes, à trancher au lot 2.
+
+**La limite à assumer.** Transmettre un lien de création de mot de passe par message instantané ou de vive voix n'est pas idéal. Sa durée courte et son usage unique en limitent la portée, et l'alternative — que l'administrateur connaisse le mot de passe — est franchement pire.
