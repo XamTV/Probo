@@ -99,5 +99,21 @@
     "AWAITING_RECONCILIATION": "To reconcile",
     "COMPLETED": "Completed",
     "FAILED": "Failed"
+  },
+  "auth": {
+    "pitch": "Probo first checks what each file is, then only scores the ones it is sure about. Doubtful documents are flagged, never graded at random.",
+    "hosting": "Data hosted in the European Union · 90-day retention",
+    "title": "Sign in",
+    "subtitle": "Reach your institution's applications.",
+    "email": "Email address",
+    "password": "Password",
+    "submit": "Sign in",
+    "submitting": "Signing in…",
+    "forgotPassword": "Forgot password",
+    "invalidCredentials": "Incorrect credentials.",
+    "throttleNotice": "After six attempts, further tries are delayed.",
+    "unavailable": "The service is briefly unavailable. Try again in a moment.",
+    "noSelfSignup": "Accounts are created by your institution's administrator. There is no self sign-up.",
+    "signOut": "Sign out"
   }
 }

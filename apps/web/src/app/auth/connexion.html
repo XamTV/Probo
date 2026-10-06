@@ -1,0 +1,164 @@
+<div class="flex min-h-dvh bg-[#1B2027]" *transloco="let t">
+  <!-- Volet de marque -->
+  <div class="hidden w-[480px] shrink-0 flex-col gap-8 p-11 pb-9 lg:flex">
+    <span class="font-mono text-[15px] font-medium tracking-[0.16em] text-white">PROBO</span>
+
+    <div class="flex grow flex-col justify-center gap-5">
+      <p class="text-[26px] leading-[1.35] tracking-tight text-white text-pretty">
+        {{ t('app.tagline') }}
+      </p>
+      <p class="max-w-[330px] text-[13.5px] leading-relaxed text-[#9AA1A9] text-pretty">
+        {{ t('auth.pitch') }}
+      </p>
+    </div>
+
+    <div class="flex items-center gap-2.5 text-[11.5px] text-[#7C858F]">
+      <svg
+        width="14"
+        height="14"
+        viewBox="0 0 24 24"
+        fill="none"
+        stroke="currentColor"
+        stroke-width="1.8"
+        stroke-linecap="round"
+        stroke-linejoin="round"
+        aria-hidden="true"
+      >
+        <path d="M12 3l7 3v6c0 4.2-2.9 7.6-7 9-4.1-1.4-7-4.8-7-9V6z" />
+      </svg>
+      {{ t('auth.hosting') }}
+    </div>
+  </div>
+
+  <!-- Formulaire -->
+  <div class="flex grow flex-col items-center justify-center bg-[#FBFBFA] p-11">
+    <form
+      [formGroup]="form"
+      (ngSubmit)="submit()"
+      class="flex w-full max-w-[384px] flex-col gap-[22px]"
+      novalidate
+    >
+      <div class="flex flex-col gap-1.5">
+        <h1 class="text-[21px] font-semibold tracking-tight text-[#14181D]">
+          {{ t('auth.title') }}
+        </h1>
+        <p class="text-[13.5px] text-[#6C757F]">{{ t('auth.subtitle') }}</p>
+      </div>
+
+      <div class="flex flex-col gap-4">
+        <div>
+          <label
+            for="email"
+            class="mb-[7px] block text-[11px] font-semibold uppercase tracking-[0.07em] text-[#6C757F]"
+          >
+            {{ t('auth.email') }}
+          </label>
+          <input
+            id="email"
+            type="email"
+            formControlName="email"
+            autocomplete="username"
+            class="h-[38px] w-full rounded border border-[#D7DBE0] bg-white px-3 text-sm text-[#14181D] focus:border-[#294B8A] focus:outline focus:outline-2 focus:outline-offset-1 focus:outline-[#C9D6EE]"
+          />
+        </div>
+
+        <div>
+          <label
+            for="password"
+            class="mb-[7px] block text-[11px] font-semibold uppercase tracking-[0.07em] text-[#6C757F]"
+          >
+            {{ t('auth.password') }}
+          </label>
+          <input
+            id="password"
+            type="password"
+            formControlName="password"
+            autocomplete="current-password"
+            class="h-[38px] w-full rounded border border-[#D7DBE0] bg-white px-3 text-sm text-[#14181D] focus:border-[#294B8A] focus:outline focus:outline-2 focus:outline-offset-1 focus:outline-[#C9D6EE]"
+          />
+        </div>
+      </div>
+
+      <button
+        type="submit"
+        [disabled]="submitting()"
+        class="h-10 rounded border border-[#294B8A] bg-[#294B8A] text-sm font-medium text-white disabled:opacity-60"
+      >
+        {{ submitting() ? t('auth.submitting') : t('auth.submit') }}
+      </button>
+
+      <!-- US-01 : un message unique, qui ne révèle jamais si l'adresse existe -->
+      @if (failed()) {
+        <div
+          role="alert"
+          class="flex items-start gap-2.5 rounded-[5px] border border-[#E8C4C0] bg-[#FCF2F1] px-3.5 py-3"
+        >
+          <svg
+            width="16"
+            height="16"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="#A32B22"
+            stroke-width="1.9"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            class="mt-px shrink-0"
+            aria-hidden="true"
+          >
+            <circle cx="12" cy="12" r="9" />
+            <path d="M12 8v5" />
+            <path d="M12 16.5h.01" />
+          </svg>
+          <div class="flex flex-col gap-0.5">
+            <span class="text-[13px] font-medium text-[#8A241D]">
+              {{ t('auth.invalidCredentials') }}
+            </span>
+            <span class="text-[12.5px] leading-snug text-[#8A241D]">
+              {{ t('auth.throttleNotice') }}
+            </span>
+          </div>
+        </div>
+      }
+
+      @if (unavailable()) {
+        <div
+          role="alert"
+          class="rounded-[5px] border border-[#E8D5AE] bg-[#FDF8EF] px-3.5 py-3 text-[13px] text-[#8A5B14]"
+        >
+          {{ t('auth.unavailable') }}
+        </div>
+      }
+
+      <div class="flex items-center gap-3">
+        <a routerLink="/mot-de-passe-oublie" class="text-[13px] text-[#294B8A] hover:underline">
+          {{ t('auth.forgotPassword') }}
+        </a>
+        <div class="grow"></div>
+        <div
+          class="flex overflow-hidden rounded border border-[#D7DBE0]"
+          [attr.aria-label]="t('language.label')"
+        >
+          @for (option of locales; track option) {
+            <button
+              type="button"
+              (click)="switchLocale(option)"
+              [attr.aria-current]="option === locale() ? 'true' : null"
+              class="px-[9px] py-1 text-xs uppercase"
+              [class]="
+                option === locale()
+                  ? 'bg-[#294B8A] font-medium text-white'
+                  : 'bg-white text-[#545C66] hover:text-[#14181D]'
+              "
+            >
+              {{ option }}
+            </button>
+          }
+        </div>
+      </div>
+
+      <p class="mt-1 text-xs leading-relaxed text-[#9AA1A9] text-pretty">
+        {{ t('auth.noSelfSignup') }}
+      </p>
+    </form>
+  </div>
+</div>
