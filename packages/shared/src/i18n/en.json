@@ -76,5 +76,28 @@
     "confirmNature": "Confirm the detected nature",
     "requalify": "Change the type",
     "revert": "Revert to the model verdict"
+  },
+  "userRole": {
+    "ADMIN": "Administrator",
+    "ADMISSIONS_OFFICER": "Admissions officer"
+  },
+  "campaignStatus": {
+    "DRAFT": "Draft",
+    "ACTIVE": "Active",
+    "CLOSED": "Closed",
+    "ARCHIVED": "Archived"
+  },
+  "applicationStatus": {
+    "PENDING": "Pending",
+    "RUNNING": "Being analysed",
+    "ANALYSED": "Analysed",
+    "FAILED": "Failed"
+  },
+  "importBatchStatus": {
+    "PENDING": "Pending",
+    "RUNNING": "Running",
+    "AWAITING_RECONCILIATION": "To reconcile",
+    "COMPLETED": "Completed",
+    "FAILED": "Failed"
   }
 }

@@ -1,5 +1,32 @@
 import { z } from 'zod';
 
+/** What a user may do. The administrator generalises the admissions officer. */
+export const UserRole = z.enum(['ADMIN', 'ADMISSIONS_OFFICER']);
+export type UserRole = z.infer<typeof UserRole>;
+
+/** Campaign lifecycle. A draft accepts no import. */
+export const CampaignStatus = z.enum(['DRAFT', 'ACTIVE', 'CLOSED', 'ARCHIVED']);
+export type CampaignStatus = z.infer<typeof CampaignStatus>;
+
+/** Where an application stands in the analysis pipeline. */
+export const ApplicationStatus = z.enum(['PENDING', 'RUNNING', 'ANALYSED', 'FAILED']);
+export type ApplicationStatus = z.infer<typeof ApplicationStatus>;
+
+/**
+ * Where an import batch stands.
+ *
+ * `AWAITING_RECONCILIATION` blocks the analysis until a human has settled an
+ * ambiguous grouping (RG-09).
+ */
+export const ImportBatchStatus = z.enum([
+  'PENDING',
+  'RUNNING',
+  'AWAITING_RECONCILIATION',
+  'COMPLETED',
+  'FAILED',
+]);
+export type ImportBatchStatus = z.infer<typeof ImportBatchStatus>;
+
 /** Nature of a document, as determined by level 1 analysis. */
 export const DocumentType = z.enum([
   'RESUME',

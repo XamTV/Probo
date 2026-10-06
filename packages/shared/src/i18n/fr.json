@@ -76,5 +76,28 @@
     "confirmNature": "Confirmer la nature détectée",
     "requalify": "Requalifier le type",
     "revert": "Revenir au verdict du modèle"
+  },
+  "userRole": {
+    "ADMIN": "Administrateur",
+    "ADMISSIONS_OFFICER": "Chargé d'admission"
+  },
+  "campaignStatus": {
+    "DRAFT": "Brouillon",
+    "ACTIVE": "Active",
+    "CLOSED": "Clôturée",
+    "ARCHIVED": "Archivée"
+  },
+  "applicationStatus": {
+    "PENDING": "En attente",
+    "RUNNING": "En cours d'analyse",
+    "ANALYSED": "Analysée",
+    "FAILED": "Erreur"
+  },
+  "importBatchStatus": {
+    "PENDING": "En attente",
+    "RUNNING": "En cours",
+    "AWAITING_RECONCILIATION": "À réconcilier",
+    "COMPLETED": "Terminé",
+    "FAILED": "Erreur"
   }
 }
