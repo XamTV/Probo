@@ -31,7 +31,9 @@ Convention : <u>clé primaire</u>, _#clé étrangère_.
 
 **Les associations binaires un-à-plusieurs ne produisent aucune table.** Elles descendent en clé étrangère du côté de cardinalité maximale 1 — `UTILISATEUR` porte `#id_etablissement`, `DOCUMENT` porte `#id_candidature`. Aucune association du MCD n'est de type plusieurs-à-plusieurs, donc le modèle ne comporte aucune table de jonction.
 
-**Les associations un-à-un deviennent des identifiants partagés.** `TEXTE_EXTRAIT` et `ANALYSE` ont pour clé primaire la clé étrangère `#id_document` elle-même. C'est ce qui garantit structurellement qu'un document ne porte qu'un texte et qu'une analyse — là où une clé technique autonome aurait laissé la porte ouverte aux doublons.
+**Les identifications relatives deviennent des clés primaires partagées.** `TEXTE_EXTRAIT` et `ANALYSE` portent la marque `(R)` au MCD : elles n'ont pas d'identifiant propre et sont identifiées **par** le document auquel elles se rattachent. La règle de passage en tire une clé primaire qui **est** la clé étrangère `#id_document`.
+
+Ce n'est donc pas un raccourci : c'est ce que le MCD prescrit. Et c'est ce qui garantit structurellement qu'un document ne porte qu'un texte et qu'une analyse — là où une clé autonome aurait laissé la porte ouverte aux doublons.
 
 **Les clés étrangères facultatives traduisent des cardinalités minimales à zéro.** `LOT_IMPORT.#id_utilisateur` et `ENTREE_AUDIT.#id_utilisateur` sont nullables : un compte supprimé ne doit pas emporter les lots qu'il a importés ni les traces qu'il a laissées. C'est ce qui permet au journal d'audit de survivre à la suppression d'un compte.
 

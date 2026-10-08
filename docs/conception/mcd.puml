@@ -9,6 +9,10 @@
 ' Notation : entités en rectangles, associations en ellipses, cardinalités
 ' Merise (min,max) portées sur chaque patte. Rendu en PlantUML standard plutôt
 ' qu'en @startchen, dont la notation est celle de Chen et non de Merise.
+'
+' (R) marque une identification relative : l'entité n'a pas d'identifiant
+' propre et se trouve identifiée par l'association qui la porte. Le MLD en
+' tire une clé primaire qui EST la clé étrangère.
 
 skinparam shadowing false
 skinparam defaultFontName Helvetica
@@ -37,8 +41,8 @@ rectangle "**RÉFÉRENTIEL**\n--\n<u>id référentiel</u>\ntype de document\npro
 rectangle "**LOT D'IMPORT**\n--\n<u>id lot</u>\nnom de l'archive\nstatut\nnombre de fichiers\nnombre de fichiers refusés\nmessage d'erreur\ndate d'achèvement" as LOT
 rectangle "**CANDIDATURE**\n--\n<u>id candidature</u>\nnom du candidat\nadresse du candidat\nréférence externe\nstatut\norigine de l'identité\nscore global\nnombre de documents atypiques\néchéance de purge" as CANDIDATURE
 rectangle "**DOCUMENT**\n--\n<u>id document</u>\nnom d'origine\ntaille\ntype de fichier\nidentité détectée\nconfiance sur l'identité\nméthode d'extraction\nstatut" as DOCUMENT
-rectangle "**TEXTE EXTRAIT**\n--\n<u>id texte</u>\ncontenu\nnombre de caractères" as TEXTE
-rectangle "**ANALYSE**\n--\n<u>id analyse</u>\ntype détecté\nconfiance\natypique\nmotif d'atypie\njustification niveau 1\nscore adéquation\nscore clarté\nscore qualité formelle\njustification adéquation\njustification clarté\njustification qualité formelle\nscore du document\nversion de prompt\ndate d'analyse\n--\ntype requalifié\nmotif de requalification\ndate de requalification" as ANALYSE
+rectangle "**TEXTE EXTRAIT**\n--\n<u>(R) par DOCUMENT</u>\ncontenu\nnombre de caractères" as TEXTE
+rectangle "**ANALYSE**\n--\n<u>(R) par DOCUMENT</u>\ntype détecté\nconfiance\natypique\nmotif d'atypie\njustification niveau 1\nscore adéquation\nscore clarté\nscore qualité formelle\njustification adéquation\njustification clarté\njustification qualité formelle\nscore du document\nversion de prompt\ndate d'analyse\n--\ntype requalifié\nmotif de requalification\ndate de requalification" as ANALYSE
 rectangle "**ENTRÉE D'AUDIT**\n--\n<u>id entrée</u>\naction\ntype de ressource\nréférence de ressource\ndate de survenue" as AUDIT
 
 usecase "EMPLOYER" as EMPLOYER
@@ -49,8 +53,8 @@ usecase "DÉPOSER" as DEPOSER
 usecase "REGROUPER" as REGROUPER
 usecase "APPORTER" as APPORTER
 usecase "RASSEMBLER" as RASSEMBLER
-usecase "PORTER" as PORTER
-usecase "ÉVALUER" as EVALUER
+usecase "PORTER\n(R)" as PORTER
+usecase "ÉVALUER\n(R)" as EVALUER
 usecase "JOURNALISER" as JOURNALISER
 usecase "DÉCLENCHER" as DECLENCHER
 usecase "CONTREDIRE" as CONTREDIRE
@@ -94,6 +98,17 @@ DECLENCHER -- AUDIT : (0,1)
 UTILISATEUR -- CONTREDIRE : (0,n)
 CONTREDIRE -- ANALYSE : (0,1)
 
+note bottom of TEXTE
+  **(R) — identification relative.**
+  Ces deux entités n'ont pas d'identifiant
+  propre : elles sont identifiées PAR le
+  document auquel elles se rattachent.
+  C'est ce qui interdit structurellement
+  qu'un document porte deux textes ou
+  deux analyses — une clé autonome aurait
+  laissé la porte ouverte au doublon.
+end note
+
 note right of CANDIDATURE
   Le **rang** n'est pas un attribut.
   Il se calcule à la lecture, par
@@ -103,9 +118,10 @@ end note
 note bottom of ANALYSE
   Le verdict du modèle et la décision
   humaine coexistent : **type détecté**
-  n'est jamais écrasé par **type
-  requalifié** (RG-10). Sans quoi on ne
-  saurait plus qui a décidé.
+  n'est jamais écrasé par
+  **type requalifié** (RG-10).
+  Sans quoi on ne saurait plus
+  qui a décidé.
 end note
 
 note bottom of ANALYSE
