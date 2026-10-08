@@ -31,7 +31,7 @@ skinparam arrow {
 }
 
 rectangle "**ÉTABLISSEMENT**\n--\n<u>id établissement</u>\nnom\nsiret\nactif" as ETABLISSEMENT
-rectangle "**UTILISATEUR**\n--\n<u>id utilisateur</u>\nadresse électronique\nmot de passe\nnom\nrôle\nactif\ndernière connexion" as UTILISATEUR
+rectangle "**UTILISATEUR**\n--\n<u>id utilisateur</u>\nadresse électronique\nmot de passe\nnom\nrôle\nactif\ndernière connexion\ntentatives échouées\nverrouillé jusqu'à" as UTILISATEUR
 rectangle "**CAMPAGNE**\n--\n<u>id campagne</u>\nnom\ndescription\nstatut\ntypes attendus\nseuil de confiance\npoids adéquation\npoids clarté\npoids qualité formelle\ndate d'ouverture\ndate de clôture" as CAMPAGNE
 rectangle "**RÉFÉRENTIEL**\n--\n<u>id référentiel</u>\ntype de document\nprofil décrit\ndocument de référence" as REFERENTIEL
 rectangle "**LOT D'IMPORT**\n--\n<u>id lot</u>\nnom de l'archive\nstatut\nnombre de fichiers\nnombre de fichiers refusés\nmessage d'erreur\ndate d'achèvement" as LOT
