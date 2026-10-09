@@ -31,6 +31,15 @@ _Périmètre : M-01_
 - Un compte désactivé ne peut plus se connecter, mais les lots qu'il a importés restent visibles et attribués
 - Toute création, modification et désactivation est inscrite au journal d'audit
 
+**Le compte créé n'est pas encore utilisable**, et c'est voulu : son propriétaire doit choisir son mot de passe lui-même. L'administrateur ne doit jamais connaître le mot de passe d'un membre de son équipe — sans quoi le journal d'audit ne prouve plus qui a agi.
+
+- La création produit un **lien d'invitation**, que l'administrateur transmet lui-même : par courriel, par message, de vive voix. Probo n'envoie aucun courriel
+- Le lien est valable **sept jours**, à usage unique, et devient caduc dès qu'un mot de passe est posé
+- Le lien mène à un écran où le propriétaire choisit son mot de passe, d'au moins douze caractères
+- Tant que le mot de passe n'est pas posé, le compte apparaît comme **invité** dans la liste et ne peut pas se connecter
+- L'administrateur peut régénérer un lien expiré ou perdu ; l'ancien cesse aussitôt de fonctionner
+- La génération d'un lien et la pose d'un mot de passe sont inscrites au journal d'audit
+
 ### US-03 · Ne jamais voir les données d'un autre établissement
 
 **En tant que** Marc, **je veux** l'assurance que mes données sont isolées **afin de** répondre à mon responsable RGPD.

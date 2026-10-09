@@ -44,6 +44,10 @@ Le dépôt ne revendique aucune capacité non implémentée, et le schéma ne po
 - **Deux lanceurs de tests, assumé.** Jest pour `apps/api`, Vitest pour `apps/web` et `packages/shared`. `npm test` à la racine lance les trois. Ne pas proposer de les unifier.
 - **`npm test` reconstruit `packages/shared` d'abord** (`pretest`). Un test qui échoue sur un type absent vient souvent de là.
 - **Ports décalés** — PostgreSQL 5433, Redis 6380. Un `P1010` trompeur signale généralement qu'on tape sur une instance locale plutôt que sur le conteneur.
+- **Le pipe de validation va sur le paramètre, jamais sur le gestionnaire.** `@UsePipes` s'applique à **tous** les paramètres : un schéma de corps de requête validerait aussi l'objet de session et en retirerait `institutionId`. Le cloisonnement disparaît alors en silence. Écrire `@Body(new ZodValidationPipe(X))`.
+- **Un secret ou une variable d'environnement se lit par `ConfigService`**, dans une fabrique `registerAsync`, jamais par `process.env` au moment de définir un module : ConfigModule n'a pas encore chargé le `.env` à cet instant, et la valeur est vide.
+- **Vérifier la plage de pairs et le format de module avant d'ajouter un paquet.** `npm install X` donne la dernière version, qui peut cibler un majeur de Nest supérieur au nôtre et n'exister qu'en ESM — que Jest, en CommonJS, ne sait pas lire.
+- **Les tests end-to-end ont besoin de `--experimental-vm-modules`** : Prisma 7 fait un import dynamique à la connexion que la machine virtuelle de Jest refuse sans ce drapeau. Il est dans le script `test:e2e`.
 
 ## Vérifications avant de rendre la main
 

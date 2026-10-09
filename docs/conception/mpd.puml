@@ -6,7 +6,7 @@
 ' consultable d'un coup d'œil ce qu'une lecture de 300 lignes donne lentement.
 '
 ' Règle de tenue : se met à jour dans la même séance que la migration.
-' Dernière synchronisation : migration 20261005114043_reference_profile_exactly_one_form.
+' Dernière synchronisation : migration 20261006075909_login_attempt_throttling.
 '
 ' Ce que le MCD ignore et qui apparaît ici — clés techniques, horodatages,
 ' empreintes, dénormalisation de institution_id, index — est justifié
@@ -43,6 +43,10 @@ entity "**user**" as app_user {
   *role : user_role
   *is_active : boolean
   last_login_at : timestamp
+  .. temporisation (US-01) ..
+  *failed_login_attempts : int
+  locked_until : timestamp
+  ..
   *created_at : timestamp
   *updated_at : timestamp
   --
