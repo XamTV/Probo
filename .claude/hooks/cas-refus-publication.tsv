@@ -1,0 +1,42 @@
+#	Cas de test du hook de publication. Une ligne : verdict attendu, tabulation,
+#	commande. « deny » = la commande revient à l'auteur, « passe » = rien ne
+#	s'interpose. Les lignes commençant par un croisillon sont ignorées.
+#
+#	Un filtre qui lit du texte ne distingue pas une commande d'une mention :
+#	les deux moitiés de ce fichier comptent autant l'une que l'autre.
+#
+#	--- doivent être refusées : elles reviennent à l'auteur ---
+deny	git push
+deny	git push origin feat/lot-1
+deny	git push --force-with-lease
+deny	git -C /tmp/x push
+deny	git --git-dir=.git push
+deny	cd apps/api && git push
+deny	true; git push
+deny	true || git push
+deny	(git push)
+deny	git push; echo fini
+deny	git push && echo ok
+deny	npm test && git push origin HEAD
+deny	$(git push)
+deny	gh pr create --fill
+deny	gh pr merge 26 --merge
+deny	gh pr create; gh pr merge 1
+#
+#	--- doivent passer : mentions, et commandes sans effet hors du poste ---
+passe	git commit -m "refuse git push via a hook"
+passe	echo "le hook refuse gh pr create"
+passe	git status
+passe	git log --oneline -5
+passe	git log --grep push
+passe	git fetch origin
+passe	git remote -v
+passe	git diff --cached
+passe	git push-is-not-a-command
+passe	gh pr list
+passe	gh pr view 26
+passe	gh pr checks 26
+passe	gh pr diff 26
+passe	gh run list
+passe	npm test
+passe	npm run lint

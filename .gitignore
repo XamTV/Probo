@@ -47,3 +47,7 @@ Thumbs.db
 .idea/
 .vscode/*
 !.vscode/extensions.json
+
+# Réglages Claude Code personnels : le hook partagé est dans
+# .claude/settings.json, les surcharges locales ne regardent personne
+.claude/settings.local.json

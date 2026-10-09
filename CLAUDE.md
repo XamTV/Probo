@@ -63,6 +63,10 @@ Cadré le 05/10/2026.
 
 **Signaler sans bloquer :** les incohérences trouvées en chemin, en fin de message.
 
+**Deux de ces arrêts sont tenus par le harnais, pas par la mémoire.** `.claude/hooks/refus-publication.sh` refuse les poussées sur `origin` et l'ouverture ou la fusion d'une pull request. Le refus est sans appel : **ces commandes reviennent à l'auteur**, qui les lance lui-même. Les présenter prêtes à coller fait partie du travail. `git commit` reste tenu par la seule règle ci-dessus — voir l'entrée du 08/10/2026 au journal.
+
+Après toute retouche au motif du hook : `npm run test:hook`. Il a produit trois défauts le jour de son installation, dont deux contournements silencieux.
+
 ## Branches et livraison
 
 Le découpage en lots, leur ordre et les dépendances qui l'imposent : [`docs/analyse/plan-livraison.md`](docs/analyse/plan-livraison.md). Ne pas le recopier ici.

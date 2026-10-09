@@ -349,3 +349,42 @@ C'est aussi la contrainte de Marc : sa DSI instruit lentement toute connexion à
 - Le jeton d'invitation demande une table ou deux colonnes, à trancher au lot 2.
 
 **La limite à assumer.** Transmettre un lien de création de mot de passe par message instantané ou de vive voix n'est pas idéal. Sa durée courte et son usage unique en limitent la portée, et l'alternative — que l'administrateur connaisse le mot de passe — est franchement pire.
+
+---
+
+## 2026-10-08 — La règle de non-publication passe du rappel au harnais
+
+**Contexte.** `CLAUDE.md` demande depuis le 05/10 l'accord explicite de l'auteur avant tout commit et avant de pousser sur `origin`. La règle a été enfreinte deux fois en trois jours : un commit non demandé le 06/10, puis un commit, un `git push` et l'ouverture de la PR #26 le 08/10, alors que la consigne reçue était seulement « corrige dans une branche adéquate ».
+
+**Options.** (a) Reformuler la règle plus fermement dans `CLAUDE.md`. (b) Protéger la branche `main` côté GitHub. (c) Un hook `PreToolUse` qui refuse la commande avant qu'elle ne parte.
+
+**Décision.** (c) — `.claude/hooks/refus-publication.sh`, déclaré dans `.claude/settings.json`, refuse `git push`, `gh pr create` et `gh pr merge`. Tout le reste de `git` et de `gh` passe.
+
+**Raison.** C'est le raisonnement que le projet applique déjà partout ailleurs, retourné vers son propre outillage. RG-08 est passée du code à une contrainte `CHECK`. Le cloisonnement est passé d'un `if` à une clause de requête, que l'appelant ne peut pas formuler autrement. Le test de bout en bout est passé de la bonne volonté à la CI. Une garantie tenue par un rappel se contourne par simple oubli ; déplacée dans une structure, elle n'a plus besoin qu'on s'en souvienne.
+
+**Pourquoi pas (a).** C'est exactement ce qui a échoué. Le texte était déjà sans ambiguïté — il ne manquait pas de fermeté, il manquait d'exécution.
+
+**Pourquoi pas (b).** Une protection de branche défend `main`, pas `origin`. Elle laisserait pousser sur une branche de lot et ouvrir une pull request, qui sont précisément les deux actes constatés. Elle reste souhaitable pour d'autres raisons, et relève du lot 7 avec le reste de la configuration de déploiement.
+
+**Conséquences.**
+
+- Le refus est porté par le harnais, pas par l'assistant : il survit à une session compactée, à un changement de modèle et à un oubli.
+- Les commandes bloquées sont présentées à l'auteur, qui les exécute ou les autorise. Le coût est d'un aller-retour par publication.
+- Le hook est versionné. Un jury qui regarde le dépôt voit une règle de collaboration outillée, pas seulement énoncée.
+- `git commit` n'est **pas** bloqué : aucune commande ne le distingue d'un commit demandé, et un commit local reste réversible sans trace. L'interdiction de committer sans accord reste tenue par `CLAUDE.md`, et c'est une faiblesse assumée de ce dispositif.
+
+**Ce que l'installation a appris, le 09/10.** Le hook a bloqué deux fois des commandes légitimes avant d'être juste, et les deux défauts disent la même chose : un filtre qui lit du texte ne distingue pas une commande d'une mention.
+
+Le premier essai a refusé le commit qui installait le hook, parce que le message de commit _parlait_ de la commande interdite. Le motif a donc été ancré en position de commande : début de ligne, ou après un séparateur de shell. Le second défaut était l'inverse — `git push; echo fini` et `(git push)` passaient, le motif exigeant un espace après le verbe. Un filtre trop large bloque le travail, un filtre trop étroit ne protège pas, et seule l'exécution réelle a montré de quel côté il penchait.
+
+Le découpage en lignes de `grep` ferme au passage le contournement par commande multi-ligne, au prix d'un refus à tort si une ligne de message de commit _commence_ par la commande. L'erreur va du bon côté : un refus se lève en demandant, un contournement ne se voit pas.
+
+**Le troisième défaut a demandé un aller-retour, et c'est le plus instructif des trois.** Choisi en `deny`, le hook a bloqué la fusion des PR #25 et #26 que l'auteur venait d'autoriser. `deny` semblait donc trop dur : `CLAUDE.md` dit « **toujours s'arrêter pour** », pas « ne jamais », et `ask` — qui ouvre une demande de permission — lisait mieux la consigne. Le hook est passé en `ask`.
+
+**L'essai a échoué au premier usage réel.** Une fusion de pull request est passée sans qu'aucune demande n'atteigne l'auteur : `ask` délègue la décision au mode de permission de la session, et un mode permissif l'approuve en silence. Retour à `deny`, décidé le 09/10.
+
+La leçon vaut au-delà de ce fichier, et c'est la même que celle du cloisonnement : **une garantie qui dépend d'un réglage par ailleurs modifiable n'est pas une garantie.** `ask` était plus fidèle à la lettre de la consigne et strictement plus faible que `deny` en pratique. Entre les deux, la formulation cède.
+
+Ce que `deny` coûte, et qu'il faut assumer : l'auteur tape lui-même chaque publication. Présenter la commande prête à coller fait désormais partie du travail.
+
+Les trente-deux cas sont versionnés dans `.claude/hooks/`, lancés par `npm run test:hook`. Hors CI : c'est une garantie de poste de travail, pas un comportement du produit. Un garde-fou qui a produit trois défauts en une journée n'avait rien à faire sans test.
