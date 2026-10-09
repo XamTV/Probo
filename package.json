@@ -16,6 +16,7 @@
     "build": "npm run build -w @probo/shared && npm run build -w @probo/api && npm run build -w @probo/web",
     "pretest": "npm run build -w @probo/shared",
     "test": "npm run test --workspaces --if-present",
+    "test:hook": "bash .claude/hooks/verifie-refus-publication.sh",
     "lint": "npm run lint --workspaces --if-present",
     "format": "prettier --write .",
     "format:check": "prettier --check .",
