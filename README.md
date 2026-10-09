@@ -113,21 +113,23 @@ Les deux locales sont embarquées dans le bundle plutôt que chargées à la dem
 
 ## Stack
 
-| Couche           | Technologie                                    |
-| ---------------- | ---------------------------------------------- |
-| Langage          | TypeScript, front et back                      |
-| Front            | Angular · Tailwind CSS · Angular CDK           |
-| Backend          | NestJS                                         |
-| Base de données  | PostgreSQL · Prisma                            |
-| File de tâches   | BullMQ · Redis                                 |
-| Validation       | Zod, partagé front et back                     |
-| Extraction PDF   | `pdftotext` (poppler) · `tesseract` en secours |
-| IA               | Mistral AI                                     |
-| Export PDF       | pdfmake                                        |
-| Authentification | Argon2 · JWT en cookie httpOnly                |
-| i18n             | Transloco — français et anglais                |
-| Tests            | Vitest (front, shared) · Jest (API)            |
-| Infrastructure   | Docker · GitHub Actions · VPS Scaleway         |
+Les choix sont arrêtés et justifiés au [journal des décisions](docs/journal-decisions.md). Ils ne sont pas tous installés : une dépendance s'ajoute au [lot](docs/analyse/plan-livraison.md) qui s'en sert, pas avant. L'installer en avance donnerait une bibliothèque inutilisée, dont la version serait à reprendre le jour du premier appel. La colonne d'état dit donc ce qui tourne aujourd'hui.
+
+| Couche           | Technologie                                    | État                            |
+| ---------------- | ---------------------------------------------- | ------------------------------- |
+| Langage          | TypeScript, front et back                      | En place                        |
+| Front            | Angular · Tailwind CSS · Angular CDK           | En place                        |
+| Backend          | NestJS                                         | En place                        |
+| Base de données  | PostgreSQL · Prisma                            | En place                        |
+| File de tâches   | BullMQ · Redis                                 | Redis en place, BullMQ au lot 4 |
+| Validation       | Zod, partagé front et back                     | En place                        |
+| Extraction PDF   | `pdftotext` (poppler) · `tesseract` en secours | Au lot 4                        |
+| IA               | Mistral AI                                     | Au lot 4                        |
+| Export PDF       | pdfmake                                        | Au lot 7                        |
+| Authentification | Argon2 · JWT en cookie httpOnly                | En place                        |
+| i18n             | Transloco — français et anglais                | En place                        |
+| Tests            | Vitest (front, shared) · Jest (API)            | En place                        |
+| Infrastructure   | Docker · GitHub Actions · VPS Scaleway         | Docker et CI en place           |
 
 ### Choix de Mistral AI
 
