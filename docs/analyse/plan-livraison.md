@@ -31,15 +31,15 @@ Un lot est donc l'unité de livraison : une branche, une pull request, une fusio
 
 ## Les sept lots
 
-| Lot   | Contenu                                | Périmètre              | User stories               | Ce qui impose cette place                                                                                                            |
-| ----- | -------------------------------------- | ---------------------- | -------------------------- | ------------------------------------------------------------------------------------------------------------------------------------ |
-| **1** | Authentification et cloisonnement      | M-01, M-11             | US-01, US-02, US-03        | Rien n'est testable sans un utilisateur et un établissement. Toute requête ultérieure est filtrée par `institutionId`                |
-| **2** | Campagne et référentiel                | M-02, M-16             | US-04, US-05, US-06, US-22 | Un lot d'import vise une campagne ; le niveau 2 compare à un référentiel. Les deux doivent exister avant d'importer quoi que ce soit |
-| **3** | Import ZIP                             | M-03                   | US-07                      | La porte d'entrée unique. RG-07 est assez précise pour être codée et testée sans maquette                                            |
-| **4** | Extraction, niveau 1 et réconciliation | M-04, M-05, M-17       | US-10, US-23               | Le cœur du produit. La réconciliation s'intercale entre niveau 1 et niveau 2, elle ne peut pas être repoussée après                  |
-| **5** | Atypiques, niveau 2 et agrégation      | M-06, M-07, M-08, M-18 | US-11, US-12, US-13, US-24 | RG-01 à RG-06 sont déjà écrites et testées dans `packages/shared` ; il reste à les câbler au pipeline                                |
-| **6** | Écrans de consultation                 | M-09, M-10             | US-14, US-15, US-16        | Les maquettes sont la spécification. Rien à concevoir, tout à implémenter                                                            |
-| **7** | RGPD et exports                        | M-12, M-13, M-15       | US-17 à US-21              | Isolables de la chaîne d'analyse, donc **coupables en dernier** si le calendrier dérape                                              |
+| Lot   | Contenu                                | Périmètre              | User stories                               | Ce qui impose cette place                                                                                                            |
+| ----- | -------------------------------------- | ---------------------- | ------------------------------------------ | ------------------------------------------------------------------------------------------------------------------------------------ |
+| **1** | Authentification et cloisonnement      | M-01, M-11             | US-01, US-02, US-03                        | Rien n'est testable sans un utilisateur et un établissement. Toute requête ultérieure est filtrée par `institutionId`                |
+| **2** | Campagne et référentiel                | M-02, M-16             | US-04, US-05, US-06, US-22 (profil décrit) | Un lot d'import vise une campagne ; le niveau 2 compare à un référentiel. Les deux doivent exister avant d'importer quoi que ce soit |
+| **3** | Import ZIP                             | M-03                   | US-07                                      | La porte d'entrée unique. RG-07 est assez précise pour être codée et testée sans maquette                                            |
+| **4** | Extraction, niveau 1 et réconciliation | M-04, M-05, M-17       | US-10, US-23, US-22 (document déposé)      | Le cœur du produit. La réconciliation s'intercale entre niveau 1 et niveau 2, elle ne peut pas être repoussée après                  |
+| **5** | Atypiques, niveau 2 et agrégation      | M-06, M-07, M-08, M-18 | US-11, US-12, US-13, US-24                 | RG-01 à RG-06 sont déjà écrites et testées dans `packages/shared` ; il reste à les câbler au pipeline                                |
+| **6** | Écrans de consultation                 | M-09, M-10             | US-14, US-15, US-16                        | Les maquettes sont la spécification. Rien à concevoir, tout à implémenter                                                            |
+| **7** | RGPD et exports                        | M-12, M-13, M-15       | US-17 à US-21                              | Isolables de la chaîne d'analyse, donc **coupables en dernier** si le calendrier dérape                                              |
 
 **US-08 et US-09** ne figurent dans aucun lot : reportées hors périmètre v1 avec M-14, conservées pour la traçabilité de l'arbitrage.
 
