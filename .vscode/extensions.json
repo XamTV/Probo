@@ -1,0 +1,9 @@
+{
+  // Les schémas du dossier de conception sont des sources PlantUML versionnées,
+  // jamais des images. Cette extension en donne l'aperçu en direct (Alt+D) et
+  // évite de passer par la ligne de commande à chaque relecture.
+  //
+  // Elle s'appuie sur `java` et `graphviz`, installés par `brew install plantuml`.
+  // Voir docs/conception/README.md.
+  "recommendations": ["jebbs.plantuml"]
+}

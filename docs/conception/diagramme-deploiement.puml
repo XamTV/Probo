@@ -1,0 +1,134 @@
+@startuml diagramme-deploiement
+' Probo — diagramme de déploiement
+'
+' Deux environnements, et la distinction est le propos du diagramme :
+'
+'   EN PLACE    — ce qui tourne aujourd'hui : le poste de développement et la
+'                 chaîne d'intégration continue.
+'   CIBLE       — la production, qui n'existe pas encore. Aucun Dockerfile
+'                 n'est écrit, aucun VPS n'est provisionné. Elle est livrée au
+'                 lot 7, avec A05 et A06 du plan de sécurisation.
+'
+' Les mentionner ensemble sans les distinguer reviendrait à revendiquer une
+' capacité non implémentée. Le trait pointillé et la mention « lot 7 » portent
+' cette distinction.
+
+skinparam shadowing false
+skinparam defaultFontName Helvetica
+skinparam node {
+  BackgroundColor #FFFFFF
+  BorderColor #294B8A
+  BorderThickness 1.2
+  FontColor #14181D
+}
+skinparam database {
+  BackgroundColor #F4F6FA
+  BorderColor #294B8A
+  FontColor #14181D
+}
+skinparam cloud {
+  BackgroundColor #FBFBFA
+  BorderColor #9AA1A9
+  FontColor #545C66
+}
+skinparam artifact {
+  BackgroundColor #FFFFFF
+  BorderColor #545C66
+  FontColor #14181D
+}
+skinparam note {
+  BackgroundColor #F4F6FA
+  BorderColor #545C66
+  FontColor #14181D
+  FontSize 11
+}
+skinparam arrow {
+  Color #545C66
+  FontColor #545C66
+  FontSize 11
+}
+
+' ───────────────────────────── EN PLACE ─────────────────────────────
+
+node "Poste de développement\n<<en place>>" as POSTE {
+  artifact "apps/web\nng serve — 4200" as WEB_DEV
+  artifact "apps/api\nNestJS — 3000" as API_DEV
+
+  node "Docker Compose" as COMPOSE {
+    database "postgres:17-alpine\nhôte 5433 → 5432" as PG_DEV
+    database "redis:7-alpine\nhôte 6380 → 6379" as REDIS_DEV
+  }
+}
+
+node "GitHub Actions\n<<en place>>" as CI {
+  artifact "Qualité, tests et build\nformat · lint · unitaires · e2e" as JOB
+  database "postgres:17-alpine\nservice éphémère" as PG_CI
+}
+
+WEB_DEV --> API_DEV : HTTP /api
+API_DEV --> PG_DEV : TCP 5433
+API_DEV ..> REDIS_DEV : TCP 6380\n<<dès le lot 4>>
+JOB --> PG_CI : migrations + e2e
+
+' ───────────────────────────── CIBLE, LOT 7 ─────────────────────────
+
+node "VPS Scaleway — Paris\n<<cible, lot 7>>" as VPS #FBFBFA {
+  node "Proxy inverse\nTLS, limitation de débit" as PROXY
+  artifact "Front Angular\nfichiers statiques" as WEB_PROD
+  artifact "API NestJS\n+ workers BullMQ" as API_PROD
+  database "PostgreSQL" as PG_PROD
+  database "Redis" as REDIS_PROD
+  artifact "Volume disque\ndocuments candidats" as DISQUE
+}
+
+cloud "API Mistral\nhébergée en UE" as MISTRAL
+
+PROXY --> WEB_PROD
+PROXY --> API_PROD : /api
+API_PROD --> PG_PROD
+API_PROD --> REDIS_PROD
+API_PROD --> DISQUE
+API_PROD --> MISTRAL : HTTPS, adresse fixe
+
+JOB ..> VPS : déploiement\n<<lot 7>>
+
+note bottom of VPS
+  **Rien de ceci n'existe au 02/11/2026.**
+  Pas de Dockerfile, pas de VPS provisionné,
+  ni BullMQ ni client Mistral installés.
+
+  Livré au lot 7, avec la configuration
+  (A05) et la chaîne de dépendances (A06).
+end note
+
+note right of POSTE
+  **Ports décalés volontairement** — 5433 et
+  6380. Une instance PostgreSQL ou Redis déjà
+  présente occupe 5432/6379, et `localhost`
+  taperait dessus plutôt que sur le conteneur.
+  Le symptôme est un `P1010` trompeur.
+end note
+
+note bottom of PG_CI
+  Les tests de bout en bout tournent contre un
+  **vrai PostgreSQL**, pas un double : le
+  cloisonnement vit dans la clause de requête,
+  et un Prisma simulé ne prouverait rien.
+end note
+
+note right of MISTRAL
+  Seul appel sortant du serveur, vers une
+  adresse **fixe et configurée**. C'est ce qui
+  rend A10 — falsification de requête côté
+  serveur — sans objet depuis l'abandon de
+  l'import Drive.
+end note
+
+note bottom of DISQUE
+  Volume local en v1. Le chiffrement au repos
+  relève de l'hébergeur et est traité au lot 7 ;
+  la migration vers un stockage objet est
+  classée `S-03`.
+end note
+
+@enduml
