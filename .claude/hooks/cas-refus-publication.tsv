@@ -5,7 +5,15 @@
 #	Un filtre qui lit du texte ne distingue pas une commande d'une mention :
 #	les deux moitiés de ce fichier comptent autant l'une que l'autre.
 #
-#	--- doivent être refusées : elles reviennent à l'auteur ---
+#	--- enregistrer : refusé depuis le 02/11/2026 ---
+deny	git commit
+deny	git commit -m "feat: x"
+deny	git commit --amend --no-edit
+deny	git -C /tmp/x commit -m "x"
+deny	cd apps/api && git commit -m "x"
+deny	git add -A && git commit -m "x"
+#
+#	--- publier : refusé depuis l'origine ---
 deny	git push
 deny	git push origin feat/lot-1
 deny	git push --force-with-lease
@@ -24,15 +32,19 @@ deny	gh pr merge 26 --merge
 deny	gh pr create; gh pr merge 1
 #
 #	--- doivent passer : mentions, et commandes sans effet hors du poste ---
-passe	git commit -m "refuse git push via a hook"
 passe	echo "le hook refuse gh pr create"
+passe	echo "il faudra committer puis pousser"
 passe	git status
+passe	git add -A
+passe	git reset --soft HEAD~1
 passe	git log --oneline -5
 passe	git log --grep push
+passe	git log --format=%s -3
 passe	git fetch origin
 passe	git remote -v
 passe	git diff --cached
 passe	git push-is-not-a-command
+passe	git commit-tree-is-not-it
 passe	gh pr list
 passe	gh pr view 26
 passe	gh pr checks 26
