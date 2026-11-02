@@ -66,6 +66,27 @@ export class AuthService {
   }
 
   /**
+   * The account a failed sign-in was aimed at, for the audit trail alone.
+   *
+   * An audit entry belongs to a tenant, and a failure carries no session to
+   * take one from. This is the only way to attach the entry to the right
+   * institution — so an unknown address returns null and nothing is recorded:
+   * there is no tenant it could belong to.
+   *
+   * It answers for a deactivated or locked account too, deliberately. Those
+   * failures are the ones worth seeing in an audit trail.
+   *
+   * Nothing here reaches the caller: `signIn` keeps returning the same message
+   * for every cause, and this result never leaves the server.
+   */
+  auditTargetFor(email: string): Promise<{ id: string; institutionId: string } | null> {
+    return this.prisma.user.findUnique({
+      where: { email },
+      select: { id: true, institutionId: true },
+    });
+  }
+
+  /**
    * The session token.
    *
    * It carries `institutionId`, which is what lets every handler scope its

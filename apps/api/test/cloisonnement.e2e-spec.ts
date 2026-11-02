@@ -176,6 +176,49 @@ describe('US-03 — tenant isolation', () => {
     });
   });
 
+  /**
+   * The failed sign-in has to land in the right tenant's audit trail, and the
+   * unknown address has to land nowhere. Nothing covered this until the class
+   * diagram showed the controller reaching into Prisma to work the tenant out
+   * for itself — the lookup moved into `AuthService.auditTargetFor`, and these
+   * two cases are what keeps it honest.
+   */
+  describe('US-01 — a failed sign-in is audited under its own institution', () => {
+    const compte = async (email: string): Promise<void> => {
+      await request(serveur())
+        .post('/api/auth/login')
+        .send({ email, password: 'wrong-password-entirely' })
+        .expect(401);
+    };
+
+    it('records the failure against the institution of the targeted account', async () => {
+      const avant = new Date();
+      await compte(adminB.email);
+
+      const entrees = await prisma.auditEntry.findMany({
+        where: { action: 'USER_LOGIN_FAILED', entityId: adminB.id, occurredAt: { gte: avant } },
+        select: { institutionId: true },
+      });
+
+      expect(entrees).toHaveLength(1);
+      // B and not A: the entry belongs to the tenant that owns the account.
+      expect(entrees[0]?.institutionId).toBe(B);
+    });
+
+    it('records nothing for an address no account carries', async () => {
+      const avant = new Date();
+      await compte('personne@cloisonnement.test');
+
+      const entrees = await prisma.auditEntry.count({
+        where: { action: 'USER_LOGIN_FAILED', occurredAt: { gte: avant } },
+      });
+
+      // No account means no tenant the entry could belong to. The lockout
+      // counter carries what is left, which is nothing here.
+      expect(entrees).toBe(0);
+    });
+  });
+
   it('refuses an unauthenticated caller', async () => {
     await request(serveur()).get('/api/users').expect(401);
   });

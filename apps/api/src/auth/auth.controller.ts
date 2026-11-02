@@ -6,14 +6,12 @@ import { AuditService } from '../audit/audit.service';
 import { Public, SESSION_COOKIE } from './auth.guard';
 import { AuthService } from './auth.service';
 import { CurrentUser } from './current-user.decorator';
-import { PrismaService } from '../prisma/prisma.service';
 
 @Controller('auth')
 export class AuthController {
   constructor(
     private readonly auth: AuthService,
     private readonly audit: AuditService,
-    private readonly prisma: PrismaService,
   ) {}
 
   /**
@@ -57,10 +55,7 @@ export class AuthController {
       // A failed attempt is recorded too, but without an institution we have
       // no tenant to attach it to — so it is only logged when the address
       // matches a known account. The lockout counter carries the rest.
-      const known = await this.prisma.user.findUnique({
-        where: { email: input.email },
-        select: { id: true, institutionId: true },
-      });
+      const known = await this.auth.auditTargetFor(input.email);
       if (known !== null) {
         await this.audit.record({
           user: null,
