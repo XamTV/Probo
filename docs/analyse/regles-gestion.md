@@ -129,7 +129,7 @@ Le rapport de décompression est vérifié **en cours d'extraction**, sur le flu
 
 **Historique.** Sous ce numéro figurait auparavant une règle sur l'origine d'un import Google Drive — un import ne pouvait citer qu'une `DriveConnection` enregistrée, jamais un identifiant de dossier reçu en requête. L'abandon de l'import Drive rend cette règle sans objet. Le raisonnement qui la fondait, sur la référence directe non sécurisée entre locataires, est conservé dans le journal de décisions.
 
-_US-07 · à implémenter au lot 2_
+_US-07 · à implémenter au lot 3_
 
 ---
 
@@ -143,9 +143,11 @@ _US-07 · à implémenter au lot 2_
 
 **Réserve à assumer devant le jury.** Le référentiel doit décrire un **profil recherché**, à la manière d'une fiche de poste. Y déposer le CV d'un candidat réellement admis reviendrait à mécaniser un biais — école d'origine, parcours, âge implicite — dans un contexte d'admission où c'est juridiquement sensible. L'interface le dit explicitement au moment du dépôt ; le produit ne peut pas l'empêcher techniquement, et il serait malhonnête de prétendre le contraire.
 
+**Échelonnement, acté le 02/11/2026.** La règle ne change pas : les deux formes restent au périmètre, et l'activation continue d'exiger un référentiel par type attendu. Seule leur livraison est échelonnée — le profil décrit au lot 2, le document déposé au lot 4. Refuser un référentiel illisible **à l'enregistrement** suppose la chaîne d'extraction, qui n'existe pas avant. Jusque-là, l'API ne sert que la forme décrite, et la contrainte `CHECK` garde la seconde ouverte sans que rien ne puisse l'écrire.
+
 **Ce que cette règle remplace.** L'entité `Criterion` et son énumération `CriterionType` sont supprimées. Elles n'étaient justifiées par aucun besoin documenté, et les critères libres restent hors périmètre (`C-01`).
 
-_US-22 · à implémenter au lot 2_
+_US-22 · profil décrit au lot 2, document déposé au lot 4_
 
 ---
 
@@ -166,7 +168,7 @@ La conséquence n'est pas symétrique. Un type mal détecté ne fait que marquer
 
 **Le repli précédent était illusoire.** L'extension `6a` du CU-04 prévoyait « aucun regroupement déductible → une candidature par fichier ». À 412 candidatures et 1 248 documents, cela produit 1 248 candidatures d'un document : ce n'est pas une dégradation gracieuse, c'est un échec silencieux.
 
-_US-23 · à implémenter au lot 2_
+_US-23 · à implémenter au lot 4_
 
 ---
 

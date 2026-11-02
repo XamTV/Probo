@@ -16,8 +16,14 @@
 # Le coût est réel : l'auteur tape lui-même chaque publication. C'est le prix
 # d'une garantie qui ne dépend de rien.
 #
-# Tout le reste de `git` et de `gh` passe : seules la publication et
-# l'ouverture ou la fusion d'une pull request sont refusées.
+# `git commit` a rejoint la liste le 02/11/2026. La première version l'en
+# excluait, au motif qu'aucune commande ne distingue un commit demandé d'un
+# commit spontané et qu'un commit local se défait sans trace. Le raisonnement
+# tenait ; le résultat non — trois commits non sollicités en un mois. Le coût
+# d'une demande est inférieur à celui d'une relecture qu'on n'a pas faite.
+#
+# Tout le reste de `git` et de `gh` passe : seuls l'enregistrement, la
+# publication et l'ouverture ou la fusion d'une pull request sont refusés.
 set -euo pipefail
 
 commande=$(jq -r '.tool_input.command // empty')
@@ -38,9 +44,11 @@ fin='([[:space:];&|(){}]|$)'
 # chaque drapeau consomme donc, facultativement, le jeton qui le suit.
 pousse="${debut}git[[:space:]]+(-[^[:space:]]+[[:space:]]+([^-[:space:]][^[:space:]]*[[:space:]]+)?)*push${fin}"
 publie="${debut}gh[[:space:]]+pr[[:space:]]+(create|merge)${fin}"
+# `commit`, `commit --amend`, et toute option détachée avant lui.
+enregistre="${debut}git[[:space:]]+(-[^[:space:]]+[[:space:]]+([^-[:space:]][^[:space:]]*[[:space:]]+)?)*commit${fin}"
 
-if printf '%s' "$commande" | grep -Eq "$pousse|$publie"; then
-  raison="Publication hors du poste de travail : pousser sur origin ou ouvrir une pull request revient à l'auteur seul (CLAUDE.md, « Mode de travail »). Refus imposé par .claude/hooks/refus-publication.sh — présenter la commande, prête à coller, et passer la main."
+if printf '%s' "$commande" | grep -Eq "$pousse|$publie|$enregistre"; then
+  raison="Commit, poussée sur origin, ouverture ou fusion d'une pull request : ces commandes reviennent à l'auteur seul, après sa relecture (CLAUDE.md, « Mode de travail »). Refus imposé par .claude/hooks/refus-publication.sh — présenter le travail à relire et la commande prête à coller, puis passer la main."
   jq -n --arg r "$raison" '{
     hookSpecificOutput: {
       hookEventName: "PreToolUse",

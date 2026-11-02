@@ -87,12 +87,22 @@ _Périmètre : M-02_
 **En tant que** Marc, **je veux** décrire ce que j'attends de chaque type de document **afin que** le score d'adéquation ait un point de comparaison explicite.
 _Périmètre : M-16_
 
+**Au lot 2 — le profil décrit**
+
 - Chaque type de document attendu porte un référentiel, et un seul (RG-08)
-- Deux formes au choix, exclusives : un texte descriptif saisi, ou un document de référence déposé
-- Le texte d'un document déposé est extrait par la même chaîne que les candidatures ; un référentiel illisible est refusé à l'enregistrement, pas découvert à l'analyse
+- Un texte descriptif saisi par l'établissement
 - Le passage de la campagne au statut actif exige un référentiel par type attendu
 - L'écran avertit explicitement qu'il faut décrire un **profil recherché**, et non déposer le CV d'un candidat réel
 - Modifier un référentiel n'altère pas les analyses déjà produites
+
+**Au lot 4 — le document déposé**
+
+- Une seconde forme, exclusive de la première : un document de référence déposé, qui remplace le texte s'il y en avait un
+- Son texte est extrait par la même chaîne que les candidatures ; un référentiel illisible est refusé **à l'enregistrement**, pas découvert à l'analyse
+
+> **Historique — scindée le 02/11/2026.** Cette US était entière au lot 2. Le second critère de la forme déposée exige de refuser un référentiel illisible au moment où on l'enregistre : cela suppose la chaîne d'extraction, qui est livrée au lot 4. Une forme déposée construite plus tôt aurait enregistré un fichier sans savoir s'il est lisible, ce que ce critère interdit précisément.
+>
+> L'identifiant ne bouge pas et le périmètre non plus — `M-16` est inchangé. Seul l'échelonnement est désormais explicite. Voir le journal de décisions.
 
 ---
 

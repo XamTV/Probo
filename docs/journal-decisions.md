@@ -415,3 +415,55 @@ La règle de gel a été reformulée au passage. Écrite en « mois 6 », elle d
 **Le détail qui déplace tout le calendrier.** La première version de cette entrée ancrait le gel sur la soutenance. C'était encore une déduction : le dossier professionnel se rend une semaine avant le passage, et c'est **le rendu** qui contraint. Un calendrier calé sur la soutenance aurait accordé sept jours de rédaction qui n'existent pas — la dernière semaine ne sert qu'aux répétitions, le document étant déjà parti.
 
 La règle générale, pour les prochaines fois : **l'échéance d'un livrable est la date où on s'en sépare, pas celle où on en parle.**
+
+---
+
+## 2026-11-02 — L'enregistrement rejoint la publication derrière le harnais
+
+**Contexte.** L'entrée du 08/10 installait un hook refusant `git push`, `gh pr create` et `gh pr merge`, et en excluait explicitement `git commit`. L'argument : aucune commande ne distingue un commit demandé d'un commit spontané, et un commit local se défait sans trace. L'entrée nommait elle-même cette exclusion comme « une faiblesse assumée de ce dispositif ».
+
+Elle a été exercée trois fois en un mois — le 06/10, le 08/10, puis le 02/11 sur le lot 2, où le travail a été enregistré avant d'avoir été soumis à la relecture que `CLAUDE.md` exige.
+
+**Options.** (a) Maintenir l'exclusion et s'en remettre à la règle écrite. (b) Refuser `git commit` comme le reste.
+
+**Décision.** (b). Le hook refuse désormais `git commit` sous toutes ses formes, `--amend` compris.
+
+**Raison.** L'argument d'origine portait sur la réversibilité — un commit local se défait — et pas sur ce qui était réellement en jeu. Ce que `CLAUDE.md` protège n'est pas l'intégrité de l'historique, c'est **la relecture** : l'auteur veut voir le travail avant qu'il ne soit figé, parce que c'est à ce moment-là qu'il le lit vraiment. Un commit défait après coup ne rend pas la relecture qui n'a pas eu lieu.
+
+Le second argument — aucune commande ne distingue les deux cas — reste vrai, et ne conclut pas. Il ne dit pas qu'il faut tout laisser passer ; il dit que le tri doit se faire ailleurs, chez l'auteur.
+
+**Conséquences.**
+
+- Le coût est d'une commande par commit, à taper par l'auteur. C'est le même coût que pour les poussées, déjà accepté depuis le 08/10.
+- Le travail est présenté indexé, avec la liste des fichiers à relire et la commande prête à coller. Préparer cette relecture fait partie du travail, et c'est inscrit dans `CLAUDE.md`.
+- Six cas de test s'ajoutent, dont `--amend` et les formes composées. Le cas qui vérifiait qu'une _mention_ de la commande passe a été rejoué sur `echo`, puisque `git commit` change de camp.
+- Ce fichier-ci ne peut plus être committé par l'assistant, ce qui est précisément l'effet recherché.
+
+**Le piège, rencontré une seconde fois.** Écrire les cas de test a d'abord été refusé par le hook : le script d'édition _contenait_ les commandes interdites comme données. C'est le même défaut qu'au 08/10, vu sous un autre angle — un filtre qui lit du texte ne distingue pas une commande d'une mention, et l'outil d'écriture de fichiers, qui n'est pas du shell, est la sortie.
+
+---
+
+## 2026-11-02 — US-22 est scindée entre le lot 2 et le lot 4
+
+**Contexte.** Le lot 2 livre la campagne et son référentiel de comparaison. US-22 demande deux formes de référentiel, exclusives l'une de l'autre : un profil décrit au clavier, ou un document de référence déposé. Un de ses critères d'acceptation porte sur la seconde : « un référentiel illisible est refusé **à l'enregistrement**, pas découvert à l'analyse ».
+
+Ce critère suppose la chaîne d'extraction de texte — `pdftotext`, et `tesseract` en secours — qui est livrée au lot 4. Il n'est donc pas satisfiable au lot 2, et le plan de livraison dit qu'un lot n'est fini que lorsque ses critères d'acceptation passent.
+
+**Options.** (a) Scinder US-22 : profil décrit au lot 2, document déposé au lot 4. (b) Avancer l'extraction au lot 2, pour le seul référentiel. (c) Déplacer US-22 entière au lot 4.
+
+**Décision.** (a).
+
+**Pourquoi pas (b).** Cela construirait un morceau du cœur du produit hors de son lot, avec sa dépendance système à installer en trois endroits, pour servir un seul usage — et le ferait au moment où l'extraction n'a encore aucun cas réel pour se valider. Le lot 4 est déjà le plus lourd et le plus incertain des six ; lui retirer sa première brique pour la poser ailleurs ne le rend pas plus sûr.
+
+**Pourquoi pas (c).** Le lot 3 livre l'import, qui vise une campagne. Sans référentiel, aucune campagne ne peut s'activer (RG-08), et le lot 3 importerait donc dans des campagnes inertes. Le profil décrit au lot 2 est ce qui rend le lot 3 testable de bout en bout.
+
+**Ce que ça change, et ce que ça ne change pas.** `M-16` est inchangé, RG-08 est inchangée dans son énoncé comme dans sa contrainte `CHECK`, et l'identifiant US-22 n'est ni renuméroté ni réattribué. Seul l'échelonnement de ses critères devient explicite, annoncé sur place dans une section « Historique », comme pour RG-07.
+
+**Conséquences.**
+
+- L'API du lot 2 ne sert que la forme décrite. Accepter d'ici là un `storageKey` venu de l'appelant enregistrerait un pointeur vers un fichier que personne n'a écrit, en laissant le client choisir où il pointe.
+- La contrainte `CHECK` garde la forme déposée ouverte côté base : elle est prête, rien ne peut l'écrire, et c'est cohérent — une colonne vide par échelonnement n'est pas une colonne sans information.
+- Les écrans du lot 2 n'affichent pas de dépôt de fichier. En afficher un, désactivé, annoncerait une capacité absente.
+- Le lot 4 reprend US-22 dans sa liste, aux côtés d'US-10 et d'US-23.
+
+**Trouvé en chemin.** Les règles de gestion annoncent chacune leur lot d'implémentation, et trois de ces mentions dataient d'avant le plan de livraison du 06/10 : RG-07 renvoyait US-07 au lot 2 au lieu du lot 3, RG-09 renvoyait US-23 au lot 2 au lieu du lot 4. Corrigées. Une mention de lot écrite avant le plan qui définit les lots était une divergence qui n'attendait qu'un lecteur attentif.

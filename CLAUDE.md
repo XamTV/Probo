@@ -63,7 +63,7 @@ Cadré le 05/10/2026.
 
 **Signaler sans bloquer :** les incohérences trouvées en chemin, en fin de message.
 
-**Deux de ces arrêts sont tenus par le harnais, pas par la mémoire.** `.claude/hooks/refus-publication.sh` refuse les poussées sur `origin` et l'ouverture ou la fusion d'une pull request. Le refus est sans appel : **ces commandes reviennent à l'auteur**, qui les lance lui-même. Les présenter prêtes à coller fait partie du travail. `git commit` reste tenu par la seule règle ci-dessus — voir l'entrée du 08/10/2026 au journal.
+**Ces arrêts sont tenus par le harnais, pas par la mémoire.** `.claude/hooks/refus-publication.sh` refuse `git commit`, les poussées sur `origin`, et l'ouverture ou la fusion d'une pull request. Le refus est sans appel : **ces commandes reviennent à l'auteur**, qui les lance lui-même après relecture. Présenter le travail à relire et la commande prête à coller fait partie du travail. Voir les entrées des 08/10 et 02/11/2026 au journal.
 
 Après toute retouche au motif du hook : `npm run test:hook`. Il a produit trois défauts le jour de son installation, dont deux contournements silencieux.
 
