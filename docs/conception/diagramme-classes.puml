@@ -191,15 +191,16 @@ note bottom of ZodValidationPipe
 end note
 
 note bottom of PrismaService
-  **Une entorse au découpage, visible ici et
-  nulle part ailleurs.** `AuthController`
-  appelle Prisma directement, sans passer par
-  un service : à l'échec d'une connexion, il
-  cherche l'établissement du compte pour
-  rattacher l'entrée d'audit à un locataire.
+  **Aucun contrôleur n'arrive ici.** L'accès
+  aux données passe par un service, sans
+  exception.
 
-  Le besoin est réel, l'endroit ne l'est pas.
-  À déplacer dans `AuthService`.
+  Ce diagramme a servi à le rendre vrai :
+  il a montré `AuthController` appelant
+  Prisma directement pour rattacher l'audit
+  d'un échec de connexion à un locataire.
+  Le besoin était réel, l'endroit non — la
+  requête est devenue `auditTargetFor`.
 end note
 
 note bottom of AuthContracts
