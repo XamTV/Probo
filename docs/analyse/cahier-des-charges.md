@@ -62,7 +62,13 @@ Les règles métier sont énoncées dans [`regles-gestion.md`](regles-gestion.md
 
 **Souveraineté des données.** Contrainte structurante, pas préférence. Elle exclut les fournisseurs de modèles soumis au Cloud Act et détermine le choix de Mistral AI, société française hébergeant en Europe.
 
-**Ressources.** Un développeur, environ 277 heures sur six mois à temps partiel, dont 70 consacrées au dossier professionnel et 35 à l'apprentissage. La marge est d'une vingtaine d'heures.
+**Ressources.** Un développeur, environ 277 heures de travail estimées, dont 70 consacrées au dossier professionnel et 35 à l'apprentissage. La marge est d'une vingtaine d'heures.
+
+**Échéance.** La soutenance a lieu le **15 avril 2027**, et le dossier professionnel se rend **une semaine avant, le 8 avril**.
+
+C'est la date de rendu qui contraint, pas celle de la soutenance : le dossier doit être fini sept jours plus tôt, et la semaine qui suit ne sert qu'aux répétitions. Tout le calendrier se déduit à rebours du 8 avril — voir le [plan de livraison](plan-livraison.md#la-contrainte-de-calendrier).
+
+Le démarrage date du 15 août 2026, ce qui donne **huit mois**, et non six comme ce document l'a annoncé jusqu'au 02/11/2026. Les 277 heures n'augmentent pas pour autant : c'est une estimation du travail à fournir, pas un quota à remplir. Le calendrier plus long réduit la cadence hebdomadaire exigée — environ 8 heures par semaine au lieu de 10,5 — il n'autorise pas de périmètre supplémentaire. La [règle de gel](perimetre.md#règle-de-gel) s'applique au dernier mois avant le rendu, quelle que soit la durée totale.
 
 **Cadre académique.** Le projet est réalisé pour le titre professionnel Concepteur Développeur d'Applications (TP-01281, niveau 6 RNCP). Il doit couvrir les trois blocs de compétences, ce qui impose des livrables — tests, plan de sécurisation, documentation de déploiement — qui ne sont pas des exigences produit mais sont non négociables.
 

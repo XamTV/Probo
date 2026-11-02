@@ -1,0 +1,214 @@
+@startuml diagramme-classes
+' Probo — diagramme de classes
+'
+' Portée : ce qui est livré, c'est-à-dire le lot 1 — authentification,
+' cloisonnement et gestion des comptes. Les lots suivants ajouteront leurs
+' classes ici, dans la séance qui les livre.
+'
+' Il ne redit pas le modèle de données : les entités persistées sont au MCD,
+' au MLD et au MPD. Ce diagramme montre les classes de l'APPLICATION et la
+' direction de leurs dépendances — ce qu'aucun des trois autres ne dit.
+'
+' Les noms de classes, de méthodes et de types sont ceux du code, donc en
+' anglais. Seuls les commentaires et les notes sont en français.
+
+skinparam shadowing false
+skinparam defaultFontName Helvetica
+skinparam class {
+  BackgroundColor #FFFFFF
+  BorderColor #294B8A
+  BorderThickness 1.2
+  FontColor #14181D
+  AttributeFontColor #545C66
+  AttributeFontSize 11
+}
+skinparam package {
+  BackgroundColor #FBFBFA
+  BorderColor #9AA1A9
+  FontColor #545C66
+}
+skinparam note {
+  BackgroundColor #F4F6FA
+  BorderColor #545C66
+  FontColor #14181D
+  FontSize 11
+}
+skinparam arrow {
+  Color #545C66
+  FontColor #545C66
+  FontSize 11
+}
+
+package "packages/shared — contrat commun" {
+  class SessionUser <<interface>> {
+    +id : string
+    +institutionId : string
+    +email : string
+    +name : string
+    +role : UserRole
+  }
+
+  enum UserRole {
+    ADMIN
+    ADMISSIONS_OFFICER
+  }
+
+  class AuthContracts <<module>> {
+    +LoginInput : ZodType
+    +CreateUserInput : ZodType
+    +UpdateUserInput : ZodType
+    +SetPasswordInput : ZodType
+    --
+    +PASSWORD_MIN_LENGTH = 12
+    +LOGIN_MAX_ATTEMPTS = 6
+    +LOGIN_LOCKOUT_MINUTES = 15
+    --
+    +isLockedOut(lockedUntil, now) : boolean
+    +lockoutUntil(failedAttempts, now) : Date?
+  }
+}
+
+package "apps/api — entrée HTTP" {
+  class AuthController {
+    +login(body, response) : SessionUser
+    +logout(response) : void
+    +me(user) : SessionUser
+  }
+
+  class UsersController {
+    +list(caller)
+    +findOne(caller, id)
+    +create(caller, body)
+    +update(caller, id, body)
+  }
+}
+
+package "apps/api — transversal" {
+  class AuthGuard <<CanActivate>> {
+    +canActivate(context) : Promise<boolean>
+  }
+
+  class ZodValidationPipe <<PipeTransform>> {
+    -schema : ZodType<T>
+    +transform(value) : T
+  }
+
+  class Decorators <<module>> {
+    +Public() : décorateur
+    +Roles(...roles) : décorateur
+    +CurrentUser() : décorateur de paramètre
+  }
+
+  class Tenant <<module>> {
+    +scopedWhere(user, where) : where & institutionId
+    +orNotFound(row) : T
+  }
+}
+
+package "apps/api — services" {
+  class AuthService {
+    +hashPassword(plain) : Promise<string>
+    +signIn(input, now) : Promise<SessionUser>
+    +signSession(user) : Promise<string>
+    +verifySession(token) : Promise<SessionUser>
+  }
+
+  class UsersService {
+    +list(caller)
+    +findOne(caller, id)
+    +create(caller, input)
+    +update(caller, id, input)
+  }
+
+  class AuditService {
+    +record(params) : Promise<void>
+  }
+}
+
+package "apps/api — persistance" {
+  class PrismaService <<OnModuleInit>> {
+    +onModuleInit() : Promise<void>
+    +onModuleDestroy() : Promise<void>
+  }
+
+  class PrismaClient <<généré>>
+}
+
+PrismaService --|> PrismaClient
+
+' Arêtes invisibles : elles n'ajoutent aucune information, elles imposent
+' seulement l'ordre de lecture — entrée HTTP, services, persistance.
+AuthController -[hidden]down- AuthService
+UsersController -[hidden]down- UsersService
+AuthService -[hidden]down- PrismaService
+
+AuthController --> AuthService
+AuthController --> AuditService
+AuthController --> PrismaService
+UsersController --> UsersService
+
+AuthGuard --> AuthService
+UsersService --> PrismaService
+UsersService --> AuthService
+UsersService --> AuditService
+AuthService --> PrismaService
+
+UsersService ..> Tenant : <<use>>
+AuthService ..> AuthContracts : <<use>>
+
+' Les dépendances vers `SessionUser` et `UserRole` ne sont pas tracées : tout
+' en dépend, et sept flèches de plus diraient « partout » moins bien que cette
+' ligne. Même raison pour ZodValidationPipe, posé sur chaque paramètre de corps
+' de requête des deux contrôleurs.
+
+note bottom of AuthGuard
+  Enregistré en **APP_GUARD**, donc global.
+  Une route est protégée **sauf si** elle
+  déclare `@Public()`.
+
+  Oublier le décorateur verrouille une route ;
+  oublier un garde l'aurait ouverte. Le mode
+  de défaillance pointe du bon côté.
+end note
+
+note bottom of Tenant
+  Le cœur de US-03. `scopedWhere` ajoute
+  l'établissement de l'appelant à toute clause
+  et **écrase** celui qu'une charge utile
+  aurait glissé ; `orNotFound` rend 404.
+
+  Deux fonctions et non une classe : la règle
+  se **nomme à chaque appel** au lieu d'être
+  réécrite en `if` que le prochain oubliera.
+end note
+
+note bottom of ZodValidationPipe
+  Se pose sur le **paramètre**, jamais sur le
+  gestionnaire : `@UsePipes` s'applique à tous
+  les paramètres et retirerait `institutionId`
+  de l'objet de session. Le cloisonnement
+  disparaîtrait en silence.
+end note
+
+note bottom of PrismaService
+  **Aucun contrôleur n'arrive ici.** L'accès
+  aux données passe par un service, sans
+  exception.
+
+  Ce diagramme a servi à le rendre vrai :
+  il a montré `AuthController` appelant
+  Prisma directement pour rattacher l'audit
+  d'un échec de connexion à un locataire.
+  Le besoin était réel, l'endroit non — la
+  requête est devenue `auditTargetFor`.
+end note
+
+note bottom of AuthContracts
+  Un seul endroit définit les schémas, les
+  seuils et le calcul de temporisation, pour
+  l'API comme pour le front. `isLockedOut` et
+  `lockoutUntil` sont des fonctions pures,
+  donc testables sans base ni serveur.
+end note
+
+@enduml

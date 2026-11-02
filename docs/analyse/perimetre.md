@@ -2,7 +2,7 @@
 
 Ce document dit ce qui est dans le projet, ce qui n'y est pas, et ce qui n'y sera que si le temps le permet. Il est la référence en cas d'arbitrage : une demande hors de ce périmètre est refusée ou reportée, elle n'est pas absorbée en silence.
 
-**Contrainte structurante** : environ 277 heures planifiées sur 250 à 300 heures utiles, réparties sur six mois à temps partiel. La marge est d'une vingtaine d'heures. Elle est déjà affectée aux imprévus, pas à de nouvelles fonctionnalités.
+**Contrainte structurante** : environ 277 heures planifiées sur 250 à 300 heures utiles, réparties sur huit mois à temps partiel — du 15/08/2026 au rendu du 08/04/2027. La marge est d'une vingtaine d'heures. Elle est déjà affectée aux imprévus, pas à de nouvelles fonctionnalités.
 
 ---
 
@@ -78,6 +78,8 @@ Cette table n'existait pas au cadrage. Elle porte ce qui était engagé puis ret
 
 ## Règle de gel
 
-**Aucune fonctionnalité n'est ajoutée à partir du mois 6.** Ce mois est consacré au durcissement, au jeu d'essai, à la finalisation du dossier et aux répétitions de soutenance.
+**Aucune fonctionnalité n'est ajoutée à partir du 8 mars 2027**, soit un mois avant le rendu du dossier le 8 avril. Ce dernier mois est consacré au durcissement, au jeu d'essai et à la finalisation du dossier ; la semaine qui sépare le rendu de la soutenance du 15 avril ne sert qu'aux répétitions.
+
+La règle porte sur une durée — le dernier mois — et non sur un numéro de mois : elle se recalcule depuis **la date de rendu**, jamais depuis la date de démarrage ni depuis celle de la soutenance. Formulée en « mois 6 » jusqu'au 02/11/2026, elle désignait un mois qui n'était pas le dernier.
 
 Une fonctionnalité ajoutée en dernière ligne droite est une fonctionnalité non testée et non documentée — exactement ce sur quoi un jury appuie.

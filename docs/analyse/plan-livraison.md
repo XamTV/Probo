@@ -6,11 +6,22 @@ Il existe parce que l'ordre de réalisation n'est pas une préférence : il est 
 
 ## La contrainte de calendrier
 
-Démarrage le **15 août 2026**, soutenance visée à six mois. La [règle de gel](perimetre.md#règle-de-gel) interdit toute nouvelle fonctionnalité **à partir du 15 janvier 2027** : le dernier mois va au durcissement, au jeu d'essai, à la finalisation du dossier et aux répétitions.
+**La soutenance a lieu le 15 avril 2027, et le dossier se rend le 8 avril.** Le point fixe est le **rendu**, pas la soutenance : le dossier doit être terminé une semaine avant le passage, et c'est de cette date que tout se lit à rebours.
 
-Il reste donc **quatorze semaines de construction** pour dix-sept fonctionnalités « doit être fait ». C'est tenable, mais la marge de vingt heures sur 277 est déjà affectée aux imprévus — pas à des lots supplémentaires.
+| Jalon                   | Date          | Ce qui s'y joue                                                                |
+| ----------------------- | ------------- | ------------------------------------------------------------------------------ |
+| Démarrage               | 15/08/2026    | Socle technique                                                                |
+| **Gel des ajouts**      | 08/03/2027    | Plus aucune fonctionnalité — voir la [règle de gel](perimetre.md#règle-de-gel) |
+| Durcissement et dossier | 08/03 → 08/04 | Jeu d'essai, cahier de recettes, finalisation du dossier                       |
+| **Rendu du dossier**    | 08/04/2027    | Échéance contraignante                                                         |
+| Répétitions             | 08/04 → 15/04 | Plus rien ne s'écrit : on répète                                               |
+| **Soutenance**          | 15/04/2027    |                                                                                |
 
-> **État au 06/10/2026.** Le socle technique est prêt depuis le 15 août, le dossier de conception est complet sur tout ce qu'il peut produire seul, et **l'application expose une seule route**, la sonde de santé. Les sept semaines écoulées sont allées à l'analyse, aux maquettes et au modèle de données. Le reste doit aller au code.
+Soit **huit mois**, dont un dernier mois sans aucun ajout et une dernière semaine sans aucune écriture.
+
+> **Correction du 02/11/2026.** Ce document déduisait jusqu'ici le gel d'une « soutenance visée à six mois », faute de date de session connue : il annonçait le 15 janvier. La date réelle était disponible, elle n'avait simplement jamais été versée au dossier. Le calendrier s'ancre désormais sur le rendu, et non sur une durée choisie. Voir le journal de décisions.
+
+> **État au 02/11/2026.** Le **lot 1 est livré** — authentification, cloisonnement, comptes, écran de connexion, tests de bout en bout contre une vraie base. Les six autres restent. Il s'est écoulé 33 % du calendrier pour un lot sur sept, mais les sept premières semaines ont produit l'intégralité du dossier de conception, qui pèse 70 des 277 heures. Restent **18 semaines avant le gel**, soit environ trois semaines par lot — ce qui tient, à condition que les lots 4 et 5, les plus lourds, ne débordent pas sur les autres.
 
 ## Pourquoi des lots et non une user story à la fois
 
@@ -69,7 +80,7 @@ Pas pour la revue — se relire par principe est du théâtre. Pour trois choses
 
 ### Ce que ce flux ne doit pas devenir
 
-Pas de branche par commit, pas de `develop`, pas de GitFlow. Un développeur seul sur six mois n'a besoin que de `main` et d'une branche de lot vivante. Toute cérémonie supplémentaire coûte du temps que le code n'a pas.
+Pas de branche par commit, pas de `develop`, pas de GitFlow. Un développeur seul sur huit mois n'a besoin que de `main` et d'une branche de lot vivante. Toute cérémonie supplémentaire coûte du temps que le code n'a pas.
 
 **`main` reste toujours déployable.** C'est la seule règle non négociable du flux.
 

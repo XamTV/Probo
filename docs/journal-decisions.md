@@ -388,3 +388,30 @@ La leçon vaut au-delà de ce fichier, et c'est la même que celle du cloisonnem
 Ce que `deny` coûte, et qu'il faut assumer : l'auteur tape lui-même chaque publication. Présenter la commande prête à coller fait désormais partie du travail.
 
 Les trente-deux cas sont versionnés dans `.claude/hooks/`, lancés par `npm run test:hook`. Hors CI : c'est une garantie de poste de travail, pas un comportement du produit. Un garde-fou qui a produit trois défauts en une journée n'avait rien à faire sans test.
+
+---
+
+## 2026-11-02 — Le calendrier s'ancre sur la soutenance, pas sur une durée choisie
+
+**Contexte.** Trois documents portaient une planification déduite, non constatée. `cahier-des-charges.md` annonçait « 277 heures sur six mois », `plan-livraison.md` en tirait une « soutenance visée à six mois » puis un gel au 15 janvier 2027, et la règle de gel parlait du « mois 6 ». Aucun document ne nommait de date de session — la seule contrainte dure du projet était absente du dossier qui planifie le projet.
+
+L'écart a été découvert en répondant à la question « pourquoi le 15 janvier ? » : la réponse était « parce que c'est 15 août plus cinq mois », ce qui n'est pas une justification.
+
+**Options.** (a) Garder la planification en durée et noter la date de session à côté. (b) Réancrer tout le calendrier sur la date de soutenance.
+
+**Décision.** (b). La soutenance est le **15 avril 2027**, et le dossier se rend **le 8 avril**, une semaine avant. Le point d'ancrage est le rendu, pas la soutenance : le gel passe au **8 mars 2027**, un mois avant le rendu. Le projet dure donc huit mois, et non six.
+
+**Raison.** Une date de session ne se négocie pas ; une durée choisie, si. Planifier sur la seconde en ignorant la première, c'est construire un calendrier qui peut être juste par hasard. Il l'était d'ailleurs dans le mauvais sens : le dossier se croyait en retard de huit semaines qu'il n'avait pas.
+
+La règle de gel a été reformulée au passage. Écrite en « mois 6 », elle désignait un rang depuis le démarrage ; elle porte en réalité sur une durée — le dernier mois — et se recalcule depuis le rendu du dossier. Les deux formulations coïncidaient tant que le projet durait six mois, et divergeaient dès qu'il n'en durait plus six.
+
+**Conséquences.**
+
+- Il reste **18 semaines avant le gel** pour six lots, soit environ trois par lot, contre 1,8 selon l'ancien calcul.
+- **Aucune réduction de périmètre n'est nécessaire.** Une rétrogradation de M-15 (export PDF) avait été envisagée le même jour, sur la foi du calendrier déduit : elle est abandonnée, et les dix-sept `M-xx` sont maintenus.
+- Les 277 heures ne bougent pas. C'est une estimation du travail à fournir, pas un quota à remplir : un calendrier plus long réduit la cadence exigée — environ 8 h par semaine au lieu de 10,5 — il n'ouvre aucun périmètre supplémentaire.
+- La date de soutenance figure désormais dans `cahier-des-charges.md`, sous « Contraintes », là où un jury la cherchera.
+
+**Le détail qui déplace tout le calendrier.** La première version de cette entrée ancrait le gel sur la soutenance. C'était encore une déduction : le dossier professionnel se rend une semaine avant le passage, et c'est **le rendu** qui contraint. Un calendrier calé sur la soutenance aurait accordé sept jours de rédaction qui n'existent pas — la dernière semaine ne sert qu'aux répétitions, le document étant déjà parti.
+
+La règle générale, pour les prochaines fois : **l'échéance d'un livrable est la date où on s'en sépare, pas celle où on en parle.**
