@@ -467,3 +467,57 @@ Ce critère suppose la chaîne d'extraction de texte — `pdftotext`, et `tesser
 - Le lot 4 reprend US-22 dans sa liste, aux côtés d'US-10 et d'US-23.
 
 **Trouvé en chemin.** Les règles de gestion annoncent chacune leur lot d'implémentation, et trois de ces mentions dataient d'avant le plan de livraison du 06/10 : RG-07 renvoyait US-07 au lot 2 au lieu du lot 3, RG-09 renvoyait US-23 au lot 2 au lieu du lot 4. Corrigées. Une mention de lot écrite avant le plan qui définit les lots était une divergence qui n'attendait qu'un lecteur attentif.
+
+---
+
+## 2026-11-03 — Une recette démarre l'application et entre par la porte
+
+**Contexte.** Quatre défauts sont apparus en une matinée, en voulant simplement se connecter aux écrans du lot 2 : aucun compte n'était créable, le serveur de développement n'avait aucune route vers l'API, `npm run dev` ne construisait pas les contrats partagés, et le chemin du `.env` se cassait dès qu'un fichier était ajouté hors de `src/` — avec, au passage, `npm run start:prod` hors service sans que rien ne le signale.
+
+La suite de tests était verte pendant tout ce temps, et elle avait raison. Les tests de bout en bout appellent l'API **dans le même processus** : ils ne construisent rien, n'ouvrent aucun port, ne traversent aucune passerelle, et l'écran de connexion est testé contre un serveur simulé. Le proxy du serveur de développement n'appartient à aucun chemin testé.
+
+Les quatre défauts n'en font qu'un : **personne n'avait jamais ouvert cette application dans un navigateur et ne s'y était connecté.** Personne ne le pouvait — il n'existait aucun compte.
+
+**Options.** (a) Un script de recette en HTTP, lancé par la CI. (b) Playwright, un navigateur pilotant la vraie interface. (c) Ne rien ajouter et compter sur l'attention.
+
+**Décision.** (a) maintenant, (b) au lot 6, avec la coquille de navigation.
+
+**Pourquoi.** Un seul scénario coche les quatre cases : partir du dépôt, tout construire, démarrer la vraie pile, entrer par la porte. Le script le fait en une trentaine de lignes, sans dépendance, pour deux minutes de CI. Playwright ajouterait les erreurs d'exécution du front — un gabarit qui lève, une route absente, une clé de traduction manquante — mais le lot 2 n'a que deux écrans isolés, et des parcours de navigation n'ont de sens qu'une fois la coquille livrée. Le dossier attendra de toute façon une recette formelle ; elle arrivera avec de quoi la remplir.
+
+**Pourquoi pas (c).** Les quatre défauts ont été trouvés par l'auteur, à la main, en voulant se servir du produit. C'est le mode de détection le plus coûteux et le moins fiable dont on dispose.
+
+**Conséquences.**
+
+- `scripts/recette.sh`, lancé par `npm run recette`, remplace l'étape de build en CI : il construit tout, puis démarre le binaire construit et le serveur de développement, se connecte, lit et crée une campagne, et vérifie qu'un mot de passe faux reste un 401 et non une panne.
+- Il contrôle le **type de contenu** autant que le code HTTP. Le serveur de développement répond 200 en HTML pour toute route inconnue : sans ce second contrôle, une passerelle absente passerait pour un succès.
+- Il a été éprouvé en réintroduisant deux des quatre défauts : les deux font échouer la recette, avec un message qui désigne la cause.
+- Deux pièges sont durcis plutôt que surveillés. La racine du dépôt est **trouvée en remontant** jusqu'au `package.json` qui déclare les workspaces, au lieu d'être comptée en `../..` depuis le fichier compilé. Le port de l'API est **lu** dans le `.env` par `proxy.conf.mjs`, au lieu d'y être recopié.
+- Le seed est la contrepartie indispensable : sans premier compte, aucune recette ne peut se connecter.
+
+**Ce que la recette ne couvre pas, sciemment.** Le troisième défaut — les contrats non construits au démarrage de `npm run dev` — n'est pas rejouable par ce script, qui construit avant de démarrer. Il est traité structurellement : un `predev`, et plus de nettoyage du dossier de sortie en mode surveillance. Une régression se verrait au premier `npm run dev` d'un dépôt propre.
+
+**Reste ouvert.** En production, personne ne peut créer le premier administrateur d'un établissement client. Le seed ne règle que le poste de développement. Soit un `M-xx` d'inscription, soit une commande d'administration — à trancher avant la mise en ligne.
+
+---
+
+## 2026-11-05 — Le front repasse en anglais, et la règle de langue est réécrite
+
+**Contexte.** Le README annonçait depuis le début : « le code, la base et l'API sont en anglais ». Le front disait le contraire — `connexion.ts`, `classement.ts`, `campagnes/`, `ListeCampagnes`, `ReglagesCampagne`, `CampagnesService`, et les routes `/connexion`, `/campagnes`, `/classement`.
+
+Ce n'était pas un choix : aucune entrée de ce journal ne le portait. Une dérive partie du lot 1, étendue au lot 2 le 03/11 en nommant quatre fichiers de campagne en français « pour suivre la convention existante » — c'est-à-dire en suivant le code contre la règle écrite, sans le signaler.
+
+Le détail qui tranche : les clés de traduction étaient **déjà** en anglais. On lisait donc, dans un même fichier, `class ReglagesCampagne`, `t('campaign.weighting')` et `/api/campaigns`. Trois orthographes pour une notion, et côté API la même chose s'appelait `CampaignsService`. Une recherche sur « campaign » ne ramenait que la moitié du produit.
+
+**Options.** (a) Tout passer en anglais, routes comprises. (b) Garder le français côté front et corriger la règle écrite pour qu'elle dise vrai. (c) Anglais pour les identifiants, français pour les routes, qui sont visibles de l'utilisateur.
+
+**Décision.** (a).
+
+**Pourquoi pas (b).** La règle est bonne et le reste du dépôt l'applique. Défendre une exception devant un jury qui sait chercher coûte plus cher que de renommer quatorze fichiers.
+
+**Pourquoi pas (c).** L'interface est bilingue. Une URL française n'est pas « la langue de l'utilisateur », c'est la langue d'un seul des deux publics : un anglophone naviguerait vers `/campagnes`. Et il n'existe aucun utilisateur en production, donc le changement d'URL ne coûte rien aujourd'hui — il coûterait plus tard.
+
+**Ce qui change.** `connexion` → `login`, `classement` → `ranking`, `campagnes` → `campaigns`, `liste-campagnes` → `campaign-list`, `reglages-campagne` → `campaign-settings`, avec les classes, sélecteurs, routes et identifiants locaux correspondants. Le paramètre d'URL `suite` devient `next`. Les commentaires de gabarits et les intitulés de tests passent en anglais comme ceux de l'API.
+
+**La règle, réécrite pour qu'elle couvre le cas qui a dérivé.** Le **produit** est en anglais — et le front en fait partie au même titre que l'API. L'**outillage** et la **documentation** sont en français : `scripts/`, les commentaires de CI, le dossier. Ce qui s'affiche vient d'une clé de traduction : un composant `Login` qui affiche « Connexion » est correct, et c'est la preuve que la séparation tient. Un test l'affirme désormais explicitement, pour que le prochain remplacement en masse ne le retourne pas en silence.
+
+**Trouvé en chemin.** Le remplacement automatique a produit trois défauts, relus un par un : un import pointant vers un fichier inexistant, une variable `next` masquant le gestionnaire du même nom dans l'intercepteur, et une assertion qui vérifiait l'affichage français et s'est retrouvée à attendre « Login ». Celle-là serait passée inaperçue — le test restait vert, il ne vérifiait simplement plus rien. Un renommage en masse se relit intégralement, ou ne se fait pas.

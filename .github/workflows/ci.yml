@@ -77,5 +77,11 @@ jobs:
       - name: Tests de bout en bout
         run: npm run test:e2e -w @probo/api
 
-      - name: Build
-        run: npm run build
+      # Remplace une étape de build : la recette construit tout, puis démarre
+      # le binaire construit et le serveur de développement et entre par la
+      # porte, comme un utilisateur. Les tests ci-dessus appellent l'API dans
+      # le même processus — ils ne construisent rien, n'ouvrent aucun port et
+      # ne passent par aucune passerelle. Quatre défauts ont vécu dans cet
+      # angle mort le 03/11/2026.
+      - name: Build et recette
+        run: npm run recette

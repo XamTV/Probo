@@ -1,12 +1,12 @@
 import { Module } from '@nestjs/common';
 import { ConfigModule } from '@nestjs/config';
 import { APP_GUARD } from '@nestjs/core';
-import { resolve } from 'node:path';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { AuthGuard } from './auth/auth.guard';
 import { AuthModule } from './auth/auth.module';
 import { CampaignsModule } from './campaigns/campaigns.module';
+import { envFile } from './common/monorepo-root';
 import { PrismaModule } from './prisma/prisma.module';
 import { UsersModule } from './users/users.module';
 
@@ -14,8 +14,9 @@ import { UsersModule } from './users/users.module';
   imports: [
     ConfigModule.forRoot({
       isGlobal: true,
-      // The monorepo has a single .env, at the root.
-      envFilePath: resolve(__dirname, '../../../.env'),
+      // The monorepo has a single .env, at the root — found by walking up,
+      // not by counting directories from the compiled file.
+      envFilePath: envFile(),
     }),
     PrismaModule,
     AuthModule,
