@@ -10,11 +10,11 @@ import { SessionService } from './session.service';
 
 /** US-01 — the sign-in screen. Its specification is Connexion.dc.html. */
 @Component({
-  selector: 'app-connexion',
+  selector: 'app-login',
   imports: [ReactiveFormsModule, TranslocoDirective, RouterLink],
-  templateUrl: './connexion.html',
+  templateUrl: './login.html',
 })
-export class Connexion {
+export class Login {
   private readonly session = inject(SessionService);
   private readonly router = inject(Router);
   private readonly route = inject(ActivatedRoute);
@@ -66,8 +66,8 @@ export class Connexion {
       await this.session.signIn(parsed.data);
       // US-01 — return to where the visitor was heading before the session
       // sent them here.
-      const suite = this.route.snapshot.queryParamMap.get('suite');
-      await this.router.navigateByUrl(suite ?? '/classement');
+      const next = this.route.snapshot.queryParamMap.get('next');
+      await this.router.navigateByUrl(next ?? '/ranking');
     } catch (error) {
       if (error instanceof HttpErrorResponse && error.status === 401) {
         this.failed.set(true);

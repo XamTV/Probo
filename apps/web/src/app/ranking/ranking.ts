@@ -1,5 +1,5 @@
 import { Component, inject } from '@angular/core';
-import { Router } from '@angular/router';
+import { Router, RouterLink } from '@angular/router';
 import { TranslocoDirective } from '@jsverse/transloco';
 
 import { SessionService } from '../auth/session.service';
@@ -12,8 +12,8 @@ import { SessionService } from '../auth/session.service';
  * with its own lot; nothing here is meant to survive.
  */
 @Component({
-  selector: 'app-classement',
-  imports: [TranslocoDirective],
+  selector: 'app-ranking',
+  imports: [RouterLink, TranslocoDirective],
   template: `
     <main
       class="mx-auto flex min-h-dvh max-w-2xl flex-col justify-center gap-6 px-6"
@@ -23,7 +23,10 @@ import { SessionService } from '../auth/session.service';
       @if (session.user(); as user) {
         <p class="text-slate-600">{{ user.name }} — {{ t('userRole.' + user.role) }}</p>
       }
-      <div>
+      <div class="flex items-center gap-3">
+        <a routerLink="/campaigns" class="text-sm text-[#294B8A] hover:underline">
+          {{ t('campaign.title') }}
+        </a>
         <button
           type="button"
           (click)="signOut()"
@@ -35,12 +38,12 @@ import { SessionService } from '../auth/session.service';
     </main>
   `,
 })
-export class Classement {
+export class Ranking {
   protected readonly session = inject(SessionService);
   private readonly router = inject(Router);
 
   protected async signOut(): Promise<void> {
     await this.session.signOut();
-    await this.router.navigate(['/connexion']);
+    await this.router.navigate(['/login']);
   }
 }

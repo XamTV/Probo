@@ -1,5 +1,5 @@
 <div class="flex min-h-dvh bg-[#1B2027]" *transloco="let t">
-  <!-- Volet de marque -->
+  <!-- Brand panel -->
   <div class="hidden w-[480px] shrink-0 flex-col gap-8 p-11 pb-9 lg:flex">
     <span class="font-mono text-[15px] font-medium tracking-[0.16em] text-white">PROBO</span>
 
@@ -30,7 +30,7 @@
     </div>
   </div>
 
-  <!-- Formulaire -->
+  <!-- Form -->
   <div class="flex grow flex-col items-center justify-center bg-[#FBFBFA] p-11">
     <form
       [formGroup]="form"
@@ -87,7 +87,7 @@
         {{ submitting() ? t('auth.submitting') : t('auth.submit') }}
       </button>
 
-      <!-- US-01 : un message unique, qui ne révèle jamais si l'adresse existe -->
+      <!-- US-01: one message, which never reveals whether the address exists -->
       @if (failed()) {
         <div
           role="alert"

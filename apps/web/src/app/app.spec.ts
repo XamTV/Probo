@@ -5,7 +5,7 @@ import { App } from './app';
 /**
  * The shell holds the router outlet and nothing else. What used to be tested
  * here — the bilingual interface, enum labels resolved by key — moved to
- * `auth/connexion.spec.ts`, which exercises a screen that really renders them.
+ * `auth/login.spec.ts`, which exercises a screen that really renders them.
  */
 describe('App', () => {
   beforeEach(async () => {

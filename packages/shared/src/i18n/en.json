@@ -115,5 +115,71 @@
     "unavailable": "The service is briefly unavailable. Try again in a moment.",
     "noSelfSignup": "Accounts are created by your institution's administrator. There is no self sign-up.",
     "signOut": "Sign out"
+  },
+  "campaign": {
+    "title": "Campaigns",
+    "subtitle": "A campaign frames the analysis of one recruitment session.",
+    "empty": "No campaign yet. Create one to get started.",
+    "new": "New campaign",
+    "name": "Campaign name",
+    "description": "Description",
+    "descriptionOptional": "optional",
+    "opensAt": "Opens",
+    "closesAt": "Closes",
+    "create": "Create",
+    "creating": "Creating…",
+    "cancel": "Cancel",
+    "save": "Save",
+    "saving": "Saving…",
+    "saved": "Saved",
+    "settings": "Settings",
+    "identity": "Identity",
+    "backToList": "Back to campaigns",
+    "activate": "Activate campaign",
+    "activating": "Activating…",
+    "readOnly": "Only an administrator configures a campaign.",
+    "saveFailed": "Saving failed. Try again.",
+    "activationFailed": "Activation failed."
+  },
+  "expectedTypes": {
+    "title": "Expected documents",
+    "help": "What you ask of every candidate. A document whose detected type is not on this list is marked atypical and leaves the score computation. At least one type is required.",
+    "atLeastOne": "At least one type is required."
+  },
+  "weighting": {
+    "title": "Weighting of the three axes",
+    "help": "A document's score is the weighted mean of its three sub-scores. Weights are normalised by their sum, so they need not add up to 100. A weighting that is zero throughout is refused.",
+    "effective": "Effective relative weight",
+    "allZero": "A weighting that is zero throughout is refused."
+  },
+  "threshold": {
+    "title": "Confidence threshold",
+    "help": "Below this threshold the system considers it does not know which document it is looking at: the document is marked atypical and is not scored.",
+    "default": "Default value",
+    "min": "0 — everything accepted",
+    "max": "100"
+  },
+  "reference": {
+    "title": "Comparison reference",
+    "help": "What level 2 compares each document against to produce the relevance sub-score. One reference per expected type: a cover letter is not judged on what a CV is expected to show.",
+    "warning": "Describe the profile you are looking for; do not copy an admitted file.",
+    "warningDetail": "A reference built from a real candidate's CV reproduces their school, their path and their implicit age across the whole next intake. In admissions, that is a selection bias you would have to justify.",
+    "defined": "Defined",
+    "missing": "Missing",
+    "describedProfile": "Described profile",
+    "characters": "characters",
+    "edit": "Edit",
+    "provide": "Provide the reference",
+    "placeholder": "Describe the profile sought for this document type.",
+    "tooShort": "Describe the profile in a few sentences — at least {{min}} characters.",
+    "unchanged": "Changing a reference leaves analyses already produced alone.",
+    "uploadLater": "Uploading a reference document arrives with the extraction chain."
+  },
+  "activation": {
+    "blocked": "This campaign cannot be activated",
+    "NO_EXPECTED_TYPE": "No expected document type is ticked.",
+    "MISSING_REFERENCE_PROFILE": "An expected type has no reference.",
+    "ZERO_WEIGHTING": "The weighting of the three axes is zero throughout.",
+    "CLOSED_WINDOW": "The closing date precedes the opening date."
   }
 }
