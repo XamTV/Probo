@@ -49,6 +49,18 @@ jobs:
       - name: Installer les dépendances
         run: npm ci
 
+      # Juste après l'installation, avant toute construction : il s'exécute en
+      # deux dixièmes de seconde et ne lit que des fichiers. Il vérifie que le
+      # dossier de conception et le code ne se contredisent pas — qu'aucun
+      # identifiant cité n'est pendant, qu'aucune règle ne s'annonce testée
+      # sans l'être, qu'aucune question ouverte n'échappe au registre.
+      #
+      # `npm test` le relance ; c'est voulu, pour qu'un lancement local le
+      # couvre aussi. L'étape séparée n'est là que pour nommer la cause dans
+      # l'interface de la CI avant trois minutes de build.
+      - name: Cohérence du dossier
+        run: npm run coherence
+
       # Les contrats partagés doivent être construits avant que l'API et le
       # front puissent les typer.
       - name: Construire les contrats partagés

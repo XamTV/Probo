@@ -16,8 +16,9 @@
     "dev": "concurrently -n shared,api,web -c gray,blue,magenta \"npm run dev -w @probo/shared\" \"npm run dev -w @probo/api\" \"npm run start -w @probo/web\"",
     "build": "npm run build -w @probo/shared && npm run build -w @probo/api && npm run build -w @probo/web",
     "pretest": "npm run build -w @probo/shared",
-    "test": "npm run test --workspaces --if-present",
+    "test": "npm run coherence && npm run test --workspaces --if-present",
     "test:hook": "bash .claude/hooks/verifie-refus-publication.sh",
+    "coherence": "tsc --noEmit && vitest run --config vitest.coherence.ts",
     "recette": "bash scripts/recette.sh",
     "lint": "npm run lint --workspaces --if-present",
     "format": "prettier --write .",
@@ -30,7 +31,9 @@
     "db:seed": "npm run db:seed -w @probo/api"
   },
   "devDependencies": {
+    "@types/node": "^22.10.0",
     "concurrently": "^9.1.2",
-    "prettier": "^3.4.2"
+    "prettier": "^3.4.2",
+    "vitest": "^4.0.0"
   }
 }

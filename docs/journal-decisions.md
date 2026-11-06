@@ -210,7 +210,7 @@ Or **le produit tout entier repose sur le fait que les noms de fichiers mentent.
 - `ImportBatchStatus` gagne `AWAITING_RECONCILIATION`.
 - Un écran de réconciliation s'ajoute au lot de maquettes, entre l'import et le classement.
 
-**Ce que cela coûte.** Un appel supplémentaire au modèle par document, ou une extraction d'identité greffée sur l'appel de niveau 1 — à trancher à l'implémentation. Et une étape humaine de plus dans un parcours qu'on voulait sans friction. C'est le prix d'un classement dont les regroupements sont défendables ; un classement rapide et faux ne vaut rien.
+**Ce que cela coûte.** Un appel supplémentaire au modèle par document, ou une extraction d'identité greffée sur l'appel de niveau 1 — à trancher à l'implémentation (**Q-01**). Et une étape humaine de plus dans un parcours qu'on voulait sans friction. C'est le prix d'un classement dont les regroupements sont défendables ; un classement rapide et faux ne vaut rien.
 
 ---
 
@@ -346,7 +346,7 @@ C'est aussi la contrainte de Marc : sa DSI instruit lentement toute connexion à
 
 - US-02 gagne six critères d'acceptation. Le périmètre est inchangé : c'est M-01 qui se précise, pas un M-xx de plus.
 - Un compte sans mot de passe posé est **invité**, visible comme tel et incapable de se connecter. L'état existe déjà dans les maquettes de l'écran Comptes, sous le libellé « Invitation envoyée » — à corriger, puisque Probo n'envoie rien.
-- Le jeton d'invitation demande une table ou deux colonnes, à trancher au lot 2.
+- Le jeton d'invitation demande une table ou deux colonnes, à trancher au lot 2 (**Q-02** — tranchée le 02/11/2026, voir l'entrée de cette date).
 
 **La limite à assumer.** Transmettre un lien de création de mot de passe par message instantané ou de vive voix n'est pas idéal. Sa durée courte et son usage unique en limitent la portée, et l'alternative — que l'administrateur connaisse le mot de passe — est franchement pire.
 
@@ -470,6 +470,33 @@ Ce critère suppose la chaîne d'extraction de texte — `pdftotext`, et `tesser
 
 ---
 
+## 2026-11-02 — Le jeton d'invitation tient en deux colonnes
+
+> **Consignée le 05/11/2026**, trois jours après la décision. Le retard n'est pas anodin : la décision n'a existé pendant ces trois jours que dans la mémoire de l'assistant, invisible pour l'auteur comme pour le dossier, pendant que le journal continuait d'annoncer le point « à trancher ». C'est le défaut qui a motivé le registre des questions ouvertes et le vérificateur de cohérence — voir l'entrée du 05/11.
+
+**Contexte.** L'entrée du 05/10/2026 décide du lien d'invitation à usage unique pour US-02, et laisse ouvert (**Q-02**) le moyen de porter le jeton : une table dédiée, ou deux colonnes sur `user`.
+
+**Options.** (a) Une entité `Invitation` — identifiant, compte visé, hachage, expiration, consommation, création. (b) Deux colonnes sur `user` : `invitationTokenHash` et `invitationExpiresAt`.
+
+**Décision.** (b).
+
+**Pourquoi.** Un seul jeton est vivant à la fois, et l'invitation est en relation 1-1 avec le compte : ce n'est pas une entité qui a sa propre vie, c'est **un état du compte**. Une table permettrait plusieurs lignes par utilisateur — un état que le produit n'a pas, et qu'il faudrait alors une règle pour arbitrer.
+
+Et le MCD gagnerait une entité que **ne justifie aucune user story**. C'est exactement le motif pour lequel `Criterion` a été supprimée le 03/09/2026. Faire entrer par la petite porte ce qu'on a fait sortir par la grande deux mois plus tôt coûterait cher devant un jury Merise, pour un bénéfice nul.
+
+**Pourquoi pas l'historique des invitations.** Il n'est demandé par personne, et il existe déjà : le journal d'audit porte `USER_CREATED`, rattaché à l'établissement et non au compte, donc survivant à la purge. Une table d'invitations serait une seconde trace, à entretenir et à purger elle aussi.
+
+**Conséquences.**
+
+- `user` gagne `invitationTokenHash` et `invitationExpiresAt`, tous deux nullables : `null` signifie « aucune invitation en cours », ce qui est une information et non une colonne vide.
+- Le jeton est stocké **haché**. Un vol de base ne doit pas donner la main sur un compte en attente. Un hachage rapide suffit, contrairement à un mot de passe : le jeton est long et tiré au hasard, il n'y a rien à deviner par force brute.
+- `passwordHash` est aujourd'hui non nullable. Un compte invité n'en a pas encore : l'implémentation devra trancher entre rendre la colonne nullable et y poser une valeur inutilisable. La première voie dit la vérité au schéma, la seconde se contente de la cacher.
+- Les quatre livrables du modèle — MCD, MLD, MPD, dictionnaire de données — se mettent à jour **dans la même séance que la migration**, pas après.
+
+**Ce qui reste à faire.** Rien n'est implémenté. C'est une dette du lot 1 à solder au lot 2, et la raison pour laquelle l'issue US-02 ne peut pas être fermée.
+
+---
+
 ## 2026-11-03 — Une recette démarre l'application et entre par la porte
 
 **Contexte.** Quatre défauts sont apparus en une matinée, en voulant simplement se connecter aux écrans du lot 2 : aucun compte n'était créable, le serveur de développement n'avait aucune route vers l'API, `npm run dev` ne construisait pas les contrats partagés, et le chemin du `.env` se cassait dès qu'un fichier était ajouté hors de `src/` — avec, au passage, `npm run start:prod` hors service sans que rien ne le signale.
@@ -496,7 +523,7 @@ Les quatre défauts n'en font qu'un : **personne n'avait jamais ouvert cette app
 
 **Ce que la recette ne couvre pas, sciemment.** Le troisième défaut — les contrats non construits au démarrage de `npm run dev` — n'est pas rejouable par ce script, qui construit avant de démarrer. Il est traité structurellement : un `predev`, et plus de nettoyage du dossier de sortie en mode surveillance. Une régression se verrait au premier `npm run dev` d'un dépôt propre.
 
-**Reste ouvert.** En production, personne ne peut créer le premier administrateur d'un établissement client. Le seed ne règle que le poste de développement. Soit un `M-xx` d'inscription, soit une commande d'administration — à trancher avant la mise en ligne.
+**Reste ouvert.** En production, personne ne peut créer le premier administrateur d'un établissement client. Le seed ne règle que le poste de développement. Soit un `M-xx` d'inscription, soit une commande d'administration — à trancher avant la mise en ligne (**Q-03**).
 
 ---
 
@@ -521,3 +548,52 @@ Le détail qui tranche : les clés de traduction étaient **déjà** en anglais.
 **La règle, réécrite pour qu'elle couvre le cas qui a dérivé.** Le **produit** est en anglais — et le front en fait partie au même titre que l'API. L'**outillage** et la **documentation** sont en français : `scripts/`, les commentaires de CI, le dossier. Ce qui s'affiche vient d'une clé de traduction : un composant `Login` qui affiche « Connexion » est correct, et c'est la preuve que la séparation tient. Un test l'affirme désormais explicitement, pour que le prochain remplacement en masse ne le retourne pas en silence.
 
 **Trouvé en chemin.** Le remplacement automatique a produit trois défauts, relus un par un : un import pointant vers un fichier inexistant, une variable `next` masquant le gestionnaire du même nom dans l'intercepteur, et une assertion qui vérifiait l'affichage français et s'est retrouvée à attendre « Login ». Celle-là serait passée inaperçue — le test restait vert, il ne vérifiait simplement plus rien. Un renommage en masse se relit intégralement, ou ne se fait pas.
+
+---
+
+## 2026-11-05 — Les règles du cadre deviennent des mécanismes
+
+**Contexte.** `CLAUDE.md` cadre le travail depuis le 05/10/2026, et son contenu n'a jamais été contesté. Pourtant, sur un mois :
+
+- le front a dérivé en français sur deux lots entiers, alors que la règle de langue était écrite et sans ambiguïté ;
+- la décision sur le jeton d'invitation a vécu trois jours hors du dépôt, alors que la règle dit « le jour où elle est prise » (**Q-02**) ;
+- les vingt-quatre issues GitHub sont restées ouvertes, zéro fermée, alors que le lot 1 était fusionné depuis trois semaines ;
+- `RG-08` s'annonçait « à implémenter » au tableau de synthèse pendant que le lot 2 la testait des deux côtés du contrat, et `RG-10` n'y figurait pas du tout ;
+- trois arbitrages en suspens vivaient dispersés dans le journal, retrouvables seulement en cherchant « à trancher ».
+
+Ce qui a tenu sur la même période se compte aussi : le hook qui refuse `git commit`, la CI, le `pretest` qui reconstruit les contrats partagés. Aucun n'est mieux écrit que les règles qui ont dérivé. **La différence est qu'ils tombent en panne.**
+
+**Options.** (a) Rappeler les règles plus fermement et plus souvent. (b) Un vérificateur qui échoue, lancé par la CI. (c) Accepter la dérive et corriger avant la soutenance.
+
+**Décision.** (b) — c'est le même arbitrage que le 08/10/2026 pour la règle de non-publication, et pour la même raison.
+
+**Pourquoi pas (a).** C'est ce qui a été tenté, implicitement, pendant un mois. La règle de langue est le contre-exemple décisif : parfaitement claire, elle a été enfreinte par celui-là même qui venait de la lire, en suivant le code existant plutôt que la règle écrite. Une consigne ne se défend pas contre l'habitude.
+
+**Pourquoi pas (c).** Un dossier rattrapé en fin de parcours est exactement le mode d'échec que `docs/README.md` annonce vouloir éviter — « une bonne application avec un dossier reconstitué de mémoire en trois week-ends ».
+
+**Ce qui est mis en place.**
+
+- **`tests/coherence.test.ts`**, lancé par `npm run coherence`, par `npm test` et par la CI juste après l'installation. Il vérifie cinq invariants : aucun identifiant cité sans être déclaré, aucun identifiant déclaré deux fois sous la même forme, aucune question ouverte sans clé de registre, aucune règle de gestion dont l'état annoncé contredit les tests — dans les deux sens —, aucune clé de traduction présente dans une seule langue.
+- **`docs/questions-ouvertes.md`**, registre des `Q-xx`. Le journal est chronologique : il dit ce qui a été décidé, pas ce qui attend de l'être. Les trois arbitrages en suspens y sont enregistrés, et le vérificateur refuse désormais un « à trancher » qui ne cite aucune clé.
+- **`.github/pull_request_template.md`**, qui porte la ligne `Closes #n` et la définition de « lot fini ». Le jalon GitHub portait déjà le lot et l'étiquette l'épopée : il ne manquait que la fermeture.
+- **`.commits/`**, ignoré par git, pour les messages de commit en attente de relecture. Ils vivaient dans un dossier temporaire propre à la session, disparu le lendemain — au moment précis où l'auteur veut relire.
+
+**Les quatre incohérences que le vérificateur a trouvées en entrant en service** sont corrigées : les trois questions ouvertes citent leur clé, `RG-10` figure au tableau de synthèse, `RG-08` y passe à « Testée ».
+
+**Il a lui-même été éprouvé.** Ses détections sont isolées en fonctions pures, et le second bloc du fichier les soumet à des exemples : une réattribution, une référence pendante, une question sans clé — et aussi trois écritures légitimes qui leur ressemblent et ne doivent pas les déclencher, car un vérificateur qui crie trop est désarmé en quinze jours.
+
+La première version en a révélé un dans le vérificateur lui-même : son corpus venait de `git ls-files`, qui ne liste que les fichiers suivis. **Un document créé dans la séance n'était vérifié par rien jusqu'à son premier commit** — c'est-à-dire au moment où il est le plus susceptible de citer un identifiant inexistant. Le registre des questions ouvertes, écrit une heure plus tôt, était dans cet angle mort.
+
+**Un test, pas un script, et pas un skill.** Trois formes étaient possibles. Un _skill_ de l'assistant a été écarté d'emblée : c'est un prompt, il ne s'exécute que si un agent est invoqué et choisit de s'en servir — exactement le mode de défaillance qu'on cherche à fermer, et la CI ne sait pas en invoquer un. Restaient le script shell et le test.
+
+La première version était en shell, et elle a buté sur `sed -i`, qui ne s'écrit pas pareil sous BSD et sous GNU. Le test Vitest fait le même travail en un fichier au lieu de deux, dans le langage du reste du dépôt, avec des messages d'échec qui nomment la cause, et il sabote des chaînes en mémoire au lieu de réécrire des fichiers du dépôt pour s'éprouver.
+
+**Ce qu'on perd :** le shell tournait avant `npm ci` et échouait en dix secondes sur une faute de dossier. Le test demande l'installation. Le coût réel est d'une minute et demie d'attente dans le seul cas où le dossier est en faute, contre une portabilité fragile et un second script à maintenir tous les autres jours.
+
+C'est le troisième mécanisme sur trois à produire un défaut le jour de son installation. Le hook en avait produit trois, la recette avait besoin qu'on lui réintroduise deux défauts pour prouver qu'elle les voyait. **Faire échouer un garde-fou exprès fait partie de son écriture, pas de sa maintenance.**
+
+**Ce que cela ne couvre pas.** Le vérificateur ne lit pas GitHub : il ne peut pas constater qu'une issue est restée ouverte. Ce point-là repose sur le gabarit de PR, donc encore sur l'attention — mais une attention sollicitée au seul moment où elle porte, et par un formulaire pré-rempli plutôt que par un paragraphe lu un mois plus tôt.
+
+Il ne juge pas non plus le contenu : il vérifie que les documents ne se contredisent pas, jamais qu'ils disent vrai. Un énoncé faux mais cohérent passe.
+
+**Reste ouvert.** Rien de nouveau — le registre est à jour, **Q-01** et **Q-03** attendent leur échéance.

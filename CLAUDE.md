@@ -18,7 +18,7 @@ Le **produit** est en anglais, l'**outillage** et la **documentation** en franç
 
 ## Identifiants — stables, jamais réattribués
 
-`RG-xx` (règles), `M-xx` / `S-xx` / `C-xx` (périmètre), `US-xx`, `CU-xx` sont des clés de traçabilité citées dans le dossier.
+`RG-xx` (règles), `M-xx` / `S-xx` / `C-xx` (périmètre), `US-xx`, `CU-xx`, `Q-xx` (questions ouvertes) sont des clés de traçabilité citées dans le dossier.
 
 **Ne jamais renuméroter, ne jamais réattribuer un identifiant libéré.** Un identifiant retiré laisse un trou, documenté sur place. `M-14` est vacant depuis l'abandon de l'import Drive : le combler ferait pointer silencieusement les US qui citent `M-15` vers une autre fonctionnalité.
 
@@ -32,6 +32,8 @@ Les entrées passées ne se réécrivent pas : une décision devenue caduque re�
 
 Ne pas y verser les changements mineurs. Le journal vaut par sa densité.
 
+**Ce qui n'est pas tranché ne va pas au journal, mais au registre.** Le journal est chronologique : un arbitrage laissé en suspens au détour d'une entrée de septembre n'est plus visible en novembre. Toute question ouverte s'enregistre dans [`docs/questions-ouvertes.md`](docs/questions-ouvertes.md) sous un `Q-xx`, et l'entrée de journal qui la pose cite cette clé. `npm run coherence` refuse un « à trancher » qui ne cite aucun `Q-xx`.
+
 ## Ordre des livrables de conception
 
 **besoins → user stories → cas d'utilisation → maquettes → MCD.** Ne pas produire le MCD avant les maquettes : dessiner les écrans révèle des attributs manquants, et un MCD antérieur est un MCD à refaire. Une première version a déjà été supprimée pour cette raison.
@@ -41,6 +43,26 @@ Le MCD se met à jour **dans la même séance** que la migration Prisma correspo
 ## Ne pas documenter ce qui n'existe pas
 
 Le dépôt ne revendique aucune capacité non implémentée, et le schéma ne porte aucune colonne sans information — une colonne à valeur unique est supprimée plutôt que conservée « au cas où ». Réintroduire coûte une migration ; mentir au jury coûte plus cher.
+
+## Une règle sans mécanisme a la durée de vie d'une séance
+
+Ce fichier a été écrit le 05/10/2026, et plusieurs de ses règles ont dérivé pendant que personne ne les relisait. Le front est passé en français sur deux lots entiers alors que la règle de langue était écrite et sans ambiguïté. La décision sur le jeton d'invitation a vécu trois jours hors du dépôt. Les vingt-quatre issues GitHub sont restées ouvertes alors que le lot 1 était livré.
+
+Ce qui a tenu, sur la même période, sont les règles qui avaient un mécanisme : le hook qui refuse `git commit`, la CI, le `pretest` qui reconstruit les contrats partagés. **La clarté n'a jamais été la variable.**
+
+La conséquence pratique : quand on ajoute une règle, la question n'est pas « est-elle claire » mais **« qu'est-ce qui tombe en panne quand on l'enfreint »**. Si la réponse est « rien », la règle est un vœu.
+
+**Un mécanisme du projet n'est pas un garde-fou d'agent, et ils ne vivent pas au même endroit.** La CI ne sait pas invoquer un assistant : elle lance des commandes. Ce qui doit empêcher quelque chose de passer dans `main` est donc un test ou un script, lancé par la CI, qui fonctionne sans assistant et qu'un jury peut lire.
+
+| Où         | Portée                      | Mécanisme                 | Ce qu'il tient                                             |
+| ---------- | --------------------------- | ------------------------- | ---------------------------------------------------------- |
+| `tests/`   | Le projet — lancé par la CI | `coherence.test.ts`       | Le dossier de conception et le code ne se contredisent pas |
+| `scripts/` | Le projet — lancé par la CI | `recette.sh`              | L'application démarre vraiment et on peut s'y connecter    |
+| `.claude/` | L'agent seul — hors CI      | `hooks/refus-publication` | Pas de commit, de poussée ni de PR sans l'auteur           |
+
+Les deux premiers sont du code du dépôt, à relire et à faire évoluer comme le reste. Le troisième n'a de sens que pour un assistant et n'a rien à faire ailleurs — il se revérifie par `npm run test:hook`.
+
+Chacun des trois a produit un défaut le jour de son installation. **Faire échouer un garde-fou exprès fait partie de son écriture**, pas de sa maintenance : les détections de `coherence.test.ts` sont éprouvées sur des exemples, dans le même fichier.
 
 ## Pièges techniques
 
@@ -55,7 +77,9 @@ Le dépôt ne revendique aucune capacité non implémentée, et le schéma ne po
 
 ## Vérifications avant de rendre la main
 
-`npm run lint`, `npm test`, et `npm run format` si des fichiers ont été écrits.
+`npm run coherence`, `npm run lint`, `npm test`, et `npm run format` si des fichiers ont été écrits.
+
+`npm run coherence` est le moins cher et le plus souvent utile : il ne demande ni installation ni base, il s'exécute en quelques secondes, et il attrape ce qu'une relecture laisse passer — un identifiant cité et jamais déclaré, une règle annoncée testée qui ne l'est pas, une clé de traduction présente dans une seule langue.
 
 ## Mode de travail
 
@@ -67,7 +91,9 @@ Cadré le 05/10/2026.
 
 **Signaler sans bloquer :** les incohérences trouvées en chemin, en fin de message.
 
-**Ces arrêts sont tenus par le harnais, pas par la mémoire.** `.claude/hooks/refus-publication.sh` refuse `git commit`, les poussées sur `origin`, et l'ouverture ou la fusion d'une pull request. Le refus est sans appel : **ces commandes reviennent à l'auteur**, qui les lance lui-même après relecture. Présenter le travail à relire et la commande prête à coller fait partie du travail. Voir les entrées des 08/10 et 02/11/2026 au journal.
+**Ces arrêts sont tenus par le harnais, pas par la mémoire.** `.claude/hooks/refus-publication.sh` refuse `git commit`, les poussées sur `origin`, et l'ouverture ou la fusion d'une pull request. Le refus est sans appel : **ces commandes reviennent à l'auteur**, qui les lance lui-même après relecture. Présenter le travail à relire et la commande prête à coller fait partie du travail.
+
+**Le message de commit s'écrit dans `.commits/`**, à la racine du dépôt, ignoré par git. Pas dans un dossier temporaire : un chemin de session a disparu le lendemain, au moment précis où l'auteur veut relire ce qu'il s'apprête à committer. Voir les entrées des 08/10 et 02/11/2026 au journal.
 
 Après toute retouche au motif du hook : `npm run test:hook`. Il a produit trois défauts le jour de son installation, dont deux contournements silencieux.
 
@@ -79,7 +105,11 @@ Le découpage en lots, leur ordre et les dépendances qui l'imposent : [`docs/an
 
 **`main` reste toujours déployable.** Pas de `develop`, pas de GitFlow, pas de branche par commit.
 
-Un lot n'est fini que lorsque les critères d'acceptation passent, que ses règles de gestion sont testées sous leur identifiant `RG-xx`, que la CI est verte, et que les livrables de conception qu'il périme sont à jour dans la même séance.
+Un lot n'est fini que lorsque les critères d'acceptation passent, que ses règles de gestion sont testées sous leur identifiant `RG-xx`, que la CI est verte, que les livrables de conception qu'il périme sont à jour dans la même séance, et que **les issues de ses user stories sont fermées**.
+
+**Les issues se ferment par la PR, jamais à la main.** Le corps de la PR porte une ligne `Closes #n` par US livrée — c'est le gabarit [`.github/pull_request_template.md`](.github/pull_request_template.md) qui le rappelle. Sans cette ligne, l'issue survit à la fusion et l'onglet Issues affirme que rien n'a été livré : vingt-quatre ouvertes et zéro fermée, le 05/11/2026, alors que le lot 1 était en production depuis trois semaines.
+
+Le jalon GitHub porte le lot, l'étiquette porte l'épopée. Une US livrée en partie ne se ferme pas : la PR la cite sans `Closes`, et dit ce qui reste.
 
 ## Commits
 
