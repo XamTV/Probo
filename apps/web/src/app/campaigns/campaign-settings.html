@@ -1,0 +1,262 @@
+<main class="mx-auto flex min-h-dvh max-w-3xl flex-col gap-7 px-6 py-10" *transloco="let t">
+  <a routerLink="/campaigns" class="text-[13px] text-[#294B8A] hover:underline">
+    ← {{ t('campaign.backToList') }}
+  </a>
+
+  @if (campaign(); as c) {
+    <div class="flex items-start gap-4">
+      <div class="flex grow flex-col gap-1">
+        <h1 class="text-[21px] font-semibold tracking-tight text-[#14181D]">{{ c.name }}</h1>
+        <p class="text-[13px] text-[#6C757F]">{{ t('campaignStatus.' + c.status) }}</p>
+      </div>
+
+      @if (canWrite() && c.status === 'DRAFT') {
+        <button
+          type="button"
+          (click)="activate()"
+          [disabled]="!ready() || saving()"
+          class="h-9 shrink-0 rounded border border-[#294B8A] bg-[#294B8A] px-3.5 text-sm font-medium text-white disabled:opacity-50"
+        >
+          {{ saving() ? t('campaign.activating') : t('campaign.activate') }}
+        </button>
+      }
+    </div>
+
+    @if (!canWrite()) {
+      <p
+        class="rounded-[5px] border border-[#D7DBE0] bg-[#FBFBFA] px-4 py-2.5 text-[13px] text-[#545C66]"
+      >
+        {{ t('campaign.readOnly') }}
+      </p>
+    }
+
+    <!-- Everything still missing, at once: the rule comes from the server -->
+    @if (blockers().length > 0) {
+      <div
+        role="status"
+        class="flex flex-col gap-1.5 rounded-[5px] border border-[#E8D5AE] bg-[#FDF8EF] px-4 py-3"
+      >
+        <span class="text-[13px] font-medium text-[#8A5B14]">{{ t('activation.blocked') }}</span>
+        <ul class="flex flex-col gap-0.5 text-[12.5px] text-[#8A5B14]">
+          @for (blocker of blockers(); track blocker) {
+            <li>— {{ t('activation.' + blocker) }}</li>
+          }
+        </ul>
+      </div>
+    }
+
+    @if (failed()) {
+      <p role="alert" class="text-[13px] text-[#8A241D]">{{ t('campaign.saveFailed') }}</p>
+    }
+
+    <!-- Expected documents -->
+    <section class="flex flex-col gap-3 rounded-[5px] border border-[#D7DBE0] bg-white p-5">
+      <h2 class="text-sm font-semibold text-[#14181D]">{{ t('expectedTypes.title') }}</h2>
+      <p class="text-[12.5px] leading-relaxed text-[#6C757F]">{{ t('expectedTypes.help') }}</p>
+
+      <ul class="mt-1 flex flex-col gap-2">
+        @for (type of types; track type) {
+          <li class="flex items-center gap-2.5">
+            <input
+              type="checkbox"
+              [id]="'type-' + type"
+              [checked]="isExpected(type)"
+              [disabled]="!canWrite() || saving()"
+              (change)="toggleType(type)"
+              class="size-4 rounded border-[#D7DBE0] accent-[#294B8A]"
+            />
+            <label [for]="'type-' + type" class="text-sm text-[#14181D]">
+              {{ t('documentType.' + type) }}
+            </label>
+          </li>
+        }
+      </ul>
+    </section>
+
+    <!-- Comparison reference -->
+    <section class="flex flex-col gap-3 rounded-[5px] border border-[#D7DBE0] bg-white p-5">
+      <h2 class="text-sm font-semibold text-[#14181D]">{{ t('reference.title') }}</h2>
+      <p class="text-[12.5px] leading-relaxed text-[#6C757F]">{{ t('reference.help') }}</p>
+
+      <div class="flex flex-col gap-1 rounded-[5px] border border-[#E8D5AE] bg-[#FDF8EF] px-4 py-3">
+        <span class="text-[12.5px] font-medium text-[#8A5B14]">{{ t('reference.warning') }}</span>
+        <span class="text-[12px] leading-relaxed text-[#8A5B14]">
+          {{ t('reference.warningDetail') }}
+        </span>
+      </div>
+
+      @if (c.expectedTypes.length === 0) {
+        <p class="text-[12.5px] text-[#6C757F]">{{ t('expectedTypes.atLeastOne') }}</p>
+      }
+
+      <ul class="flex flex-col divide-y divide-[#E8EAEE]">
+        @for (type of c.expectedTypes; track type) {
+          <li class="flex flex-col gap-2 py-3">
+            <div class="flex items-center gap-3">
+              <span class="grow text-sm text-[#14181D]">{{ t('documentType.' + type) }}</span>
+
+              @if (referenceOf(type); as ref) {
+                <span
+                  class="rounded-full bg-[#E6F0E8] px-2.5 py-0.5 text-[11px] font-medium text-[#2C6B3F]"
+                >
+                  {{ t('reference.defined') }}
+                </span>
+                <span class="text-[12px] text-[#6C757F]">
+                  {{ t('reference.describedProfile') }} — {{ ref.text?.length }}
+                  {{ t('reference.characters') }}
+                </span>
+              } @else {
+                <span
+                  class="rounded-full bg-[#FDF0EE] px-2.5 py-0.5 text-[11px] font-medium text-[#8A241D]"
+                >
+                  {{ t('reference.missing') }}
+                </span>
+              }
+
+              @if (canWrite() && editing() !== type) {
+                <button
+                  type="button"
+                  (click)="startEditing(type)"
+                  class="h-8 shrink-0 rounded border border-[#D7DBE0] px-3 text-[13px] text-[#294B8A]"
+                >
+                  {{ referenceOf(type) ? t('reference.edit') : t('reference.provide') }}
+                </button>
+              }
+            </div>
+
+            @if (editing() === type) {
+              <div class="flex flex-col gap-2">
+                <textarea
+                  rows="6"
+                  [ngModel]="draft()"
+                  (ngModelChange)="draft.set($event)"
+                  [placeholder]="t('reference.placeholder')"
+                  class="w-full rounded border border-[#D7DBE0] px-3 py-2 text-sm leading-relaxed text-[#14181D] focus:border-[#294B8A] focus:outline focus:outline-2 focus:outline-offset-1 focus:outline-[#C9D6EE]"
+                ></textarea>
+
+                <div class="flex items-center gap-2.5">
+                  <button
+                    type="button"
+                    (click)="saveReference()"
+                    [disabled]="draft().trim().length < minLength || saving()"
+                    class="h-9 rounded border border-[#294B8A] bg-[#294B8A] px-3.5 text-sm font-medium text-white disabled:opacity-50"
+                  >
+                    {{ saving() ? t('campaign.saving') : t('campaign.save') }}
+                  </button>
+                  <button
+                    type="button"
+                    (click)="cancelEditing()"
+                    class="h-9 rounded border border-[#D7DBE0] px-3.5 text-sm text-[#545C66]"
+                  >
+                    {{ t('campaign.cancel') }}
+                  </button>
+                  @if (draft().trim().length < minLength) {
+                    <span class="text-[12px] text-[#9AA1A9]">
+                      {{ t('reference.tooShort', { min: minLength }) }}
+                    </span>
+                  }
+                </div>
+              </div>
+            }
+          </li>
+        }
+      </ul>
+
+      <p class="text-[12px] text-[#9AA1A9]">{{ t('reference.unchanged') }}</p>
+    </section>
+
+    <!-- Weighting -->
+    <section class="flex flex-col gap-3 rounded-[5px] border border-[#D7DBE0] bg-white p-5">
+      <h2 class="text-sm font-semibold text-[#14181D]">{{ t('weighting.title') }}</h2>
+      <p class="text-[12.5px] leading-relaxed text-[#6C757F]">{{ t('weighting.help') }}</p>
+
+      <div class="mt-1 flex flex-col gap-3">
+        <label class="flex items-center gap-3">
+          <span class="w-36 shrink-0 text-[13px] text-[#14181D]">{{ t('score.relevance') }}</span>
+          <input
+            type="range"
+            min="0"
+            max="100"
+            [value]="c.relevanceWeight * 100"
+            [disabled]="!canWrite() || saving()"
+            (change)="saveWeighting('relevance', $any($event.target).value)"
+            class="grow accent-[#294B8A]"
+          />
+          <span class="w-12 shrink-0 text-right text-[13px] tabular-nums text-[#545C66]">
+            {{ effective()?.relevance ?? 0 }} %
+          </span>
+        </label>
+
+        <label class="flex items-center gap-3">
+          <span class="w-36 shrink-0 text-[13px] text-[#14181D]">{{ t('score.clarity') }}</span>
+          <input
+            type="range"
+            min="0"
+            max="100"
+            [value]="c.clarityWeight * 100"
+            [disabled]="!canWrite() || saving()"
+            (change)="saveWeighting('clarity', $any($event.target).value)"
+            class="grow accent-[#294B8A]"
+          />
+          <span class="w-12 shrink-0 text-right text-[13px] tabular-nums text-[#545C66]">
+            {{ effective()?.clarity ?? 0 }} %
+          </span>
+        </label>
+
+        <label class="flex items-center gap-3">
+          <span class="w-36 shrink-0 text-[13px] text-[#14181D]">
+            {{ t('score.formalQuality') }}
+          </span>
+          <input
+            type="range"
+            min="0"
+            max="100"
+            [value]="c.formalQualityWeight * 100"
+            [disabled]="!canWrite() || saving()"
+            (change)="saveWeighting('formalQuality', $any($event.target).value)"
+            class="grow accent-[#294B8A]"
+          />
+          <span class="w-12 shrink-0 text-right text-[13px] tabular-nums text-[#545C66]">
+            {{ effective()?.formalQuality ?? 0 }} %
+          </span>
+        </label>
+      </div>
+
+      @if (effective() === null) {
+        <p class="text-[12.5px] text-[#8A241D]">{{ t('weighting.allZero') }}</p>
+      } @else {
+        <p class="text-[12px] text-[#9AA1A9]">{{ t('weighting.effective') }}</p>
+      }
+    </section>
+
+    <!-- Confidence threshold -->
+    <section class="flex flex-col gap-3 rounded-[5px] border border-[#D7DBE0] bg-white p-5">
+      <h2 class="text-sm font-semibold text-[#14181D]">{{ t('threshold.title') }}</h2>
+      <p class="text-[12.5px] leading-relaxed text-[#6C757F]">{{ t('threshold.help') }}</p>
+
+      <div class="flex items-center gap-3">
+        <input
+          type="range"
+          min="0"
+          max="100"
+          [value]="c.confidenceThreshold"
+          [disabled]="!canWrite() || saving()"
+          (change)="saveThreshold($any($event.target).value)"
+          class="grow accent-[#294B8A]"
+          [attr.aria-label]="t('threshold.title')"
+        />
+        <span class="w-12 shrink-0 text-right text-[13px] tabular-nums text-[#545C66]">
+          {{ c.confidenceThreshold }} %
+        </span>
+      </div>
+
+      <div class="flex justify-between text-[11.5px] text-[#9AA1A9]">
+        <span>{{ t('threshold.min') }}</span>
+        @if (c.confidenceThreshold === defaultThreshold) {
+          <span>{{ t('threshold.default') }}</span>
+        }
+        <span>{{ t('threshold.max') }}</span>
+      </div>
+    </section>
+  }
+</main>

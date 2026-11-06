@@ -1,0 +1,125 @@
+<main class="mx-auto flex min-h-dvh max-w-3xl flex-col gap-7 px-6 py-10" *transloco="let t">
+  <div class="flex items-start gap-4">
+    <div class="flex grow flex-col gap-1">
+      <h1 class="text-[21px] font-semibold tracking-tight text-[#14181D]">
+        {{ t('campaign.title') }}
+      </h1>
+      <p class="text-[13.5px] text-[#6C757F]">{{ t('campaign.subtitle') }}</p>
+    </div>
+
+    @if (canWrite() && !formOpen()) {
+      <button
+        type="button"
+        (click)="open()"
+        class="h-9 shrink-0 rounded border border-[#294B8A] bg-[#294B8A] px-3.5 text-sm font-medium text-white"
+      >
+        {{ t('campaign.new') }}
+      </button>
+    }
+  </div>
+
+  @if (formOpen()) {
+    <form
+      [formGroup]="form"
+      (ngSubmit)="submit()"
+      novalidate
+      class="flex flex-col gap-4 rounded-[5px] border border-[#D7DBE0] bg-white p-5"
+    >
+      <div>
+        <label
+          for="name"
+          class="mb-[7px] block text-[11px] font-semibold uppercase tracking-[0.07em] text-[#6C757F]"
+        >
+          {{ t('campaign.name') }}
+        </label>
+        <input
+          id="name"
+          type="text"
+          formControlName="name"
+          class="h-[38px] w-full rounded border border-[#D7DBE0] px-3 text-sm text-[#14181D] focus:border-[#294B8A] focus:outline focus:outline-2 focus:outline-offset-1 focus:outline-[#C9D6EE]"
+        />
+      </div>
+
+      <div>
+        <label
+          for="description"
+          class="mb-[7px] block text-[11px] font-semibold uppercase tracking-[0.07em] text-[#6C757F]"
+        >
+          {{ t('campaign.description') }}
+          <span class="font-normal normal-case tracking-normal text-[#9AA1A9]">
+            — {{ t('campaign.descriptionOptional') }}
+          </span>
+        </label>
+        <textarea
+          id="description"
+          formControlName="description"
+          rows="3"
+          class="w-full rounded border border-[#D7DBE0] px-3 py-2 text-sm text-[#14181D] focus:border-[#294B8A] focus:outline focus:outline-2 focus:outline-offset-1 focus:outline-[#C9D6EE]"
+        ></textarea>
+      </div>
+
+      @if (failed()) {
+        <p role="alert" class="text-[13px] text-[#8A241D]">{{ t('campaign.saveFailed') }}</p>
+      }
+
+      <div class="flex items-center gap-2.5">
+        <button
+          type="submit"
+          [disabled]="form.invalid || creating()"
+          class="h-9 rounded border border-[#294B8A] bg-[#294B8A] px-3.5 text-sm font-medium text-white disabled:opacity-60"
+        >
+          {{ creating() ? t('campaign.creating') : t('campaign.create') }}
+        </button>
+        <button
+          type="button"
+          (click)="close()"
+          class="h-9 rounded border border-[#D7DBE0] px-3.5 text-sm text-[#545C66]"
+        >
+          {{ t('campaign.cancel') }}
+        </button>
+      </div>
+    </form>
+  }
+
+  @if (items(); as list) {
+    @if (list.length === 0) {
+      <p
+        class="rounded-[5px] border border-dashed border-[#D7DBE0] px-5 py-8 text-center text-[13.5px] text-[#6C757F]"
+      >
+        {{ t('campaign.empty') }}
+      </p>
+    } @else {
+      <ul
+        class="flex flex-col divide-y divide-[#E8EAEE] rounded-[5px] border border-[#D7DBE0] bg-white"
+      >
+        @for (campaign of list; track campaign.id) {
+          <li>
+            <a
+              [routerLink]="['/campaigns', campaign.id]"
+              class="flex items-center gap-4 px-5 py-3.5 hover:bg-[#FBFBFA]"
+            >
+              <span class="flex grow flex-col gap-0.5">
+                <span class="text-sm font-medium text-[#14181D]">{{ campaign.name }}</span>
+                @if (campaign.description) {
+                  <span class="line-clamp-1 text-[12.5px] text-[#6C757F]">
+                    {{ campaign.description }}
+                  </span>
+                }
+              </span>
+              <span
+                class="shrink-0 rounded-full px-2.5 py-0.5 text-[11px] font-medium"
+                [class]="
+                  campaign.status === 'ACTIVE'
+                    ? 'bg-[#E6F0E8] text-[#2C6B3F]'
+                    : 'bg-[#EEF0F3] text-[#545C66]'
+                "
+              >
+                {{ t('campaignStatus.' + campaign.status) }}
+              </span>
+            </a>
+          </li>
+        }
+      </ul>
+    }
+  }
+</main>

@@ -6,17 +6,17 @@ import { TranslocoService, provideTransloco } from '@jsverse/transloco';
 import { DEFAULT_LOCALE, LOCALES } from '@probo/shared';
 
 import { SharedTranslocoLoader } from '../i18n/transloco-loader';
-import { Connexion } from './connexion';
+import { Login } from './login';
 
 /**
  * The sign-in screen is the first one a visitor sees, so it is where the
  * bilingual interface is exercised end to end. These assertions moved here
  * from the old foundation screen, which the router shell replaced.
  */
-describe('Connexion', () => {
+describe('Login', () => {
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      imports: [Connexion],
+      imports: [Login],
       providers: [
         provideRouter([]),
         provideHttpClient(),
@@ -35,7 +35,7 @@ describe('Connexion', () => {
   });
 
   async function render() {
-    const fixture = TestBed.createComponent(Connexion);
+    const fixture = TestBed.createComponent(Login);
     await fixture.whenStable();
     return fixture;
   }
@@ -47,6 +47,8 @@ describe('Connexion', () => {
 
   it('renders French by default', async () => {
     const rendered = (await render()).nativeElement as HTMLElement;
+    // The French interface says "Connexion" while the component is named
+    // Login: the rendered word comes from a translation key, not from the code.
     expect(rendered.querySelector('h1')?.textContent).toContain('Connexion');
     expect(rendered.textContent).toContain('Adresse email');
   });
@@ -77,17 +79,17 @@ describe('Connexion', () => {
 
   it('US-01: says nothing about whether the address exists', async () => {
     const fixture = await render();
-    const composant = fixture.componentInstance as unknown as {
+    const component = fixture.componentInstance as unknown as {
       failed: { set: (v: boolean) => void };
     };
-    composant.failed.set(true);
+    component.failed.set(true);
     await fixture.whenStable();
 
-    const texte = (fixture.nativeElement as HTMLElement).textContent ?? '';
-    expect(texte).toContain('Identifiants incorrects.');
+    const text = (fixture.nativeElement as HTMLElement).textContent ?? '';
+    expect(text).toContain('Identifiants incorrects.');
     // One message, whatever the cause. Anything naming the account or the
     // password separately would turn the form into an oracle.
-    expect(texte).not.toContain('inconnu');
-    expect(texte).not.toContain('existe');
+    expect(text).not.toContain('inconnu');
+    expect(text).not.toContain('existe');
   });
 });

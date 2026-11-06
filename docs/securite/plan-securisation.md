@@ -52,7 +52,9 @@ Le garde est enregistré en `APP_GUARD`. Une route est protégée **sauf si** el
 
 ### Vérification
 
-`apps/api/test/cloisonnement.e2e-spec.ts`, contre la vraie base : le cloisonnement vit dans la requête, et un Prisma simulé ne prouverait rien. Sept cas, dont une création de compte où la charge utile tente d'imposer un autre établissement — il est ignoré, pas honoré.
+`apps/api/test/tenant-isolation.e2e-spec.ts`, contre la vraie base : le cloisonnement vit dans la requête, et un Prisma simulé ne prouverait rien. Sept cas, dont une création de compte où la charge utile tente d'imposer un autre établissement — il est ignoré, pas honoré.
+
+`apps/api/test/invitation.e2e-spec.ts` couvre le jeton : la ligne ne porte ni mot de passe ni jeton en clair, le lien ne sert qu'une fois, un lien expiré et un lien inexistant sont indiscernables, et émettre un nouveau lien tue le précédent.
 
 > **Un défaut trouvé par ce test, et par rien d'autre.** `@UsePipes` s'applique à tous les paramètres d'un gestionnaire : le schéma Zod du corps validait aussi l'objet de session et en retirait `institutionId`. Le cloisonnement disparaissait **en silence**, sans erreur ni avertissement. Seul un test de bout en bout pouvait le voir.
 
@@ -64,7 +66,19 @@ Le garde est enregistré en `APP_GUARD`. Une route est protégée **sauf si** el
 
 **Argon2id**, la variante à coût mémoire, avec les paramètres par défaut de la bibliothèque. Le choix tient en une phrase : un attaquant qui dispose de cartes graphiques en tire beaucoup moins qu'avec une fonction purement calculatoire.
 
-Le mot de passe en clair n'est jamais stocké, jamais journalisé, et ne figure dans aucune réponse — la projection `VISIBLE` d'un compte exclut explicitement `passwordHash`.
+Le mot de passe en clair n'est jamais stocké, jamais journalisé, et ne figure dans aucune réponse : la lecture d'un compte retient `passwordHash` pour en déduire l'état « invité », puis le retire avant de rendre la ligne. Seul ce qu'il vaut — présent ou absent — sort du service.
+
+### Jeton d'invitation (US-02)
+
+Le lien que l'administrateur transmet porte 256 bits tirés par `randomBytes`. **La base n'en conserve que l'empreinte SHA-256** : un vol de base ne donne pas la main sur un compte en attente de son propriétaire.
+
+SHA-256 et non Argon2, délibérément. Un mot de passe est court et choisi par un humain : il lui faut un hachage lent pour résister à une attaque hors ligne. Ce jeton est aléatoire sur 256 bits — il n'y a rien à deviner, et le seul scénario qui compte est la lecture de la base.
+
+Le jeton en clair n'existe qu'une fois, dans la réponse qui le crée. Il n'est ni stocké, ni journalisé, ni renvoyé par une lecture ultérieure — c'est pourquoi un lien perdu se **régénère** au lieu de se relire, et pourquoi émettre le nouveau rend l'ancien caduc dans la même écriture.
+
+Il voyage dans le corps de la requête et non dans l'URL : une URL s'écrit dans les journaux du serveur et dans l'historique du navigateur, et celui-ci est une information d'authentification tant qu'il n'a pas servi.
+
+**Un compte invité n'a pas d'empreinte de mot de passe du tout.** `password_hash` est nullable, et la connexion refuse explicitement une ligne qui n'en porte pas — avec le même message que tout autre échec, pour ne pas révéler qu'une adresse a été invitée. L'alternative consistait à poser une empreinte inutilisable : elle aurait caché l'état au lieu de le dire, et rien n'aurait empêché de l'oublier.
 
 ### Jeton de session
 

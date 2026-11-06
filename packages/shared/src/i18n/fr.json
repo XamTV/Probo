@@ -56,7 +56,9 @@
     "ANALYSIS_VERDICT_OVERRIDDEN": "Verdict contredit",
     "APPLICATION_DELETED": "Candidature supprimée",
     "APPLICATION_PURGED": "Purge automatique",
-    "RANKING_EXPORTED": "Classement exporté"
+    "RANKING_EXPORTED": "Classement exporté",
+    "USER_INVITED": "Lien d'invitation émis",
+    "USER_PASSWORD_SET": "Mot de passe posé"
   },
   "auditEntityType": {
     "INSTITUTION": "Établissement",
@@ -80,6 +82,11 @@
   "userRole": {
     "ADMIN": "Administrateur",
     "ADMISSIONS_OFFICER": "Chargé d'admission"
+  },
+  "accountState": {
+    "INVITED": "Invité",
+    "ACTIVE": "Actif",
+    "DEACTIVATED": "Désactivé"
   },
   "campaignStatus": {
     "DRAFT": "Brouillon",
@@ -109,11 +116,108 @@
     "password": "Mot de passe",
     "submit": "Se connecter",
     "submitting": "Connexion…",
-    "forgotPassword": "Mot de passe oublié",
     "invalidCredentials": "Identifiants incorrects.",
     "throttleNotice": "Après six tentatives, les essais suivants seront temporisés.",
     "unavailable": "Le service est momentanément indisponible. Réessayez dans quelques instants.",
     "noSelfSignup": "Les comptes sont créés par l'administrateur de votre établissement. Il n'y a pas d'inscription libre.",
     "signOut": "Déconnexion"
+  },
+  "account": {
+    "title": "Comptes",
+    "subtitle": "Les membres de votre équipe, et ce qu'ils peuvent faire.",
+    "new": "Créer un compte",
+    "create": "Créer le compte",
+    "creating": "Création…",
+    "name": "Nom",
+    "email": "Adresse email",
+    "role": "Rôle",
+    "state": "État",
+    "you": "vous",
+    "deactivate": "Désactiver",
+    "reactivate": "Réactiver",
+    "EMAIL_ALREADY_USED": "Cette adresse porte déjà un compte.",
+    "UNAVAILABLE": "L'opération a échoué. Réessayez.",
+    "noDeletion": "Un compte se désactive, il ne se supprime pas : les lots qu'il a importés restent visibles et lui restent attribués, et le journal d'audit reste lisible."
+  },
+  "invitation": {
+    "title": "Choisissez votre mot de passe",
+    "subtitle": "Ce lien vous a été transmis par votre administrateur. Il ne sert qu'une fois.",
+    "submit": "Choisir ce mot de passe",
+    "submitting": "Enregistrement…",
+    "minLength": "Au moins {{min}} caractères. La longueur compte plus que les symboles.",
+    "refused": "Ce lien n'est plus valable",
+    "refusedDetail": "Il a peut-être déjà servi, ou expiré. Demandez-en un nouveau à votre administrateur.",
+    "issued": "Lien d'invitation — transmettez-le vous-même",
+    "copy": "Copier le lien",
+    "copied": "Lien copié",
+    "reissue": "Nouveau lien",
+    "validity": "Valable sept jours, une seule fois.",
+    "noEmail": "Probo n'envoie aucun courriel. La création d'un compte produit un lien que vous transmettez comme vous voulez. Le propriétaire choisit son mot de passe lui-même : vous ne devez jamais le connaître, sans quoi le journal d'audit ne prouve plus qui a agi."
+  },
+  "campaign": {
+    "title": "Campagnes",
+    "subtitle": "Une campagne cadre l'analyse d'une session de recrutement.",
+    "empty": "Aucune campagne. Créez-en une pour commencer.",
+    "new": "Nouvelle campagne",
+    "name": "Nom de la campagne",
+    "description": "Description",
+    "descriptionOptional": "facultative",
+    "opensAt": "Ouverture",
+    "closesAt": "Clôture",
+    "create": "Créer",
+    "creating": "Création…",
+    "cancel": "Annuler",
+    "save": "Enregistrer",
+    "saving": "Enregistrement…",
+    "saved": "Enregistré",
+    "settings": "Réglages",
+    "identity": "Identité",
+    "backToList": "Retour aux campagnes",
+    "activate": "Activer la campagne",
+    "activating": "Activation…",
+    "readOnly": "Seul un administrateur configure une campagne.",
+    "saveFailed": "L'enregistrement a échoué. Réessayez.",
+    "activationFailed": "L'activation a échoué."
+  },
+  "expectedTypes": {
+    "title": "Documents attendus",
+    "help": "Ce que vous réclamez à chaque candidat. Un document dont le type détecté ne figure pas dans cette liste est marqué atypique et sort du calcul de score. Au moins un type est obligatoire.",
+    "atLeastOne": "Au moins un type est obligatoire."
+  },
+  "weighting": {
+    "title": "Pondération des trois axes",
+    "help": "Le score d'un document est la moyenne pondérée de ses trois sous-scores. Les poids sont normalisés par leur somme : leur total n'a pas besoin de valoir 100. Une pondération entièrement nulle est refusée.",
+    "effective": "Poids relatif réel",
+    "allZero": "Une pondération entièrement nulle est refusée."
+  },
+  "threshold": {
+    "title": "Seuil de confiance",
+    "help": "En dessous de ce seuil, le système considère qu'il ne sait pas de quel document il s'agit : le document est marqué atypique et n'est pas scoré.",
+    "default": "Valeur par défaut",
+    "min": "0 — tout est accepté",
+    "max": "100"
+  },
+  "reference": {
+    "title": "Référentiel de comparaison",
+    "help": "Ce à quoi le niveau 2 compare chaque document pour établir le sous-score d'adéquation. Un référentiel par type attendu : on n'évalue pas une lettre de motivation sur les attendus d'un CV.",
+    "warning": "Décrivez le profil recherché, ne copiez pas un dossier admis.",
+    "warningDetail": "Un référentiel construit sur le CV d'un candidat réel reproduit son école, son parcours et son âge implicite sur toute la promotion suivante. En admission, c'est un biais de sélection que vous auriez à justifier.",
+    "defined": "Défini",
+    "missing": "Manquant",
+    "describedProfile": "Profil décrit",
+    "characters": "caractères",
+    "edit": "Modifier",
+    "provide": "Fournir le référentiel",
+    "placeholder": "Décrivez le profil recherché pour ce type de document.",
+    "tooShort": "Décrivez le profil en quelques phrases — au moins {{min}} caractères.",
+    "unchanged": "Modifier un référentiel n'altère pas les analyses déjà produites.",
+    "uploadLater": "Le dépôt d'un document de référence arrive avec la chaîne d'extraction."
+  },
+  "activation": {
+    "blocked": "Cette campagne ne peut pas être activée",
+    "NO_EXPECTED_TYPE": "Aucun type de document attendu n'est coché.",
+    "MISSING_REFERENCE_PROFILE": "Un type attendu n'a pas de référentiel.",
+    "ZERO_WEIGHTING": "La pondération des trois axes est entièrement nulle.",
+    "CLOSED_WINDOW": "La clôture précède l'ouverture."
   }
 }

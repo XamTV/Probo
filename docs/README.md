@@ -17,6 +17,7 @@ Deux raisons de ne pas y revenir plus tôt. D'abord, chaque entité doit pouvoir
 | Livrable                                     | État                                                                 |
 | -------------------------------------------- | -------------------------------------------------------------------- |
 | `journal-decisions.md`                       | Écrit, tenu au fil de l'eau                                          |
+| `questions-ouvertes.md`                      | Écrit — Q-01 à Q-03, dont 1 tranchée et implémentée                  |
 | `analyse/cahier-des-charges.md`              | Écrit                                                                |
 | `analyse/perimetre.md`                       | Écrit — MoSCoW, refus actés et reports datés                         |
 | `analyse/personas.md`                        | Écrit — Claire, Marc, Sofia                                          |
@@ -29,9 +30,9 @@ Deux raisons de ne pas y revenir plus tôt. D'abord, chaque entité doit pouvoir
 | `maquettage/accessibilite-rgaa.md`           | Écrit — 4 engagements, 5 points à vérifier                           |
 | `conception/diagramme-cas-utilisation.puml`  | Écrit — 14 CU, CU-11 exclu car reporté                               |
 | `conception/mcd.puml`, `mld.md`, `mpd.puml`  | Écrit — reconstruits après les maquettes                             |
-| `conception/ecarts-mcd-mpd.md`               | Écrit — 10 écarts, dont 1 signalé comme faiblesse                    |
+| `conception/ecarts-mcd-mpd.md`               | Écrit — 11 écarts, dont 1 signalé comme faiblesse                    |
 | `conception/dictionnaire-donnees.md`         | Écrit — 11 tables, dérivé de `schema.prisma`                         |
-| `conception/diagramme-classes.puml`          | Écrit — classes du lot 1, complété par chaque lot                    |
+| `conception/diagramme-classes.puml`          | Écrit — classes des lots 1 et 2, complété par chaque lot             |
 | `conception/diagramme-sequence-analyse.puml` | À produire au lot 4 — meilleur atout de soutenance                   |
 | `conception/diagramme-deploiement.puml`      | Écrit — développement en place, production visée au lot 7            |
 | `securite/plan-securisation.md`              | En cours — A01, A02, A07 écrites ; les autres au lot qui les produit |
@@ -41,6 +42,12 @@ Deux raisons de ne pas y revenir plus tôt. D'abord, chaque entité doit pouvoir
 | `tests/jeu-essai/`                           | À constituer — 40 documents réels annotés                            |
 | `veille/methode-et-sources.md`               | À produire                                                           |
 | `veille/veille-anglophone.md`                | À produire                                                           |
+
+## Ce qui tient ce dossier cohérent avec le code
+
+[`tests/coherence.test.ts`](../tests/coherence.test.ts) vérifie, en deux dixièmes de seconde, les invariants que personne ne relit : aucun identifiant cité sans être déclaré, aucun identifiant déclaré deux fois sous la même forme, aucune question ouverte hors du registre, aucune règle de gestion dont l'état annoncé contredit les tests, aucune clé de traduction présente dans une seule langue, aucune chaîne d'interface, aucun nom ni aucun intitulé de test français dans le code du produit. `npm run coherence` le lance seul ; `npm test` et la CI le lancent avec le reste.
+
+Ses détections sont éprouvées sur des exemples dans le même fichier — un vérificateur qu'on n'a jamais vu échouer ne prouve rien, et un vérificateur qui crie trop est désarmé en quinze jours. La première version a d'ailleurs révélé un défaut dans sa propre lecture du dépôt : son corpus ignorait les fichiers non encore suivis par git, si bien qu'un document neuf n'était vérifié par rien jusqu'à son premier commit.
 
 ## Deux règles de travail
 

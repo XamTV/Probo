@@ -89,3 +89,7 @@ Pas de branche par commit, pas de `develop`, pas de GitFlow. Un développeur seu
 Les user stories sont ouvertes comme **issues GitHub**, une par US, groupées par **jalon** correspondant au lot, étiquetées par épopée. Elles ont été créées depuis [`user-stories.md`](user-stories.md).
 
 > **Les documents font foi, pas les issues.** Une issue est une copie de confort pour suivre l'avancement. Quand une user story change, elle change ici d'abord ; l'issue suit, ou diverge sans que personne ne s'en aperçoive. C'est la même règle que pour les maquettes et les schémas rendus.
+
+**Une issue non fermée n'est pas une divergence neutre.** Le paragraphe ci-dessus autorisait la copie à diverger, et le 05/11/2026 les vingt-quatre issues étaient ouvertes alors que le lot 1 tournait en production depuis trois semaines. Une user story qui diverge en silence est une inexactitude ; une issue ouverte **affirme activement** que rien n'a été livré, à qui regarde l'onglet plutôt que le dossier.
+
+La fermeture ne se fait donc pas à la main : le corps de la pull request porte une ligne `Closes #n` par US livrée, et la fusion ferme l'issue. C'est le gabarit [`.github/pull_request_template.md`](../../.github/pull_request_template.md) qui le rappelle au seul moment où la question se pose. Une US livrée en partie se cite sans `Closes`, en disant ce qui reste.

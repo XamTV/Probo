@@ -51,3 +51,8 @@ Thumbs.db
 # Réglages Claude Code personnels : le hook partagé est dans
 # .claude/settings.json, les surcharges locales ne regardent personne
 .claude/settings.local.json
+
+# Messages de commit préparés pour relecture. Le hook renvoie tout commit à
+# l'auteur ; le message l'attend ici, à un chemin stable dans le dépôt, et non
+# dans un dossier temporaire propre à une session qui aura disparu demain.
+.commits/

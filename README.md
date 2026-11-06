@@ -44,28 +44,49 @@ openssl rand -base64 48        # à coller dans JWT_SECRET
 # Infrastructure locale
 npm run infra:up               # PostgreSQL sur 5433, Redis sur 6380
 npm run db:migrate
+npm run db:seed                # comptes de développement
 
 # Lancement
 npm run dev                    # API sur :3000, front sur :4200
 ```
 
-Vérification : `curl http://localhost:3000/api/health` doit répondre `{"status":"ok","database":"ok",...}`.
+Vérification : `npm run recette` construit tout, démarre l'application et s'y connecte, et `npm run coherence` vérifie que le dossier de conception et le code ne se contredisent pas. Plus léger : `curl http://localhost:3000/api/health` doit répondre `{"status":"ok","database":"ok",...}`.
+
+### Comptes de développement
+
+Créés par `npm run db:seed`, mot de passe commun `ProboDemo2026!`.
+
+| Identifiant         | Rôle               | Établissement                     |
+| ------------------- | ------------------ | --------------------------------- |
+| `admin@probo.test`  | Administrateur     | École Supérieure de Démonstration |
+| `charge@probo.test` | Chargé d'admission | École Supérieure de Démonstration |
+| `admin@voisin.test` | Administrateur     | Institut Voisin                   |
+
+Deux établissements, parce que le cloisonnement (M-11, US-03) ne se démontre pas avec un seul. Deux rôles dans le même, pour atteindre les écrans en lecture seule sans toucher la base.
+
+Il n'existe pas d'inscription : `POST /users` exige une session, qui exige un compte. Le seed est la seule porte d'entrée vers le premier administrateur. Le relancer débloque aussi un compte verrouillé par six tentatives ratées (US-01).
 
 > **Ports décalés.** PostgreSQL écoute sur **5433** et Redis sur **6380**, pas sur leurs ports standard. Une installation locale de PostgreSQL occupe généralement 5432, et `localhost` taperait dessus plutôt que sur le conteneur — avec un `P1010: User was denied access` très trompeur à la clé.
 
 ### Commandes
 
-| Commande             | Effet                                  |
-| -------------------- | -------------------------------------- |
-| `npm run dev`        | API et front en watch, en parallèle    |
-| `npm test`           | Tests des trois workspaces             |
-| `npm run lint`       | ESLint sur l'API et le front           |
-| `npm run format`     | Prettier en écriture sur tout le dépôt |
-| `npm run build`      | Build ordonné : shared → api → web     |
-| `npm run infra:up`   | Démarre PostgreSQL et Redis            |
-| `npm run infra:down` | Arrête les conteneurs                  |
-| `npm run db:migrate` | Applique et crée les migrations Prisma |
-| `npm run db:studio`  | Ouvre Prisma Studio                    |
+| Commande                          | Effet                                   |
+| --------------------------------- | --------------------------------------- |
+| `npm run dev`                     | Contrats, API et front en watch         |
+| `npm test`                        | Tests des trois workspaces              |
+| `npm run recette`                 | Construit, démarre, et se connecte      |
+| `npm run coherence`               | Dossier de conception contre le code    |
+| `npm run test:e2e -w @probo/api`  | Bout en bout contre la vraie base       |
+| `npm run test:hook`               | Garde-fou de publication de l'assistant |
+| `npm run lint`                    | ESLint sur l'API et le front            |
+| `npm run format`                  | Prettier en écriture sur tout le dépôt  |
+| `npm run build`                   | Build ordonné : shared → api → web      |
+| `npm run infra:up`                | Démarre PostgreSQL et Redis             |
+| `npm run infra:down`              | Arrête les conteneurs                   |
+| `npm run db:migrate`              | Applique et crée les migrations Prisma  |
+| `npm run db:deploy -w @probo/api` | Applique sans jamais en écrire une      |
+| `npm run db:seed`                 | Crée les comptes de développement       |
+| `npm run db:studio`               | Ouvre Prisma Studio                     |
 
 ---
 
@@ -155,7 +176,7 @@ Institution ─┬─ User
                                                       └─ DocumentAnalysis
 ```
 
-> **Langues.** Le code, la base et l'API sont en anglais ; le dossier professionnel est en français. L'interface est **bilingue français / anglais** via [Transloco](#internationalisation). Les identifiants de règles `RG-xx` restent identiques des deux côtés : ce sont des clés de traçabilité, pas de la prose.
+> **Langues.** Le **produit** est en anglais — code, base, API, routes du front, noms de composants, clés de traduction. L'**outillage** et la **documentation** sont en français : scripts, commentaires de CI, dossier professionnel. L'interface affichée est **bilingue français / anglais** via [Transloco](#internationalisation) : le mot que l'utilisateur lit vient d'une clé, jamais du code. Les identifiants de règles `RG-xx` restent identiques des deux côtés — ce sont des clés de traçabilité, pas de la prose.
 
 Le modèle physique vit dans [`apps/api/prisma/schema.prisma`](apps/api/prisma/schema.prisma). Le MCD Merise correspondant sera établi après les maquettes — voir [docs/README.md](docs/README.md) pour la chaîne de dépendance des livrables de conception.
 

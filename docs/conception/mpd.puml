@@ -38,11 +38,14 @@ entity "**user**" as app_user {
   --
   *institution_id : uuid <<FK>>
   *email : text <<UK>>
-  *password_hash : text
+  password_hash : text
   *name : text
   *role : user_role
   *is_active : boolean
   last_login_at : timestamp
+  .. invitation (US-02) ..
+  invitation_token_hash : text
+  invitation_expires_at : timestamp
   .. temporisation (US-01) ..
   *failed_login_attempts : int
   locked_until : timestamp

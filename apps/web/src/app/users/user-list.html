@@ -1,0 +1,206 @@
+<div class="min-h-dvh bg-[#FBFBFA]" *transloco="let t">
+  <div class="mx-auto flex max-w-[940px] flex-col gap-7 px-7 py-10">
+    <div class="flex items-start gap-4">
+      <div class="flex grow flex-col gap-1.5">
+        <h1 class="text-[21px] font-semibold tracking-tight text-[#14181D]">
+          {{ t('account.title') }}
+        </h1>
+        <p class="text-[13.5px] text-[#6C757F]">{{ t('account.subtitle') }}</p>
+      </div>
+      <a routerLink="/campaigns" class="text-[13px] text-[#294B8A] hover:underline">
+        {{ t('campaign.title') }}
+      </a>
+    </div>
+
+    @if (canWrite()) {
+      <div class="flex flex-col gap-4">
+        @if (!formOpen()) {
+          <button
+            type="button"
+            (click)="formOpen.set(true)"
+            class="h-9 self-start rounded border border-[#294B8A] bg-[#294B8A] px-3.5 text-[13px] font-medium text-white"
+          >
+            {{ t('account.new') }}
+          </button>
+        } @else {
+          <form
+            [formGroup]="form"
+            (ngSubmit)="submit()"
+            class="flex flex-col gap-4 rounded-[5px] border border-[#E3E5E8] bg-white p-5"
+            novalidate
+          >
+            <div class="grid gap-4 sm:grid-cols-3">
+              <div>
+                <label
+                  for="account-name"
+                  class="mb-[7px] block text-[11px] font-semibold uppercase tracking-[0.07em] text-[#6C757F]"
+                >
+                  {{ t('account.name') }}
+                </label>
+                <input
+                  id="account-name"
+                  type="text"
+                  formControlName="name"
+                  class="h-[38px] w-full rounded border border-[#D7DBE0] bg-white px-3 text-sm text-[#14181D]"
+                />
+              </div>
+              <div>
+                <label
+                  for="account-email"
+                  class="mb-[7px] block text-[11px] font-semibold uppercase tracking-[0.07em] text-[#6C757F]"
+                >
+                  {{ t('account.email') }}
+                </label>
+                <input
+                  id="account-email"
+                  type="email"
+                  formControlName="email"
+                  class="h-[38px] w-full rounded border border-[#D7DBE0] bg-white px-3 text-sm text-[#14181D]"
+                />
+              </div>
+              <div>
+                <label
+                  for="account-role"
+                  class="mb-[7px] block text-[11px] font-semibold uppercase tracking-[0.07em] text-[#6C757F]"
+                >
+                  {{ t('account.role') }}
+                </label>
+                <select
+                  id="account-role"
+                  formControlName="role"
+                  class="h-[38px] w-full rounded border border-[#D7DBE0] bg-white px-3 text-sm text-[#14181D]"
+                >
+                  <option value="ADMISSIONS_OFFICER">{{ t('userRole.ADMISSIONS_OFFICER') }}</option>
+                  <option value="ADMIN">{{ t('userRole.ADMIN') }}</option>
+                </select>
+              </div>
+            </div>
+
+            <div class="flex items-center gap-3">
+              <button
+                type="submit"
+                [disabled]="creating()"
+                class="h-9 rounded border border-[#294B8A] bg-[#294B8A] px-3.5 text-[13px] font-medium text-white disabled:opacity-60"
+              >
+                {{ creating() ? t('account.creating') : t('account.create') }}
+              </button>
+              <button
+                type="button"
+                (click)="formOpen.set(false)"
+                class="text-[13px] text-[#6C757F] hover:text-[#14181D]"
+              >
+                {{ t('campaign.cancel') }}
+              </button>
+            </div>
+          </form>
+        }
+
+        <!-- US-02: shown once, because the server keeps only a hash of it -->
+        @if (issued(); as invitation) {
+          <div
+            class="flex flex-col gap-2.5 rounded-[5px] border border-[#C9D6EE] bg-[#F4F7FC] px-4 py-3.5"
+          >
+            <span class="text-[13px] font-medium text-[#1F3C70]">
+              {{ t('invitation.issued') }}
+            </span>
+            <code
+              class="block overflow-x-auto rounded border border-[#D7DBE0] bg-white px-3 py-2 font-mono text-[12.5px] text-[#14181D]"
+              >{{ invitation.link }}</code
+            >
+            <div class="flex items-center gap-3">
+              <button
+                type="button"
+                (click)="copy()"
+                class="h-8 rounded border border-[#294B8A] px-3 text-[12.5px] font-medium text-[#294B8A]"
+              >
+                {{ copied() ? t('invitation.copied') : t('invitation.copy') }}
+              </button>
+              <span class="text-[12.5px] text-[#4A5560]">{{ t('invitation.validity') }}</span>
+            </div>
+          </div>
+        }
+      </div>
+    }
+
+    @if (failed(); as reason) {
+      <div
+        role="alert"
+        class="rounded-[5px] border border-[#E8C4C0] bg-[#FCF2F1] px-3.5 py-3 text-[13px] text-[#8A241D]"
+      >
+        {{ t('account.' + reason) }}
+      </div>
+    }
+
+    @if (items(); as accounts) {
+      <table class="w-full border-separate border-spacing-0 text-left text-sm">
+        <thead>
+          <tr class="text-[11px] font-semibold uppercase tracking-[0.07em] text-[#6C757F]">
+            <th class="border-b border-[#E3E5E8] pb-2">{{ t('account.name') }}</th>
+            <th class="border-b border-[#E3E5E8] pb-2">{{ t('account.email') }}</th>
+            <th class="border-b border-[#E3E5E8] pb-2">{{ t('account.role') }}</th>
+            <th class="border-b border-[#E3E5E8] pb-2">{{ t('account.state') }}</th>
+            <th class="border-b border-[#E3E5E8] pb-2"><span class="sr-only">Actions</span></th>
+          </tr>
+        </thead>
+        <tbody>
+          @for (account of accounts; track account.id) {
+            <tr>
+              <td class="border-b border-[#EDEFF1] py-3 text-[#14181D]">
+                {{ account.name }}
+                @if (account.id === me()) {
+                  <span class="text-[12.5px] text-[#6C757F]"> — {{ t('account.you') }}</span>
+                }
+              </td>
+              <td class="border-b border-[#EDEFF1] py-3 text-[#4A5560]">{{ account.email }}</td>
+              <td class="border-b border-[#EDEFF1] py-3 text-[#4A5560]">
+                {{ t('userRole.' + account.role) }}
+              </td>
+              <td class="border-b border-[#EDEFF1] py-3">
+                <span
+                  class="rounded-full px-2 py-0.5 text-[12px]"
+                  [class]="
+                    account.state === 'ACTIVE'
+                      ? 'bg-[#EAF3EC] text-[#2A6B3C]'
+                      : account.state === 'INVITED'
+                        ? 'bg-[#F4F7FC] text-[#1F3C70]'
+                        : 'bg-[#F1F2F3] text-[#6C757F]'
+                  "
+                >
+                  {{ t('accountState.' + account.state) }}
+                </span>
+              </td>
+              <td class="border-b border-[#EDEFF1] py-3 text-right">
+                @if (canWrite()) {
+                  @if (account.state === 'INVITED') {
+                    <button
+                      type="button"
+                      (click)="reissue(account)"
+                      class="text-[12.5px] text-[#294B8A] hover:underline"
+                    >
+                      {{ t('invitation.reissue') }}
+                    </button>
+                  } @else if (account.id !== me()) {
+                    <button
+                      type="button"
+                      (click)="setActive(account, !account.isActive)"
+                      class="text-[12.5px] text-[#294B8A] hover:underline"
+                    >
+                      {{ account.isActive ? t('account.deactivate') : t('account.reactivate') }}
+                    </button>
+                  }
+                }
+              </td>
+            </tr>
+          }
+        </tbody>
+      </table>
+
+      <p class="max-w-[640px] text-xs leading-relaxed text-[#9AA1A9] text-pretty">
+        {{ t('account.noDeletion') }}
+      </p>
+      <p class="max-w-[640px] text-xs leading-relaxed text-[#9AA1A9] text-pretty">
+        {{ t('invitation.noEmail') }}
+      </p>
+    }
+  </div>
+</div>

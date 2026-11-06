@@ -16,8 +16,8 @@ export const authGuard: CanActivateFn = async (_route, state) => {
   if (!session.isSettled()) await session.restore();
   if (session.isSignedIn()) return true;
 
-  return router.createUrlTree(['/connexion'], {
-    queryParams: state.url === '/' ? {} : { suite: state.url },
+  return router.createUrlTree(['/login'], {
+    queryParams: state.url === '/' ? {} : { next: state.url },
   });
 };
 
@@ -27,5 +27,5 @@ export const guestGuard: CanActivateFn = async () => {
   const router = inject(Router);
 
   if (!session.isSettled()) await session.restore();
-  return session.isSignedIn() ? router.createUrlTree(['/classement']) : true;
+  return session.isSignedIn() ? router.createUrlTree(['/ranking']) : true;
 };

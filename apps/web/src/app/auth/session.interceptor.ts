@@ -28,9 +28,10 @@ export const sessionInterceptor: HttpInterceptorFn = (request, next) => {
 
       if (expired) {
         session.clear();
-        const suite = router.url;
-        void router.navigate(['/connexion'], {
-          queryParams: suite === '/' ? {} : { suite },
+        // Not named `next`: that is the interceptor's own handler.
+        const requested = router.url;
+        void router.navigate(['/login'], {
+          queryParams: requested === '/' ? {} : { next: requested },
         });
       }
       return throwError(() => error);

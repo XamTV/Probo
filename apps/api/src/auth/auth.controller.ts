@@ -1,5 +1,5 @@
 import { Body, Controller, Get, HttpCode, Post, Req, Res } from '@nestjs/common';
-import { LoginInput, type SessionUser } from '@probo/shared';
+import { AcceptInvitationInput, LoginInput, type SessionUser } from '@probo/shared';
 import type { Request, Response } from 'express';
 import { ZodValidationPipe } from '../common/zod-validation.pipe';
 import { AuditService } from '../audit/audit.service';
@@ -68,6 +68,39 @@ export class AuthController {
       }
       throw error;
     }
+  }
+
+  /**
+   * US-02 — the owner sets their own password from their invitation link.
+   *
+   * Public, because the caller has no account to sign in with yet: the token
+   * is the credential. It travels in the body, not in the URL, since a URL is
+   * written to server logs and browser history.
+   *
+   * No session is opened here. The owner then signs in like anyone else, which
+   * keeps one way in rather than two.
+   */
+  @Public()
+  @Post('invitation')
+  @HttpCode(200)
+  async acceptInvitation(
+    @Body(new ZodValidationPipe(AcceptInvitationInput)) input: AcceptInvitationInput,
+    @Req() request: Request,
+  ): Promise<{ email: string }> {
+    const owner = await this.auth.acceptInvitation(input);
+
+    // The actor is the account's owner, who has no session yet: the entry
+    // carries no user, and names the account it was done to.
+    await this.audit.record({
+      user: null,
+      institutionId: owner.institutionId,
+      action: 'USER_PASSWORD_SET',
+      entityType: 'USER',
+      entityId: owner.id,
+      request,
+    });
+
+    return { email: owner.email };
   }
 
   @Post('logout')

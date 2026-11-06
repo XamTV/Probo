@@ -210,7 +210,7 @@ Or **le produit tout entier repose sur le fait que les noms de fichiers mentent.
 - `ImportBatchStatus` gagne `AWAITING_RECONCILIATION`.
 - Un écran de réconciliation s'ajoute au lot de maquettes, entre l'import et le classement.
 
-**Ce que cela coûte.** Un appel supplémentaire au modèle par document, ou une extraction d'identité greffée sur l'appel de niveau 1 — à trancher à l'implémentation. Et une étape humaine de plus dans un parcours qu'on voulait sans friction. C'est le prix d'un classement dont les regroupements sont défendables ; un classement rapide et faux ne vaut rien.
+**Ce que cela coûte.** Un appel supplémentaire au modèle par document, ou une extraction d'identité greffée sur l'appel de niveau 1 — à trancher à l'implémentation (**Q-01**). Et une étape humaine de plus dans un parcours qu'on voulait sans friction. C'est le prix d'un classement dont les regroupements sont défendables ; un classement rapide et faux ne vaut rien.
 
 ---
 
@@ -346,7 +346,7 @@ C'est aussi la contrainte de Marc : sa DSI instruit lentement toute connexion à
 
 - US-02 gagne six critères d'acceptation. Le périmètre est inchangé : c'est M-01 qui se précise, pas un M-xx de plus.
 - Un compte sans mot de passe posé est **invité**, visible comme tel et incapable de se connecter. L'état existe déjà dans les maquettes de l'écran Comptes, sous le libellé « Invitation envoyée » — à corriger, puisque Probo n'envoie rien.
-- Le jeton d'invitation demande une table ou deux colonnes, à trancher au lot 2.
+- Le jeton d'invitation demande une table ou deux colonnes, à trancher au lot 2 (**Q-02** — tranchée le 02/11/2026, voir l'entrée de cette date).
 
 **La limite à assumer.** Transmettre un lien de création de mot de passe par message instantané ou de vive voix n'est pas idéal. Sa durée courte et son usage unique en limitent la portée, et l'alternative — que l'administrateur connaisse le mot de passe — est franchement pire.
 
@@ -467,3 +467,219 @@ Ce critère suppose la chaîne d'extraction de texte — `pdftotext`, et `tesser
 - Le lot 4 reprend US-22 dans sa liste, aux côtés d'US-10 et d'US-23.
 
 **Trouvé en chemin.** Les règles de gestion annoncent chacune leur lot d'implémentation, et trois de ces mentions dataient d'avant le plan de livraison du 06/10 : RG-07 renvoyait US-07 au lot 2 au lieu du lot 3, RG-09 renvoyait US-23 au lot 2 au lieu du lot 4. Corrigées. Une mention de lot écrite avant le plan qui définit les lots était une divergence qui n'attendait qu'un lecteur attentif.
+
+---
+
+## 2026-11-02 — Le jeton d'invitation tient en deux colonnes
+
+> **Consignée le 05/11/2026**, trois jours après la décision. Le retard n'est pas anodin : la décision n'a existé pendant ces trois jours que dans la mémoire de l'assistant, invisible pour l'auteur comme pour le dossier, pendant que le journal continuait d'annoncer le point « à trancher ». C'est le défaut qui a motivé le registre des questions ouvertes et le vérificateur de cohérence — voir l'entrée du 05/11.
+
+**Contexte.** L'entrée du 05/10/2026 décide du lien d'invitation à usage unique pour US-02, et laisse ouvert (**Q-02**) le moyen de porter le jeton : une table dédiée, ou deux colonnes sur `user`.
+
+**Options.** (a) Une entité `Invitation` — identifiant, compte visé, hachage, expiration, consommation, création. (b) Deux colonnes sur `user` : `invitationTokenHash` et `invitationExpiresAt`.
+
+**Décision.** (b).
+
+**Pourquoi.** Un seul jeton est vivant à la fois, et l'invitation est en relation 1-1 avec le compte : ce n'est pas une entité qui a sa propre vie, c'est **un état du compte**. Une table permettrait plusieurs lignes par utilisateur — un état que le produit n'a pas, et qu'il faudrait alors une règle pour arbitrer.
+
+Et le MCD gagnerait une entité que **ne justifie aucune user story**. C'est exactement le motif pour lequel `Criterion` a été supprimée le 03/09/2026. Faire entrer par la petite porte ce qu'on a fait sortir par la grande deux mois plus tôt coûterait cher devant un jury Merise, pour un bénéfice nul.
+
+**Pourquoi pas l'historique des invitations.** Il n'est demandé par personne, et il existe déjà : le journal d'audit porte `USER_CREATED`, rattaché à l'établissement et non au compte, donc survivant à la purge. Une table d'invitations serait une seconde trace, à entretenir et à purger elle aussi.
+
+**Conséquences.**
+
+- `user` gagne `invitationTokenHash` et `invitationExpiresAt`, tous deux nullables : `null` signifie « aucune invitation en cours », ce qui est une information et non une colonne vide.
+- Le jeton est stocké **haché**. Un vol de base ne doit pas donner la main sur un compte en attente. Un hachage rapide suffit, contrairement à un mot de passe : le jeton est long et tiré au hasard, il n'y a rien à deviner par force brute.
+- `passwordHash` est aujourd'hui non nullable. Un compte invité n'en a pas encore : l'implémentation devra trancher entre rendre la colonne nullable et y poser une valeur inutilisable. La première voie dit la vérité au schéma, la seconde se contente de la cacher.
+- Les quatre livrables du modèle — MCD, MLD, MPD, dictionnaire de données — se mettent à jour **dans la même séance que la migration**, pas après.
+
+**Ce qui reste à faire.** Rien n'est implémenté. C'est une dette du lot 1 à solder au lot 2, et la raison pour laquelle l'issue US-02 ne peut pas être fermée.
+
+---
+
+## 2026-11-03 — Une recette démarre l'application et entre par la porte
+
+**Contexte.** Quatre défauts sont apparus en une matinée, en voulant simplement se connecter aux écrans du lot 2 : aucun compte n'était créable, le serveur de développement n'avait aucune route vers l'API, `npm run dev` ne construisait pas les contrats partagés, et le chemin du `.env` se cassait dès qu'un fichier était ajouté hors de `src/` — avec, au passage, `npm run start:prod` hors service sans que rien ne le signale.
+
+La suite de tests était verte pendant tout ce temps, et elle avait raison. Les tests de bout en bout appellent l'API **dans le même processus** : ils ne construisent rien, n'ouvrent aucun port, ne traversent aucune passerelle, et l'écran de connexion est testé contre un serveur simulé. Le proxy du serveur de développement n'appartient à aucun chemin testé.
+
+Les quatre défauts n'en font qu'un : **personne n'avait jamais ouvert cette application dans un navigateur et ne s'y était connecté.** Personne ne le pouvait — il n'existait aucun compte.
+
+**Options.** (a) Un script de recette en HTTP, lancé par la CI. (b) Playwright, un navigateur pilotant la vraie interface. (c) Ne rien ajouter et compter sur l'attention.
+
+**Décision.** (a) maintenant, (b) au lot 6, avec la coquille de navigation.
+
+**Pourquoi.** Un seul scénario coche les quatre cases : partir du dépôt, tout construire, démarrer la vraie pile, entrer par la porte. Le script le fait en une trentaine de lignes, sans dépendance, pour deux minutes de CI. Playwright ajouterait les erreurs d'exécution du front — un gabarit qui lève, une route absente, une clé de traduction manquante — mais le lot 2 n'a que deux écrans isolés, et des parcours de navigation n'ont de sens qu'une fois la coquille livrée. Le dossier attendra de toute façon une recette formelle ; elle arrivera avec de quoi la remplir.
+
+**Pourquoi pas (c).** Les quatre défauts ont été trouvés par l'auteur, à la main, en voulant se servir du produit. C'est le mode de détection le plus coûteux et le moins fiable dont on dispose.
+
+**Conséquences.**
+
+- `scripts/recette.sh`, lancé par `npm run recette`, remplace l'étape de build en CI : il construit tout, puis démarre le binaire construit et le serveur de développement, se connecte, lit et crée une campagne, et vérifie qu'un mot de passe faux reste un 401 et non une panne.
+- Il contrôle le **type de contenu** autant que le code HTTP. Le serveur de développement répond 200 en HTML pour toute route inconnue : sans ce second contrôle, une passerelle absente passerait pour un succès.
+- Il a été éprouvé en réintroduisant deux des quatre défauts : les deux font échouer la recette, avec un message qui désigne la cause.
+- Deux pièges sont durcis plutôt que surveillés. La racine du dépôt est **trouvée en remontant** jusqu'au `package.json` qui déclare les workspaces, au lieu d'être comptée en `../..` depuis le fichier compilé. Le port de l'API est **lu** dans le `.env` par `proxy.conf.mjs`, au lieu d'y être recopié.
+- Le seed est la contrepartie indispensable : sans premier compte, aucune recette ne peut se connecter.
+
+**Ce que la recette ne couvre pas, sciemment.** Le troisième défaut — les contrats non construits au démarrage de `npm run dev` — n'est pas rejouable par ce script, qui construit avant de démarrer. Il est traité structurellement : un `predev`, et plus de nettoyage du dossier de sortie en mode surveillance. Une régression se verrait au premier `npm run dev` d'un dépôt propre.
+
+**Reste ouvert.** En production, personne ne peut créer le premier administrateur d'un établissement client. Le seed ne règle que le poste de développement. Soit un `M-xx` d'inscription, soit une commande d'administration — à trancher avant la mise en ligne (**Q-03**).
+
+---
+
+## 2026-11-05 — Le front repasse en anglais, et la règle de langue est réécrite
+
+**Contexte.** Le README annonçait depuis le début : « le code, la base et l'API sont en anglais ». Le front disait le contraire — `connexion.ts`, `classement.ts`, `campagnes/`, `ListeCampagnes`, `ReglagesCampagne`, `CampagnesService`, et les routes `/connexion`, `/campagnes`, `/classement`.
+
+Ce n'était pas un choix : aucune entrée de ce journal ne le portait. Une dérive partie du lot 1, étendue au lot 2 le 03/11 en nommant quatre fichiers de campagne en français « pour suivre la convention existante » — c'est-à-dire en suivant le code contre la règle écrite, sans le signaler.
+
+Le détail qui tranche : les clés de traduction étaient **déjà** en anglais. On lisait donc, dans un même fichier, `class ReglagesCampagne`, `t('campaign.weighting')` et `/api/campaigns`. Trois orthographes pour une notion, et côté API la même chose s'appelait `CampaignsService`. Une recherche sur « campaign » ne ramenait que la moitié du produit.
+
+**Options.** (a) Tout passer en anglais, routes comprises. (b) Garder le français côté front et corriger la règle écrite pour qu'elle dise vrai. (c) Anglais pour les identifiants, français pour les routes, qui sont visibles de l'utilisateur.
+
+**Décision.** (a).
+
+**Pourquoi pas (b).** La règle est bonne et le reste du dépôt l'applique. Défendre une exception devant un jury qui sait chercher coûte plus cher que de renommer quatorze fichiers.
+
+**Pourquoi pas (c).** L'interface est bilingue. Une URL française n'est pas « la langue de l'utilisateur », c'est la langue d'un seul des deux publics : un anglophone naviguerait vers `/campagnes`. Et il n'existe aucun utilisateur en production, donc le changement d'URL ne coûte rien aujourd'hui — il coûterait plus tard.
+
+**Ce qui change.** `connexion` → `login`, `classement` → `ranking`, `campagnes` → `campaigns`, `liste-campagnes` → `campaign-list`, `reglages-campagne` → `campaign-settings`, avec les classes, sélecteurs, routes et identifiants locaux correspondants. Le paramètre d'URL `suite` devient `next`. Les commentaires de gabarits et les intitulés de tests passent en anglais comme ceux de l'API.
+
+**La règle, réécrite pour qu'elle couvre le cas qui a dérivé.** Le **produit** est en anglais — et le front en fait partie au même titre que l'API. L'**outillage** et la **documentation** sont en français : `scripts/`, les commentaires de CI, le dossier. Ce qui s'affiche vient d'une clé de traduction : un composant `Login` qui affiche « Connexion » est correct, et c'est la preuve que la séparation tient. Un test l'affirme désormais explicitement, pour que le prochain remplacement en masse ne le retourne pas en silence.
+
+**Trouvé en chemin.** Le remplacement automatique a produit trois défauts, relus un par un : un import pointant vers un fichier inexistant, une variable `next` masquant le gestionnaire du même nom dans l'intercepteur, et une assertion qui vérifiait l'affichage français et s'est retrouvée à attendre « Login ». Celle-là serait passée inaperçue — le test restait vert, il ne vérifiait simplement plus rien. Un renommage en masse se relit intégralement, ou ne se fait pas.
+
+---
+
+## 2026-11-05 — Les règles du cadre deviennent des mécanismes
+
+**Contexte.** `CLAUDE.md` cadre le travail depuis le 05/10/2026, et son contenu n'a jamais été contesté. Pourtant, sur un mois :
+
+- le front a dérivé en français sur deux lots entiers, alors que la règle de langue était écrite et sans ambiguïté ;
+- la décision sur le jeton d'invitation a vécu trois jours hors du dépôt, alors que la règle dit « le jour où elle est prise » (**Q-02**) ;
+- les vingt-quatre issues GitHub sont restées ouvertes, zéro fermée, alors que le lot 1 était fusionné depuis trois semaines ;
+- `RG-08` s'annonçait « à implémenter » au tableau de synthèse pendant que le lot 2 la testait des deux côtés du contrat, et `RG-10` n'y figurait pas du tout ;
+- trois arbitrages en suspens vivaient dispersés dans le journal, retrouvables seulement en cherchant « à trancher ».
+
+Ce qui a tenu sur la même période se compte aussi : le hook qui refuse `git commit`, la CI, le `pretest` qui reconstruit les contrats partagés. Aucun n'est mieux écrit que les règles qui ont dérivé. **La différence est qu'ils tombent en panne.**
+
+**Options.** (a) Rappeler les règles plus fermement et plus souvent. (b) Un vérificateur qui échoue, lancé par la CI. (c) Accepter la dérive et corriger avant la soutenance.
+
+**Décision.** (b) — c'est le même arbitrage que le 08/10/2026 pour la règle de non-publication, et pour la même raison.
+
+**Pourquoi pas (a).** C'est ce qui a été tenté, implicitement, pendant un mois. La règle de langue est le contre-exemple décisif : parfaitement claire, elle a été enfreinte par celui-là même qui venait de la lire, en suivant le code existant plutôt que la règle écrite. Une consigne ne se défend pas contre l'habitude.
+
+**Pourquoi pas (c).** Un dossier rattrapé en fin de parcours est exactement le mode d'échec que `docs/README.md` annonce vouloir éviter — « une bonne application avec un dossier reconstitué de mémoire en trois week-ends ».
+
+**Ce qui est mis en place.**
+
+- **`tests/coherence.test.ts`**, lancé par `npm run coherence`, par `npm test` et par la CI juste après l'installation. Il vérifie cinq invariants : aucun identifiant cité sans être déclaré, aucun identifiant déclaré deux fois sous la même forme, aucune question ouverte sans clé de registre, aucune règle de gestion dont l'état annoncé contredit les tests — dans les deux sens —, aucune clé de traduction présente dans une seule langue.
+- **`docs/questions-ouvertes.md`**, registre des `Q-xx`. Le journal est chronologique : il dit ce qui a été décidé, pas ce qui attend de l'être. Les trois arbitrages en suspens y sont enregistrés, et le vérificateur refuse désormais un « à trancher » qui ne cite aucune clé.
+- **`.github/pull_request_template.md`**, qui porte la ligne `Closes #n` et la définition de « lot fini ». Le jalon GitHub portait déjà le lot et l'étiquette l'épopée : il ne manquait que la fermeture.
+- **`.commits/`**, ignoré par git, pour les messages de commit en attente de relecture. Ils vivaient dans un dossier temporaire propre à la session, disparu le lendemain — au moment précis où l'auteur veut relire.
+
+**Les quatre incohérences que le vérificateur a trouvées en entrant en service** sont corrigées : les trois questions ouvertes citent leur clé, `RG-10` figure au tableau de synthèse, `RG-08` y passe à « Testée ».
+
+**Il a lui-même été éprouvé.** Ses détections sont isolées en fonctions pures, et le second bloc du fichier les soumet à des exemples : une réattribution, une référence pendante, une question sans clé — et aussi trois écritures légitimes qui leur ressemblent et ne doivent pas les déclencher, car un vérificateur qui crie trop est désarmé en quinze jours.
+
+La première version en a révélé un dans le vérificateur lui-même : son corpus venait de `git ls-files`, qui ne liste que les fichiers suivis. **Un document créé dans la séance n'était vérifié par rien jusqu'à son premier commit** — c'est-à-dire au moment où il est le plus susceptible de citer un identifiant inexistant. Le registre des questions ouvertes, écrit une heure plus tôt, était dans cet angle mort.
+
+**Un test, pas un script, et pas un skill.** Trois formes étaient possibles. Un _skill_ de l'assistant a été écarté d'emblée : c'est un prompt, il ne s'exécute que si un agent est invoqué et choisit de s'en servir — exactement le mode de défaillance qu'on cherche à fermer, et la CI ne sait pas en invoquer un. Restaient le script shell et le test.
+
+La première version était en shell, et elle a buté sur `sed -i`, qui ne s'écrit pas pareil sous BSD et sous GNU. Le test Vitest fait le même travail en un fichier au lieu de deux, dans le langage du reste du dépôt, avec des messages d'échec qui nomment la cause, et il sabote des chaînes en mémoire au lieu de réécrire des fichiers du dépôt pour s'éprouver.
+
+**Ce qu'on perd :** le shell tournait avant `npm ci` et échouait en dix secondes sur une faute de dossier. Le test demande l'installation. Le coût réel est d'une minute et demie d'attente dans le seul cas où le dossier est en faute, contre une portabilité fragile et un second script à maintenir tous les autres jours.
+
+C'est le troisième mécanisme sur trois à produire un défaut le jour de son installation. Le hook en avait produit trois, la recette avait besoin qu'on lui réintroduise deux défauts pour prouver qu'elle les voyait. **Faire échouer un garde-fou exprès fait partie de son écriture, pas de sa maintenance.**
+
+**Ce que cela ne couvre pas.** Le vérificateur ne lit pas GitHub : il ne peut pas constater qu'une issue est restée ouverte. Ce point-là repose sur le gabarit de PR, donc encore sur l'attention — mais une attention sollicitée au seul moment où elle porte, et par un formulaire pré-rempli plutôt que par un paragraphe lu un mois plus tôt.
+
+Il ne juge pas non plus le contenu : il vérifie que les documents ne se contredisent pas, jamais qu'ils disent vrai. Un énoncé faux mais cohérent passe.
+
+**Reste ouvert.** Rien de nouveau — le registre est à jour, **Q-01** et **Q-03** attendent leur échéance.
+
+---
+
+## 2026-11-06 — La règle de langue reçoit le mécanisme qui lui manquait
+
+**Contexte.** La veille, le front a été repassé en anglais et la règle de langue réécrite pour couvrir le cas qui avait dérivé. Elle restait pourtant la seule règle du cadre dont la violation ne cassait rien : le vérificateur comparait les clés de traduction entre `fr.json` et `en.json`, ce qui ne dit rien d'un composant nommé `ReglagesCampagne` ni d'un `<h1>Paramètres</h1>` écrit en dur dans un gabarit.
+
+C'est la règle qui a coûté le plus cher — deux lots entiers — et le renommage de la veille l'a seulement remise à zéro. Rien n'empêchait la même dérive de recommencer au lot 3.
+
+**Options.** (a) Interdire tout caractère accentué dans le code du produit. (b) Comparer chaque identifiant à un dictionnaire français. (c) Une liste fermée de mots français, choisis pour n'exister qu'en français.
+
+**Décision.** (a) **et** (c), qui ne visent pas la même faute.
+
+L'accent attrape la chaîne d'interface restée dans un gabarit — le mot que l'utilisateur lit et qui n'est pas passé par une clé. La liste de mots attrape le nom français **sans accent**, qui est la forme qu'avait prise la dérive : `ReglagesCampagne`, `liste-campagnes`, `/connexion`. Aucun accent dans aucun des trois.
+
+**Pourquoi pas (b).** Un dictionnaire classe `type`, `document`, `route`, `service`, `table` comme français. Le vérificateur crierait sur chaque fichier du dépôt et serait retiré dans la semaine. La liste est donc fermée et conservatrice : `analyse`, `importer`, `modifier`, `precedent` et `rapport` en sont **absents**, parce que ce sont aussi des mots anglais. Elle laisse passer des dérives, et c'est le prix pour qu'elle reste en service.
+
+**Les deux exemptions, et pourquoi elles sont justes.**
+
+- **Les tests sont exclus de la vérification des accents.** Leurs jeux d'essai sont des données françaises légitimes — une campagne s'appelle « Mastère 2027 » — et leurs assertions citent le libellé attendu à l'écran, qui est français par construction. Leur **chemin**, lui, reste jugé : un fichier mal nommé l'est tout autant sous `.spec.ts`.
+- **Les noms de fichiers du dossier de conception sont retirés avant jugement.** Le dossier est en français, et un commentaire qui renvoie à `Connexion.dc.html` désigne une maquette : il ne nomme rien dans le produit. Seules les extensions de documentation sont retirées — jamais `.ts` ni `.html` —, sans quoi un fichier nommé en français échapperait justement à la vérification.
+
+**Éprouvé par sabotage, sur le dépôt réel.** Une chaîne accentuée ajoutée à `campaign-list.html`, un `seuilDeConfiance` ajouté à `campaigns.service.ts`, et `campaign-list.ts` renommé `liste-campagnes.ts` : les trois sont relevés, avec le fichier, la ligne et le mot en cause. Cinq exemples en mémoire complètent l'épreuve, dont deux tolérances — la citation d'une maquette, et une ligne d'anglais qui ressemble au français.
+
+**Ce que cela ne couvre pas.** Une chaîne d'interface en anglais écrite en dur passe : elle n'a pas d'accent et n'est dans aucune liste. Le mécanisme tient la dérive constatée, pas toutes les dérives imaginables.
+
+**Conséquence.** Le vérificateur passe de cinq invariants à sept. Il reste la seule chose qui s'exécute, et le cadre ne gagne pas une ligne de prose.
+
+---
+
+## 2026-11-06 — Le vérificateur de langue avait un angle mort, et quelque chose dedans
+
+**Contexte.** Le mécanisme installé le matin même couvrait `apps/web/src`, `apps/api/src` et `packages/shared/src`. Les tests end-to-end vivent dans `apps/api/test`, qui n'est sous aucune de ces racines. Ils n'étaient vérifiés par rien.
+
+Derrière l'angle mort : **`campagne.e2e-spec.ts`**, **`cloisonnement.e2e-spec.ts`**, et vingt et un intitulés de tests en français. Le renommage du 05/11 avait traité le front et laissé les tests de l'API.
+
+C'est le deuxième mécanisme de la semaine à révéler un défaut dans la minute qui suit son entrée en service, et le deuxième à le révéler **dans lui-même** plutôt que dans le dépôt. Le précédent était le corpus limité aux fichiers suivis par git.
+
+**Ce qui change.** `apps/api/test` entre dans la portée. Les fichiers deviennent `campaign.e2e-spec.ts` et `tenant-isolation.e2e-spec.ts`, les vingt et un intitulés passent en anglais, et le commentaire français qui expliquait pourquoi US-22 n'est servie qu'à moitié avec eux. Le plan de sécurisation, qui citait l'ancien nom, suit.
+
+**Un intitulé n'est pas du code, et ne se juge pas pareil.** Deux des vingt et un ne portaient ni accent ni mot métier : « accepte des poids qui ne totalisent pas 1 ». Le vocabulaire ne les trahissait pas — leurs mots outils, oui. Les intitulés sont donc jugés en plus sur une petite liste d'articles et de pronoms qui n'existent pas en anglais : `qui`, `que`, `sans`, `une`, `dans`, `chaque`. Cette liste ne s'applique **qu'aux intitulés** : un identifiant ne ressemble pas à une phrase, et l'y chercher ne produirait que du bruit.
+
+**Ce que cela ne couvre toujours pas.** Le corps d'un test reste exempt — ses jeux d'essai sont du français légitime —, donc un commentaire français y passe encore. Celui du lot 2 a été trouvé à la lecture, pas par le vérificateur.
+
+**Conséquence.** Huit invariants. Les vingt-huit tests end-to-end passent après renommage.
+
+---
+
+## 2026-11-06 — Le jeton d'invitation est implémenté, et le mot de passe devient facultatif
+
+**Contexte.** La décision du 02/11/2026 porte le jeton d'invitation sur deux colonnes de `user`. Elle laissait un point à l'implémentation : `password_hash` était non nullable, et un compte invité n'a pas encore de mot de passe. Cette dette du lot 1 était la seule chose qui empêchait de fermer US-02.
+
+En attendant, le service posait une **empreinte provisoire tirée au hasard** à la création d'un compte. Elle rendait le compte inatteignable, ce qui était l'objectif ; elle rendait aussi l'état « invité » invisible dans la base, ce qui ne l'était pas.
+
+**Options.** (a) Rendre `password_hash` nullable. (b) Garder la colonne obligatoire et y laisser l'empreinte inutilisable.
+
+**Décision.** (a).
+
+**Pourquoi.** « Invité, pas encore activé » est un état réel du produit : il s'affiche à l'écran, il interdit la connexion, et il se termine quand le propriétaire pose son mot de passe. Un schéma qui le dit se relit ; un schéma qui pose une valeur pour ne pas avoir de trou oblige à savoir, ailleurs, que cette valeur ne veut rien dire. C'est la même règle que pour les colonnes sans information : ce qui n'existe pas ne se remplit pas.
+
+Le coût était d'ailleurs faible — une migration et un refus explicite à la connexion — et il était à payer une fois.
+
+**Ce qui est livré.**
+
+- `user` porte `invitation_token_hash` et `invitation_expires_at`, et `password_hash` est devenue nullable. Deux migrations : les colonnes, puis les actions d'audit.
+- `AuditAction` gagne `USER_INVITED` et `USER_PASSWORD_SET`, traduites dans les deux langues. US-02 demande que la génération d'un lien et la pose d'un mot de passe soient inscrites au journal d'audit ; chacune porte désormais son action, plutôt que d'être devinée depuis `USER_CREATED`.
+- La création d'un compte renvoie le lien **une seule fois** : le serveur n'en garde que l'empreinte. Un lien perdu se régénère, et le précédent cesse de fonctionner dans la même écriture.
+- `POST /api/auth/invitation` est public et prend le jeton **dans le corps**, pas dans l'URL : une URL s'écrit dans les journaux du serveur et dans l'historique du navigateur, et ce jeton est une information d'authentification tant qu'il n'a pas servi.
+- Deux écrans : la liste des comptes (`Comptes.dc.html`) et l'écran de choix du mot de passe. Aucune session n'est ouverte à la pose du mot de passe — le propriétaire se connecte ensuite comme tout le monde, ce qui laisse une seule porte d'entrée au produit plutôt que deux.
+- Un compte invité ne peut pas se connecter, et le refus porte **le même message que tous les autres** : dire qu'une adresse a été invitée serait dire qu'elle existe.
+
+**Les quatre livrables du modèle suivent la migration, dans cette séance** : MCD (`jeton d'invitation`, `expiration de l'invitation` sur `UTILISATEUR`), MLD, MPD et dictionnaire des données, plus un onzième écart MCD/MPD — le MCD dit « jeton », le MPD stocke son empreinte.
+
+**Éprouvé par sabotage.** Stocker le jeton en clair et ne pas le consommer à l'usage font tomber six des douze cas de `invitation.e2e-spec.ts`, avec les messages attendus.
+
+**Q-02 est soldée.** Elle reste au registre à l'état `Tranchée`, avec son état d'avancement mis à jour : la décision du 02/11 est désormais dans le code.
+
+**Trouvé en chemin, et retiré.** L'écran de connexion portait un lien « Mot de passe oublié » vers `/mot-de-passe-oublie` : une **route française**, survivante du renommage du 05/11, et une route qui **n'existe pas** — aucune user story ne couvre la réinitialisation de mot de passe. Deux règles enfreintes par trois mots, dont celle qui dit que le dépôt ne revendique aucune capacité qu'il n'a pas. Le lien et sa clé de traduction sont supprimés ; réintroduire un écran coûtera moins cher que d'expliquer devant un jury pourquoi celui-ci menait au vide.
+
+Le vérificateur ne l'attrapait pas : ni `mot`, ni `passe`, ni `oublie` n'étaient dans sa liste. Ils y sont, éprouvés sur cette route précise.
+
+`SetPasswordInput` disparaît aussi : `AcceptInvitationInput` le remplace, et il ne restait plus personne pour l'appeler — seulement son propre test, qui prouvait qu'un contrat mort valide correctement.
+
+**Les tests de bout en bout prennent trente secondes de délai, au lieu de cinq.** Le délai par défaut de Jest est dimensionné pour des tests unitaires. Ceux-ci montent une application Nest, parlent à un vrai PostgreSQL et vérifient des empreintes Argon2 — une fonction **à coût mémoire par construction**, donc lente dès que la machine est chargée. Sous charge, trois échecs se sont produits, chaque fois dans un fichier différent et jamais reproductibles à froid. Le code n'était pas en cause : le plafond l'était. Un exécutant de CI est plus lent que le poste, donc le risque y est plus grand, pas moindre.
+
+**Les tests de bout en bout passent aussi à un seul exécutant.** La quatrième suite a fait basculer leur exécution parallèle : quatre applications Nest complètes, chacune hachant des mots de passe en Argon2 — coûteux en mémoire par construction — sur une seule base. Les `beforeAll` ont commencé à expirer, puis une connexion a répondu 404 une fois, sans jamais se reproduire. Mettre `maxWorkers: 1` ne cache pas le problème : ces suites partagent une base et ne gagnent rien à être parallélisées. Les adresses d'essai portent en plus un suffixe propre à l'exécution, pour qu'une exécution interrompue avant son nettoyage n'entre jamais en collision avec la suivante.

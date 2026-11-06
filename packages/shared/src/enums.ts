@@ -68,6 +68,8 @@ export const AuditAction = z.enum([
   'USER_LOGGED_IN',
   'USER_LOGIN_FAILED',
   'USER_CREATED',
+  'USER_INVITED',
+  'USER_PASSWORD_SET',
   'USER_UPDATED',
   'USER_DEACTIVATED',
   'CAMPAIGN_CREATED',

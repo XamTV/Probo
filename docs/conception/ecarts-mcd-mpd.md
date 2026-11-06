@@ -81,3 +81,13 @@ C'est le seul « écart » qui soit une absence volontaire plutôt qu'un ajout.
 **Le prix.** `schema.prisma` ne décrit plus toute la base. Une relecture du seul schéma manquerait cette contrainte — d'où sa mention ici et au dictionnaire des données.
 
 **Historique.** Cet écart était le seul de cette liste qualifié de **faiblesse** plutôt que de choix, tant que la règle ne vivait que dans le code. Contrainte ajoutée le 05/10/2026.
+
+## 11. Le jeton d'invitation est haché, le MCD dit « jeton »
+
+**L'écart.** Le MCD porte `jeton d'invitation` sur `UTILISATEUR`. Le MPD porte `invitation_token_hash` : l'empreinte SHA-256 du jeton, jamais le jeton.
+
+**Pourquoi.** Conceptuellement, le compte porte une invitation en cours — c'est cela que le MCD dit. Qu'elle soit stockée sous forme d'empreinte est une précaution de stockage, au même titre que `password_hash` : un vol de base ne doit pas donner la main sur un compte en attente de son propriétaire.
+
+**Pourquoi SHA-256 et non Argon2.** Un mot de passe est court, choisi par un humain, et se devine : il lui faut un hachage lent. Ce jeton est tiré de 256 bits aléatoires — il n'y a rien à deviner, et la seule menace qui compte est la lecture de la base elle-même.
+
+**Ce que l'écart ne cache pas.** Le jeton en clair n'existe qu'une fois, dans la réponse qui le produit. Il n'est stocké nulle part, ni journalisé : c'est pourquoi l'écran d'administration l'affiche immédiatement, et pourquoi un lien perdu se régénère au lieu de se relire.

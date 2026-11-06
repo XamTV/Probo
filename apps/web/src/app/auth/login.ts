@@ -1,7 +1,7 @@
 import { Component, inject, signal } from '@angular/core';
 import { HttpErrorResponse } from '@angular/common/http';
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
-import { ActivatedRoute, Router, RouterLink } from '@angular/router';
+import { ActivatedRoute, Router } from '@angular/router';
 import { TranslocoDirective } from '@jsverse/transloco';
 import { LoginInput, type Locale } from '@probo/shared';
 
@@ -10,11 +10,11 @@ import { SessionService } from './session.service';
 
 /** US-01 — the sign-in screen. Its specification is Connexion.dc.html. */
 @Component({
-  selector: 'app-connexion',
-  imports: [ReactiveFormsModule, TranslocoDirective, RouterLink],
-  templateUrl: './connexion.html',
+  selector: 'app-login',
+  imports: [ReactiveFormsModule, TranslocoDirective],
+  templateUrl: './login.html',
 })
-export class Connexion {
+export class Login {
   private readonly session = inject(SessionService);
   private readonly router = inject(Router);
   private readonly route = inject(ActivatedRoute);
@@ -66,8 +66,8 @@ export class Connexion {
       await this.session.signIn(parsed.data);
       // US-01 — return to where the visitor was heading before the session
       // sent them here.
-      const suite = this.route.snapshot.queryParamMap.get('suite');
-      await this.router.navigateByUrl(suite ?? '/classement');
+      const next = this.route.snapshot.queryParamMap.get('next');
+      await this.router.navigateByUrl(next ?? '/ranking');
     } catch (error) {
       if (error instanceof HttpErrorResponse && error.status === 401) {
         this.failed.set(true);

@@ -8,7 +8,7 @@ Convention : <u>clé primaire</u>, _#clé étrangère_.
 
 **ÉTABLISSEMENT** (<u>id_etablissement</u>, nom, siret, actif)
 
-**UTILISATEUR** (<u>id_utilisateur</u>, adresse_electronique, mot_de_passe, nom, role, actif, derniere_connexion, tentatives_echouees, verrouille_jusqu_a, _#id_etablissement_)
+**UTILISATEUR** (<u>id_utilisateur</u>, adresse_electronique, mot_de_passe, nom, role, actif, derniere_connexion, tentatives_echouees, verrouille_jusqu_a, jeton_invitation, expiration_invitation, _#id_etablissement_)
 
 **CAMPAGNE** (<u>id_campagne</u>, nom, description, statut, types_attendus, seuil_de_confiance, poids_adequation, poids_clarte, poids_qualite_formelle, date_ouverture, date_cloture, _#id_etablissement_)
 

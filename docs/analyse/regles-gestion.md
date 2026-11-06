@@ -205,5 +205,6 @@ _US-24 · à implémenter au lot 5_
 | RG-05 | Score document = moyenne pondérée normalisée              | US-06, US-12 | Testée        |
 | RG-06 | Score candidature = moyenne des retenus ; `null` si aucun | US-13, US-14 | Testée        |
 | RG-07 | Décompression défensive : chemin, type, plafonds          | US-07        | À implémenter |
-| RG-08 | Un référentiel de comparaison par type attendu            | US-22        | À implémenter |
+| RG-08 | Un référentiel de comparaison par type attendu            | US-04, US-22 | Testée        |
 | RG-09 | Identité lue dans le contenu, réconciliation si doute     | US-23        | À implémenter |
+| RG-10 | Contradiction humaine d'un verdict, sauf `UNREADABLE`     | US-24        | À implémenter |

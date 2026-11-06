@@ -4,15 +4,37 @@ import { authGuard, guestGuard } from './auth/auth.guard';
 
 export const routes: Routes = [
   {
-    path: 'connexion',
+    path: 'login',
     canActivate: [guestGuard],
-    loadComponent: () => import('./auth/connexion').then((m) => m.Connexion),
+    loadComponent: () => import('./auth/login').then((m) => m.Login),
   },
   {
-    path: 'classement',
-    canActivate: [authGuard],
-    loadComponent: () => import('./classement/classement').then((m) => m.Classement),
+    // US-02 — where an invitation link lands. Public: its holder has no
+    // account to sign in with yet, the token is what identifies them.
+    path: 'invitation/:token',
+    canActivate: [guestGuard],
+    loadComponent: () => import('./auth/accept-invitation').then((m) => m.AcceptInvitation),
   },
-  { path: '', pathMatch: 'full', redirectTo: 'classement' },
-  { path: '**', redirectTo: 'classement' },
+  {
+    path: 'users',
+    canActivate: [authGuard],
+    loadComponent: () => import('./users/user-list').then((m) => m.UserList),
+  },
+  {
+    path: 'campaigns',
+    canActivate: [authGuard],
+    loadComponent: () => import('./campaigns/campaign-list').then((m) => m.CampaignList),
+  },
+  {
+    path: 'campaigns/:id',
+    canActivate: [authGuard],
+    loadComponent: () => import('./campaigns/campaign-settings').then((m) => m.CampaignSettings),
+  },
+  {
+    path: 'ranking',
+    canActivate: [authGuard],
+    loadComponent: () => import('./ranking/ranking').then((m) => m.Ranking),
+  },
+  { path: '', pathMatch: 'full', redirectTo: 'ranking' },
+  { path: '**', redirectTo: 'ranking' },
 ];
