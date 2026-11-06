@@ -45,7 +45,7 @@ Deux raisons de ne pas y revenir plus tôt. D'abord, chaque entité doit pouvoir
 
 ## Ce qui tient ce dossier cohérent avec le code
 
-[`tests/coherence.test.ts`](../tests/coherence.test.ts) vérifie, en deux dixièmes de seconde, les invariants que personne ne relit : aucun identifiant cité sans être déclaré, aucun identifiant déclaré deux fois sous la même forme, aucune question ouverte hors du registre, aucune règle de gestion dont l'état annoncé contredit les tests, aucune clé de traduction présente dans une seule langue. `npm run coherence` le lance seul ; `npm test` et la CI le lancent avec le reste.
+[`tests/coherence.test.ts`](../tests/coherence.test.ts) vérifie, en deux dixièmes de seconde, les invariants que personne ne relit : aucun identifiant cité sans être déclaré, aucun identifiant déclaré deux fois sous la même forme, aucune question ouverte hors du registre, aucune règle de gestion dont l'état annoncé contredit les tests, aucune clé de traduction présente dans une seule langue, aucune chaîne d'interface ni aucun nom français dans le code du produit. `npm run coherence` le lance seul ; `npm test` et la CI le lancent avec le reste.
 
 Ses détections sont éprouvées sur des exemples dans le même fichier — un vérificateur qu'on n'a jamais vu échouer ne prouve rien, et un vérificateur qui crie trop est désarmé en quinze jours. La première version a d'ailleurs révélé un défaut dans sa propre lecture du dépôt : son corpus ignorait les fichiers non encore suivis par git, si bien qu'un document neuf n'était vérifié par rien jusqu'à son premier commit.
 

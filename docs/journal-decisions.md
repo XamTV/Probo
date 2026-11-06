@@ -597,3 +597,30 @@ C'est le troisième mécanisme sur trois à produire un défaut le jour de son i
 Il ne juge pas non plus le contenu : il vérifie que les documents ne se contredisent pas, jamais qu'ils disent vrai. Un énoncé faux mais cohérent passe.
 
 **Reste ouvert.** Rien de nouveau — le registre est à jour, **Q-01** et **Q-03** attendent leur échéance.
+
+---
+
+## 2026-11-06 — La règle de langue reçoit le mécanisme qui lui manquait
+
+**Contexte.** La veille, le front a été repassé en anglais et la règle de langue réécrite pour couvrir le cas qui avait dérivé. Elle restait pourtant la seule règle du cadre dont la violation ne cassait rien : le vérificateur comparait les clés de traduction entre `fr.json` et `en.json`, ce qui ne dit rien d'un composant nommé `ReglagesCampagne` ni d'un `<h1>Paramètres</h1>` écrit en dur dans un gabarit.
+
+C'est la règle qui a coûté le plus cher — deux lots entiers — et le renommage de la veille l'a seulement remise à zéro. Rien n'empêchait la même dérive de recommencer au lot 3.
+
+**Options.** (a) Interdire tout caractère accentué dans le code du produit. (b) Comparer chaque identifiant à un dictionnaire français. (c) Une liste fermée de mots français, choisis pour n'exister qu'en français.
+
+**Décision.** (a) **et** (c), qui ne visent pas la même faute.
+
+L'accent attrape la chaîne d'interface restée dans un gabarit — le mot que l'utilisateur lit et qui n'est pas passé par une clé. La liste de mots attrape le nom français **sans accent**, qui est la forme qu'avait prise la dérive : `ReglagesCampagne`, `liste-campagnes`, `/connexion`. Aucun accent dans aucun des trois.
+
+**Pourquoi pas (b).** Un dictionnaire classe `type`, `document`, `route`, `service`, `table` comme français. Le vérificateur crierait sur chaque fichier du dépôt et serait retiré dans la semaine. La liste est donc fermée et conservatrice : `analyse`, `importer`, `modifier`, `precedent` et `rapport` en sont **absents**, parce que ce sont aussi des mots anglais. Elle laisse passer des dérives, et c'est le prix pour qu'elle reste en service.
+
+**Les deux exemptions, et pourquoi elles sont justes.**
+
+- **Les tests sont exclus de la vérification des accents.** Leurs jeux d'essai sont des données françaises légitimes — une campagne s'appelle « Mastère 2027 » — et leurs assertions citent le libellé attendu à l'écran, qui est français par construction. Leur **chemin**, lui, reste jugé : un fichier mal nommé l'est tout autant sous `.spec.ts`.
+- **Les noms de fichiers du dossier de conception sont retirés avant jugement.** Le dossier est en français, et un commentaire qui renvoie à `Connexion.dc.html` désigne une maquette : il ne nomme rien dans le produit. Seules les extensions de documentation sont retirées — jamais `.ts` ni `.html` —, sans quoi un fichier nommé en français échapperait justement à la vérification.
+
+**Éprouvé par sabotage, sur le dépôt réel.** Une chaîne accentuée ajoutée à `campaign-list.html`, un `seuilDeConfiance` ajouté à `campaigns.service.ts`, et `campaign-list.ts` renommé `liste-campagnes.ts` : les trois sont relevés, avec le fichier, la ligne et le mot en cause. Cinq exemples en mémoire complètent l'épreuve, dont deux tolérances — la citation d'une maquette, et une ligne d'anglais qui ressemble au français.
+
+**Ce que cela ne couvre pas.** Une chaîne d'interface en anglais écrite en dur passe : elle n'a pas d'accent et n'est dans aucune liste. Le mécanisme tient la dérive constatée, pas toutes les dérives imaginables.
+
+**Conséquence.** Le vérificateur passe de cinq invariants à sept. Il reste la seule chose qui s'exécute, et le cadre ne gagne pas une ligne de prose.

@@ -180,6 +180,120 @@ export function clesAplaties(objet: Record<string, unknown>, prefixe = ''): stri
 }
 
 // ---------------------------------------------------------------------------
+// La langue du produit
+//
+// Le produit est en anglais — routes, dossiers, noms de fichiers, classes,
+// identifiants locaux, commentaires — et le mot que l'utilisateur lit vient
+// toujours d'une clé de traduction. La règle est écrite sans ambiguïté depuis
+// le 05/10/2026, et le front a dérivé en français sur deux lots entiers avant
+// d'être repris le 05/11 : c'est la règle du cadre qui a coûté le plus cher, et
+// la seule qui n'avait rien pour la tenir.
+// ---------------------------------------------------------------------------
+
+/** Le code du produit : le front, l'API et les contrats partagés. */
+const RACINES_PRODUIT = ['apps/web/src', 'apps/api/src', 'packages/shared/src'];
+
+const CODE_PRODUIT = /\.(ts|html)$/;
+const EST_UN_TEST = /\.(spec|test|e2e-spec)\.ts$/;
+
+const ACCENTS = /[àâäéèêëîïôöùûüÿçœæÀÂÄÉÈÊËÎÏÔÖÙÛÜŸÇŒÆ]/;
+
+/**
+ * Les mots qui trahissent une dérive, choisis pour n'exister qu'en français.
+ *
+ * `analyse`, `importer`, `modifier`, `precedent` et `rapport` en sont absents :
+ * ce sont aussi des mots anglais, et un vérificateur qui crie sur du code
+ * correct est désarmé avant la fin du mois.
+ */
+const MOTS_FRANCAIS = new Set([
+  'accueil',
+  'afficher',
+  'ajouter',
+  'annuler',
+  'campagne',
+  'campagnes',
+  'candidat',
+  'candidats',
+  'candidature',
+  'candidatures',
+  'chargement',
+  'classement',
+  'connexion',
+  'deconnexion',
+  'enregistrer',
+  'entreprise',
+  'entreprises',
+  'envoyer',
+  'erreur',
+  'erreurs',
+  'etablissement',
+  'etablissements',
+  'fermer',
+  'identifiant',
+  'identifiants',
+  'liste',
+  'listes',
+  'nouveau',
+  'nouvelle',
+  'ouvrir',
+  'parametrage',
+  'parametre',
+  'parametres',
+  'ponderation',
+  'recherche',
+  'referentiel',
+  'referentiels',
+  'resultat',
+  'resultats',
+  'selectionner',
+  'seuil',
+  'suivant',
+  'supprimer',
+  'telecharger',
+  'utilisateur',
+  'utilisateurs',
+  'valider',
+]);
+
+/** Les lignes qui portent un accent — une chaîne française restée dans le code. */
+/** Les fichiers de code du produit, tests compris. */
+const produit = () => suivis(...RACINES_PRODUIT).filter((chemin) => CODE_PRODUIT.test(chemin));
+
+export function accentuees(contenu: string): { ligne: number; texte: string }[] {
+  return contenu
+    .split('\n')
+    .flatMap((texte, index) =>
+      ACCENTS.test(texte) ? [{ ligne: index + 1, texte: texte.trim() }] : [],
+    );
+}
+
+/**
+ * Les mots français que porte un chemin ou une ligne de code.
+ *
+ * Les noms de fichiers du dossier de conception sont retirés d'abord : le
+ * dossier est en français, et un commentaire qui cite `Connexion.dc.html`
+ * désigne une maquette — il ne nomme rien dans le produit. Seules les
+ * extensions de documentation sont retirées, jamais `.ts` ni `.html`, sans quoi
+ * un fichier nommé en français échapperait justement à la vérification.
+ *
+ * Les identifiants sont ensuite découpés sur leurs bosses : sans cela,
+ * `ParametresCampagne` ne ressemblerait à aucun mot connu.
+ */
+export function motsFrancais(texte: string): string[] {
+  const mots = texte
+    .replace(/\S+\.(?:dc\.html|md|puml|png|svg|pdf)\b/gi, ' ')
+    .normalize('NFD')
+    .replace(/[̀-ͯ]/g, '')
+    .replace(/([a-z0-9])([A-Z])/g, '$1 $2')
+    .replace(/[^A-Za-z]+/g, ' ')
+    .toLowerCase()
+    .split(' ')
+    .filter(Boolean);
+
+  return [...new Set(mots.filter((mot) => MOTS_FRANCAIS.has(mot)))];
+}
+
+// ---------------------------------------------------------------------------
 
 describe('Le dossier de conception et le code se tiennent', () => {
   it('ne cite aucun identifiant qui ne soit déclaré quelque part', () => {
@@ -266,6 +380,43 @@ describe('Le dossier de conception et le code se tiennent', () => {
     expect([...fr].filter((cle) => !en.has(cle))).toEqual([]);
     expect([...en].filter((cle) => !fr.has(cle))).toEqual([]);
   });
+
+  it("n'écrit aucune chaîne d'interface dans le code du produit", () => {
+    // Un accent dans le code du produit est une chaîne française qui n'est pas
+    // passée par une clé. Les tests en sont exclus : leurs jeux d'essai et les
+    // libellés qu'ils attendent à l'écran sont du français légitime.
+    const fautes = produit()
+      .filter((chemin) => !EST_UN_TEST.test(chemin))
+      .flatMap((chemin) =>
+        accentuees(lire(chemin)).map(({ ligne, texte }) => `${chemin}:${ligne} ${texte}`),
+      );
+
+    expect(fautes).toEqual([]);
+  });
+
+  it('ne nomme rien en français dans le code du produit', () => {
+    // Les chemins sont jugés jusque dans les tests — un fichier mal nommé l'est
+    // aussi bien sous `.spec.ts`. Leur contenu, non : il cite des libellés.
+    const fichiers = produit();
+
+    const chemins = fichiers.flatMap((chemin) => {
+      const mots = motsFrancais(chemin);
+      return mots.length ? [`${chemin} → ${mots.join(', ')}`] : [];
+    });
+
+    const identifiants = fichiers
+      .filter((chemin) => !EST_UN_TEST.test(chemin))
+      .flatMap((chemin) =>
+        lire(chemin)
+          .split('\n')
+          .flatMap((texte, index) => {
+            const mots = motsFrancais(texte);
+            return mots.length ? [`${chemin}:${index + 1} → ${mots.join(', ')}`] : [];
+          }),
+      );
+
+    expect([...chemins, ...identifiants]).toEqual([]);
+  });
 });
 
 // ---------------------------------------------------------------------------
@@ -333,5 +484,26 @@ describe('Les détections attrapent ce qu elles annoncent', () => {
       'auth.title',
       'app.name',
     ]);
+  });
+
+  it('relève une chaîne française restée dans un gabarit', () => {
+    expect(accentuees('<h1>Paramètres de la campagne</h1>').map(({ ligne }) => ligne)).toEqual([1]);
+  });
+
+  it('relève un nom français jusque dans les bosses d un identifiant', () => {
+    expect(motsFrancais('export class ParametresCampagne {}')).toEqual(['parametres', 'campagne']);
+  });
+
+  it('relève un dossier français dans un chemin', () => {
+    expect(motsFrancais('apps/web/src/app/connexion/connexion.ts')).toEqual(['connexion']);
+  });
+
+  it('tolère un commentaire qui cite une maquette du dossier', () => {
+    // Le dossier de conception est en français : le citer n'est pas dériver.
+    expect(motsFrancais('/** US-01 — the screen specified by Connexion.dc.html. */')).toEqual([]);
+  });
+
+  it('tolère les mots anglais qui ressemblent à du français', () => {
+    expect(motsFrancais('const analysis = analyse(document, modifier, precedent);')).toEqual([]);
   });
 });
