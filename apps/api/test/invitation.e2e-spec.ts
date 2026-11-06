@@ -87,7 +87,8 @@ describe('US-02 — the invitation link', () => {
       .set('Cookie', cookie)
       .send({ email, name: `Invited ${created}`, role: 'ADMISSIONS_OFFICER' })
       .expect(201);
-    return { id: res.body.id, email, token: res.body.invitationToken, state: res.body.state };
+    const body = res.body as { id: string; invitationToken: string; state: string };
+    return { id: body.id, email, token: body.invitationToken, state: body.state };
   };
 
   describe('creating an account', () => {
@@ -117,10 +118,12 @@ describe('US-02 — the invitation link', () => {
       const account = await invite();
 
       const res = await request(server()).get('/api/users').set('Cookie', cookie).expect(200);
-      const listed = res.body.find((u: { id: string }) => u.id === account.id);
+      const listed = (res.body as { id: string; state: string; passwordHash?: string }[]).find(
+        (u) => u.id === account.id,
+      );
 
-      expect(listed.state).toBe('INVITED');
-      expect(listed.passwordHash).toBeUndefined();
+      expect(listed?.state).toBe('INVITED');
+      expect(listed?.passwordHash).toBeUndefined();
     });
 
     it('refuses to let an invited account sign in', async () => {
@@ -141,7 +144,7 @@ describe('US-02 — the invitation link', () => {
         .post('/api/auth/invitation')
         .send({ token: account.token, password: CHOSEN_PASSWORD })
         .expect(200)
-        .expect((res) => expect(res.body.email).toBe(account.email));
+        .expect((res) => expect((res.body as { email: string }).email).toBe(account.email));
 
       await request(server())
         .post('/api/auth/login')
@@ -207,9 +210,10 @@ describe('US-02 — the invitation link', () => {
         .send({ token: account.token, password: CHOSEN_PASSWORD })
         .expect(401);
 
+      const fresh = reissued.body as { invitationToken: string };
       await request(server())
         .post('/api/auth/invitation')
-        .send({ token: reissued.body.invitationToken, password: CHOSEN_PASSWORD })
+        .send({ token: fresh.invitationToken, password: CHOSEN_PASSWORD })
         .expect(200);
     });
 
