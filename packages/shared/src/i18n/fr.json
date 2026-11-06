@@ -56,7 +56,9 @@
     "ANALYSIS_VERDICT_OVERRIDDEN": "Verdict contredit",
     "APPLICATION_DELETED": "Candidature supprimée",
     "APPLICATION_PURGED": "Purge automatique",
-    "RANKING_EXPORTED": "Classement exporté"
+    "RANKING_EXPORTED": "Classement exporté",
+    "USER_INVITED": "Lien d'invitation émis",
+    "USER_PASSWORD_SET": "Mot de passe posé"
   },
   "auditEntityType": {
     "INSTITUTION": "Établissement",
@@ -80,6 +82,11 @@
   "userRole": {
     "ADMIN": "Administrateur",
     "ADMISSIONS_OFFICER": "Chargé d'admission"
+  },
+  "accountState": {
+    "INVITED": "Invité",
+    "ACTIVE": "Actif",
+    "DEACTIVATED": "Désactivé"
   },
   "campaignStatus": {
     "DRAFT": "Brouillon",
@@ -109,12 +116,43 @@
     "password": "Mot de passe",
     "submit": "Se connecter",
     "submitting": "Connexion…",
-    "forgotPassword": "Mot de passe oublié",
     "invalidCredentials": "Identifiants incorrects.",
     "throttleNotice": "Après six tentatives, les essais suivants seront temporisés.",
     "unavailable": "Le service est momentanément indisponible. Réessayez dans quelques instants.",
     "noSelfSignup": "Les comptes sont créés par l'administrateur de votre établissement. Il n'y a pas d'inscription libre.",
     "signOut": "Déconnexion"
+  },
+  "account": {
+    "title": "Comptes",
+    "subtitle": "Les membres de votre équipe, et ce qu'ils peuvent faire.",
+    "new": "Créer un compte",
+    "create": "Créer le compte",
+    "creating": "Création…",
+    "name": "Nom",
+    "email": "Adresse email",
+    "role": "Rôle",
+    "state": "État",
+    "you": "vous",
+    "deactivate": "Désactiver",
+    "reactivate": "Réactiver",
+    "EMAIL_ALREADY_USED": "Cette adresse porte déjà un compte.",
+    "UNAVAILABLE": "L'opération a échoué. Réessayez.",
+    "noDeletion": "Un compte se désactive, il ne se supprime pas : les lots qu'il a importés restent visibles et lui restent attribués, et le journal d'audit reste lisible."
+  },
+  "invitation": {
+    "title": "Choisissez votre mot de passe",
+    "subtitle": "Ce lien vous a été transmis par votre administrateur. Il ne sert qu'une fois.",
+    "submit": "Choisir ce mot de passe",
+    "submitting": "Enregistrement…",
+    "minLength": "Au moins {{min}} caractères. La longueur compte plus que les symboles.",
+    "refused": "Ce lien n'est plus valable",
+    "refusedDetail": "Il a peut-être déjà servi, ou expiré. Demandez-en un nouveau à votre administrateur.",
+    "issued": "Lien d'invitation — transmettez-le vous-même",
+    "copy": "Copier le lien",
+    "copied": "Lien copié",
+    "reissue": "Nouveau lien",
+    "validity": "Valable sept jours, une seule fois.",
+    "noEmail": "Probo n'envoie aucun courriel. La création d'un compte produit un lien que vous transmettez comme vous voulez. Le propriétaire choisit son mot de passe lui-même : vous ne devez jamais le connaître, sans quoi le journal d'audit ne prouve plus qui a agi."
   },
   "campaign": {
     "title": "Campagnes",

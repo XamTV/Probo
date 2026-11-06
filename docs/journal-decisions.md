@@ -642,3 +642,42 @@ C'est le deuxième mécanisme de la semaine à révéler un défaut dans la minu
 **Ce que cela ne couvre toujours pas.** Le corps d'un test reste exempt — ses jeux d'essai sont du français légitime —, donc un commentaire français y passe encore. Celui du lot 2 a été trouvé à la lecture, pas par le vérificateur.
 
 **Conséquence.** Huit invariants. Les vingt-huit tests end-to-end passent après renommage.
+
+---
+
+## 2026-11-06 — Le jeton d'invitation est implémenté, et le mot de passe devient facultatif
+
+**Contexte.** La décision du 02/11/2026 porte le jeton d'invitation sur deux colonnes de `user`. Elle laissait un point à l'implémentation : `password_hash` était non nullable, et un compte invité n'a pas encore de mot de passe. Cette dette du lot 1 était la seule chose qui empêchait de fermer US-02.
+
+En attendant, le service posait une **empreinte provisoire tirée au hasard** à la création d'un compte. Elle rendait le compte inatteignable, ce qui était l'objectif ; elle rendait aussi l'état « invité » invisible dans la base, ce qui ne l'était pas.
+
+**Options.** (a) Rendre `password_hash` nullable. (b) Garder la colonne obligatoire et y laisser l'empreinte inutilisable.
+
+**Décision.** (a).
+
+**Pourquoi.** « Invité, pas encore activé » est un état réel du produit : il s'affiche à l'écran, il interdit la connexion, et il se termine quand le propriétaire pose son mot de passe. Un schéma qui le dit se relit ; un schéma qui pose une valeur pour ne pas avoir de trou oblige à savoir, ailleurs, que cette valeur ne veut rien dire. C'est la même règle que pour les colonnes sans information : ce qui n'existe pas ne se remplit pas.
+
+Le coût était d'ailleurs faible — une migration et un refus explicite à la connexion — et il était à payer une fois.
+
+**Ce qui est livré.**
+
+- `user` porte `invitation_token_hash` et `invitation_expires_at`, et `password_hash` est devenue nullable. Deux migrations : les colonnes, puis les actions d'audit.
+- `AuditAction` gagne `USER_INVITED` et `USER_PASSWORD_SET`, traduites dans les deux langues. US-02 demande que la génération d'un lien et la pose d'un mot de passe soient inscrites au journal d'audit ; chacune porte désormais son action, plutôt que d'être devinée depuis `USER_CREATED`.
+- La création d'un compte renvoie le lien **une seule fois** : le serveur n'en garde que l'empreinte. Un lien perdu se régénère, et le précédent cesse de fonctionner dans la même écriture.
+- `POST /api/auth/invitation` est public et prend le jeton **dans le corps**, pas dans l'URL : une URL s'écrit dans les journaux du serveur et dans l'historique du navigateur, et ce jeton est une information d'authentification tant qu'il n'a pas servi.
+- Deux écrans : la liste des comptes (`Comptes.dc.html`) et l'écran de choix du mot de passe. Aucune session n'est ouverte à la pose du mot de passe — le propriétaire se connecte ensuite comme tout le monde, ce qui laisse une seule porte d'entrée au produit plutôt que deux.
+- Un compte invité ne peut pas se connecter, et le refus porte **le même message que tous les autres** : dire qu'une adresse a été invitée serait dire qu'elle existe.
+
+**Les quatre livrables du modèle suivent la migration, dans cette séance** : MCD (`jeton d'invitation`, `expiration de l'invitation` sur `UTILISATEUR`), MLD, MPD et dictionnaire des données, plus un onzième écart MCD/MPD — le MCD dit « jeton », le MPD stocke son empreinte.
+
+**Éprouvé par sabotage.** Stocker le jeton en clair et ne pas le consommer à l'usage font tomber six des douze cas de `invitation.e2e-spec.ts`, avec les messages attendus.
+
+**Q-02 est soldée.** Elle reste au registre à l'état `Tranchée`, avec son état d'avancement mis à jour : la décision du 02/11 est désormais dans le code.
+
+**Trouvé en chemin, et retiré.** L'écran de connexion portait un lien « Mot de passe oublié » vers `/mot-de-passe-oublie` : une **route française**, survivante du renommage du 05/11, et une route qui **n'existe pas** — aucune user story ne couvre la réinitialisation de mot de passe. Deux règles enfreintes par trois mots, dont celle qui dit que le dépôt ne revendique aucune capacité qu'il n'a pas. Le lien et sa clé de traduction sont supprimés ; réintroduire un écran coûtera moins cher que d'expliquer devant un jury pourquoi celui-ci menait au vide.
+
+Le vérificateur ne l'attrapait pas : ni `mot`, ni `passe`, ni `oublie` n'étaient dans sa liste. Ils y sont, éprouvés sur cette route précise.
+
+`SetPasswordInput` disparaît aussi : `AcceptInvitationInput` le remplace, et il ne restait plus personne pour l'appeler — seulement son propre test, qui prouvait qu'un contrat mort valide correctement.
+
+**Les tests de bout en bout passent à un seul exécutant.** La quatrième suite a fait basculer leur exécution parallèle : quatre applications Nest complètes, chacune hachant des mots de passe en Argon2 — coûteux en mémoire par construction — sur une seule base. Les `beforeAll` ont commencé à expirer, puis une connexion a répondu 404 une fois, sans jamais se reproduire. Mettre `maxWorkers: 1` ne cache pas le problème : ces suites partagent une base et ne gagnent rien à être parallélisées. Les adresses d'essai portent en plus un suffixe propre à l'exécution, pour qu'une exécution interrompue avant son nettoyage n'entre jamais en collision avec la suivante.

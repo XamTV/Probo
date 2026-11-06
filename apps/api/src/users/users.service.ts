@@ -1,13 +1,20 @@
 import { ConflictException, Injectable } from '@nestjs/common';
-import type { CreateUserInput, SessionUser, UpdateUserInput } from '@probo/shared';
-import { randomBytes } from 'node:crypto';
+import {
+  type CreateUserInput,
+  type SessionUser,
+  type UpdateUserInput,
+  accountState,
+} from '@probo/shared';
 import { AuditService } from '../audit/audit.service';
 import { AuthService } from '../auth/auth.service';
 import { orNotFound, scopedWhere } from '../common/tenant';
 import { PrismaService } from '../prisma/prisma.service';
 
-/** What a caller may see of an account. The password hash never leaves here. */
-const VISIBLE = {
+/**
+ * What is read from the row. `passwordHash` is read but never returned: only
+ * whether it is null leaves this file, as the account's state.
+ */
+const STORED = {
   id: true,
   email: true,
   name: true,
@@ -15,7 +22,30 @@ const VISIBLE = {
   isActive: true,
   lastLoginAt: true,
   createdAt: true,
+  passwordHash: true,
+  invitationExpiresAt: true,
 } as const;
+
+type Stored = {
+  id: string;
+  email: string;
+  name: string;
+  role: SessionUser['role'];
+  isActive: boolean;
+  lastLoginAt: Date | null;
+  createdAt: Date;
+  passwordHash: string | null;
+  invitationExpiresAt: Date | null;
+};
+
+/** What a caller may see of an account. The hash is dropped here, once. */
+function expose(row: Stored) {
+  const { passwordHash, ...rest } = row;
+  return {
+    ...rest,
+    state: accountState({ isActive: row.isActive, hasPassword: passwordHash !== null }),
+  };
+}
 
 /** US-02 — the administrator manages their team's accounts. */
 @Injectable()
@@ -26,20 +56,23 @@ export class UsersService {
     private readonly audit: AuditService,
   ) {}
 
-  list(caller: SessionUser) {
-    return this.prisma.user.findMany({
+  async list(caller: SessionUser) {
+    const rows = await this.prisma.user.findMany({
       where: scopedWhere(caller, {}),
-      select: VISIBLE,
+      select: STORED,
       orderBy: { name: 'asc' },
     });
+    return rows.map(expose);
   }
 
   async findOne(caller: SessionUser, id: string) {
-    return orNotFound(
-      await this.prisma.user.findFirst({
-        where: scopedWhere(caller, { id }),
-        select: VISIBLE,
-      }),
+    return expose(
+      orNotFound(
+        await this.prisma.user.findFirst({
+          where: scopedWhere(caller, { id }),
+          select: STORED,
+        }),
+      ),
     );
   }
 
@@ -54,21 +87,17 @@ export class UsersService {
     const taken = await this.prisma.user.findUnique({ where: { email: input.email } });
     if (taken !== null) throw new ConflictException('EMAIL_ALREADY_USED');
 
-    // No password is chosen here. A random one is stored so the account cannot
-    // be signed into before its owner sets their own — the invitation flow
-    // belongs to a later lot, and an account that is reachable in the meantime
-    // would be worse than one that is not.
-    const provisional = await this.auth.hashPassword(randomBytes(32).toString('hex'));
-
+    // US-02 — no password is chosen here, and none is invented either. The
+    // account is created without one, which is why `passwordHash` is nullable:
+    // "invited, not yet activated" is a real state and the schema says so.
     const created = await this.prisma.user.create({
       data: {
         institutionId: caller.institutionId,
         email: input.email,
         name: input.name,
         role: input.role,
-        passwordHash: provisional,
       },
-      select: VISIBLE,
+      select: STORED,
     });
 
     await this.audit.record({
@@ -80,7 +109,32 @@ export class UsersService {
       details: { email: input.email, role: input.role },
     });
 
-    return created;
+    const invitation = await this.invite(caller, created.id);
+
+    return { ...expose(created), ...invitation };
+  }
+
+  /**
+   * US-02 — issues an invitation link, for a new account or a lost one.
+   *
+   * The clear token is returned here and nowhere else: Probo sends no email,
+   * so the administrator copies the link and passes it on themselves. Issuing
+   * a new link kills the previous one.
+   */
+  async invite(caller: SessionUser, id: string) {
+    const account = await this.findOne(caller, id);
+    const { token, expiresAt } = await this.auth.issueInvitation(account.id);
+
+    await this.audit.record({
+      user: caller,
+      institutionId: caller.institutionId,
+      action: 'USER_INVITED',
+      entityType: 'USER',
+      entityId: account.id,
+      details: { expiresAt: expiresAt.toISOString() },
+    });
+
+    return { invitationToken: token, invitationExpiresAt: expiresAt };
   }
 
   /**
@@ -96,7 +150,7 @@ export class UsersService {
     const updated = await this.prisma.user.update({
       where: { id: existing.id },
       data: input,
-      select: VISIBLE,
+      select: STORED,
     });
 
     await this.audit.record({
@@ -108,6 +162,6 @@ export class UsersService {
       details: input,
     });
 
-    return updated;
+    return expose(updated);
   }
 }

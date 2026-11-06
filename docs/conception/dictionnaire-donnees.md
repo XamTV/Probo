@@ -19,18 +19,24 @@ Toutes les clés primaires sont des UUID générés par l'application. Les colon
 
 ## user — Compte d'accès
 
-| Colonne                 | Type        | Oblig. | Description                                                                   |
-| ----------------------- | ----------- | ------ | ----------------------------------------------------------------------------- |
-| `id`                    | UUID        | oui    | Identifiant                                                                   |
-| `institution_id`        | UUID        | oui    | Établissement d'appartenance — porte le cloisonnement                         |
-| `email`                 | texte       | oui    | Adresse de connexion, unique sur toute la base                                |
-| `password_hash`         | texte       | oui    | Empreinte Argon2 ; le mot de passe en clair n'est jamais stocké               |
-| `name`                  | texte       | oui    | Nom affiché dans l'interface et dans le journal d'audit                       |
-| `role`                  | `user_role` | oui    | `ADMIN` ou `ADMISSIONS_OFFICER`                                               |
-| `is_active`             | booléen     | oui    | Un compte désactivé ne peut plus se connecter, mais reste attribué à ses lots |
-| `last_login_at`         | horodatage  | non    | Vide tant que le compte ne s'est jamais connecté                              |
-| `failed_login_attempts` | entier      | oui    | Échecs consécutifs ; remis à zéro à chaque connexion réussie (US-01)          |
-| `locked_until`          | horodatage  | non    | Échéance du verrouillage, posée au sixième échec. Vide hors verrouillage      |
+| Colonne                 | Type        | Oblig. | Description                                                                         |
+| ----------------------- | ----------- | ------ | ----------------------------------------------------------------------------------- |
+| `id`                    | UUID        | oui    | Identifiant                                                                         |
+| `institution_id`        | UUID        | oui    | Établissement d'appartenance — porte le cloisonnement                               |
+| `email`                 | texte       | oui    | Adresse de connexion, unique sur toute la base                                      |
+| `password_hash`         | texte       | non    | Empreinte Argon2 ; vide tant que le propriétaire n'a pas posé son mot de passe      |
+| `name`                  | texte       | oui    | Nom affiché dans l'interface et dans le journal d'audit                             |
+| `role`                  | `user_role` | oui    | `ADMIN` ou `ADMISSIONS_OFFICER`                                                     |
+| `is_active`             | booléen     | oui    | Un compte désactivé ne peut plus se connecter, mais reste attribué à ses lots       |
+| `last_login_at`         | horodatage  | non    | Vide tant que le compte ne s'est jamais connecté                                    |
+| `failed_login_attempts` | entier      | oui    | Échecs consécutifs ; remis à zéro à chaque connexion réussie (US-01)                |
+| `locked_until`          | horodatage  | non    | Échéance du verrouillage, posée au sixième échec. Vide hors verrouillage            |
+| `invitation_token_hash` | texte       | non    | Empreinte SHA-256 du lien d'invitation en cours. Vide quand il n'y en a pas (US-02) |
+| `invitation_expires_at` | horodatage  | non    | Échéance du lien, sept jours après son émission                                     |
+
+> **`password_hash` vide est une information, pas un trou.** C'est l'état « invité » : le compte existe, son propriétaire n'a pas encore choisi son mot de passe, et il ne peut pas se connecter. L'alternative — poser une empreinte inutilisable — aurait caché cet état au lieu de le dire.
+>
+> **Le jeton d'invitation est haché, et il est porté par le compte.** Haché parce qu'un vol de base ne doit pas donner la main sur un compte en attente ; SHA-256 et non Argon2 parce qu'un jeton de 256 bits tirés au hasard n'a rien à deviner, contrairement à un mot de passe. Porté par le compte plutôt que par une table parce qu'un seul jeton est vivant à la fois — voir le journal du 02/11/2026.
 
 > **La temporisation se compte par compte, pas par adresse IP.** Un attaquant répartit ses tentatives sur de nombreuses adresses, donc un compteur par IP ne protège de rien ; et verrouiller par IP bloquerait tout un établissement derrière une passerelle unique.
 

@@ -36,7 +36,7 @@ RG-09 impose de lire l'identité du candidat **dans le texte du document**, le n
 
 **Tranchée le** 02/11/2026 : **deux colonnes sur `user`**, `invitationTokenHash` et `invitationExpiresAt`. Voir l'entrée du 02/11/2026 au journal.
 
-**État d'avancement.** La décision est prise, **l'implémentation ne l'est pas** : le schéma ne porte pas encore ces colonnes. C'est une dette du lot 1 à solder au lot 2, et elle est la raison pour laquelle l'issue US-02 ne peut pas être fermée aujourd'hui.
+**État d'avancement.** **Implémentée le 06/11/2026**, au lot 2 comme prévu. `user` porte `invitation_token_hash` et `invitation_expires_at`, et `password_hash` est devenue nullable — voir l'entrée du 06/11/2026 au journal. La dette du lot 1 est soldée et US-02 peut être fermée.
 
 ---
 

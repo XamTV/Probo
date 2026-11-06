@@ -45,10 +45,56 @@ export const UpdateUserInput = z
   .partial();
 export type UpdateUserInput = z.infer<typeof UpdateUserInput>;
 
-export const SetPasswordInput = z.object({
+/**
+ * US-02 — how long an invitation link stays usable.
+ *
+ * Seven days, counted from the moment the link is issued. An administrator can
+ * always issue a new one; the previous link stops working at that instant.
+ */
+export const INVITATION_VALIDITY_DAYS = 7;
+
+/** The deadline an invitation issued now would carry. */
+export function invitationExpiry(now: Date = new Date()): Date {
+  return new Date(now.getTime() + INVITATION_VALIDITY_DAYS * 24 * 60 * 60_000);
+}
+
+/**
+ * US-02 — whether an invitation can still be used.
+ *
+ * `null` means no invitation is pending, which is the state of every account
+ * whose owner has already set a password.
+ */
+export function isInvitationUsable(expiresAt: Date | null, now: Date = new Date()): boolean {
+  return expiresAt !== null && expiresAt.getTime() > now.getTime();
+}
+
+/**
+ * US-02 — what an administrator reads in the state column.
+ *
+ * An invited account is one whose owner has never set a password. It is a
+ * state of the account, not a separate entity — see the journal entry of
+ * 2026-11-02 — so it is derived here rather than stored.
+ */
+export const AccountState = z.enum(['INVITED', 'ACTIVE', 'DEACTIVATED']);
+export type AccountState = z.infer<typeof AccountState>;
+
+export function accountState(account: { isActive: boolean; hasPassword: boolean }): AccountState {
+  if (!account.isActive) return 'DEACTIVATED';
+  return account.hasPassword ? 'ACTIVE' : 'INVITED';
+}
+
+/**
+ * US-02 — the owner sets their own password from the link they were given.
+ *
+ * The token travels in the body rather than in the URL: a URL is written to
+ * server logs and to the browser history, and this one is a credential until
+ * it is used.
+ */
+export const AcceptInvitationInput = z.object({
+  token: z.string().trim().min(32),
   password: z.string().min(PASSWORD_MIN_LENGTH),
 });
-export type SetPasswordInput = z.infer<typeof SetPasswordInput>;
+export type AcceptInvitationInput = z.infer<typeof AcceptInvitationInput>;
 
 /**
  * The authenticated caller, as every request handler sees it.

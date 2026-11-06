@@ -17,7 +17,7 @@ Deux raisons de ne pas y revenir plus tôt. D'abord, chaque entité doit pouvoir
 | Livrable                                     | État                                                                 |
 | -------------------------------------------- | -------------------------------------------------------------------- |
 | `journal-decisions.md`                       | Écrit, tenu au fil de l'eau                                          |
-| `questions-ouvertes.md`                      | Écrit — Q-01 à Q-03, dont 1 tranchée                                 |
+| `questions-ouvertes.md`                      | Écrit — Q-01 à Q-03, dont 1 tranchée et implémentée                  |
 | `analyse/cahier-des-charges.md`              | Écrit                                                                |
 | `analyse/perimetre.md`                       | Écrit — MoSCoW, refus actés et reports datés                         |
 | `analyse/personas.md`                        | Écrit — Claire, Marc, Sofia                                          |
@@ -30,9 +30,9 @@ Deux raisons de ne pas y revenir plus tôt. D'abord, chaque entité doit pouvoir
 | `maquettage/accessibilite-rgaa.md`           | Écrit — 4 engagements, 5 points à vérifier                           |
 | `conception/diagramme-cas-utilisation.puml`  | Écrit — 14 CU, CU-11 exclu car reporté                               |
 | `conception/mcd.puml`, `mld.md`, `mpd.puml`  | Écrit — reconstruits après les maquettes                             |
-| `conception/ecarts-mcd-mpd.md`               | Écrit — 10 écarts, dont 1 signalé comme faiblesse                    |
+| `conception/ecarts-mcd-mpd.md`               | Écrit — 11 écarts, dont 1 signalé comme faiblesse                    |
 | `conception/dictionnaire-donnees.md`         | Écrit — 11 tables, dérivé de `schema.prisma`                         |
-| `conception/diagramme-classes.puml`          | Écrit — classes du lot 1, complété par chaque lot                    |
+| `conception/diagramme-classes.puml`          | Écrit — classes des lots 1 et 2, complété par chaque lot             |
 | `conception/diagramme-sequence-analyse.puml` | À produire au lot 4 — meilleur atout de soutenance                   |
 | `conception/diagramme-deploiement.puml`      | Écrit — développement en place, production visée au lot 7            |
 | `securite/plan-securisation.md`              | En cours — A01, A02, A07 écrites ; les autres au lot qui les produit |

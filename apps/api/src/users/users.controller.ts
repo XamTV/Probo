@@ -1,4 +1,4 @@
-import { Body, Controller, Get, Param, Patch, Post } from '@nestjs/common';
+import { Body, Controller, Get, HttpCode, Param, Patch, Post } from '@nestjs/common';
 import { CreateUserInput, type SessionUser, UpdateUserInput } from '@probo/shared';
 import { CurrentUser } from '../auth/current-user.decorator';
 import { Roles } from '../auth/auth.guard';
@@ -36,6 +36,16 @@ export class UsersController {
     @Body(new ZodValidationPipe(CreateUserInput)) input: CreateUserInput,
   ) {
     return this.users.create(caller, input);
+  }
+
+  /**
+   * US-02 — a fresh invitation link for an account whose link expired or was
+   * lost. The previous one stops working the moment this one is issued.
+   */
+  @Post(':id/invitation')
+  @HttpCode(200)
+  invite(@CurrentUser() caller: SessionUser, @Param('id') id: string) {
+    return this.users.invite(caller, id);
   }
 
   @Patch(':id')

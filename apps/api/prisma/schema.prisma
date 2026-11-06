@@ -65,11 +65,24 @@ model User {
   id            String    @id @default(uuid()) @db.Uuid
   institutionId String    @map("institution_id") @db.Uuid
   email         String    @unique
-  passwordHash  String    @map("password_hash")
   name          String
   role          UserRole  @default(ADMISSIONS_OFFICER)
   isActive      Boolean   @default(true) @map("is_active")
   lastLoginAt   DateTime? @map("last_login_at")
+
+  /// US-02 — null until the owner sets their own password from their
+  /// invitation link. The administrator must never know it, or the audit trail
+  /// stops proving who acted.
+  passwordHash String? @map("password_hash")
+
+  /// US-02 — the pending invitation, carried by the account rather than by a
+  /// table of its own: only one is ever alive, and it is a state of the
+  /// account. See the journal entry of 2026-11-02.
+  ///
+  /// The token is stored hashed: a stolen database must not hand over an
+  /// account that is still waiting for its owner.
+  invitationTokenHash String?   @map("invitation_token_hash")
+  invitationExpiresAt DateTime? @map("invitation_expires_at")
 
   /// US-01 — attempts are delayed after six consecutive failures.
   ///
@@ -442,6 +455,8 @@ enum AuditAction {
   USER_LOGGED_IN
   USER_LOGIN_FAILED
   USER_CREATED
+  USER_INVITED
+  USER_PASSWORD_SET
   USER_UPDATED
   USER_DEACTIVATED
   CAMPAIGN_CREATED

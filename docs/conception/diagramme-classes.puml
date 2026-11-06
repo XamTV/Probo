@@ -57,20 +57,25 @@ package "packages/shared — contrat commun" {
     +LoginInput : ZodType
     +CreateUserInput : ZodType
     +UpdateUserInput : ZodType
-    +SetPasswordInput : ZodType
+    +AcceptInvitationInput : ZodType
     --
     +PASSWORD_MIN_LENGTH = 12
     +LOGIN_MAX_ATTEMPTS = 6
     +LOGIN_LOCKOUT_MINUTES = 15
+    +INVITATION_VALIDITY_DAYS = 7
     --
     +isLockedOut(lockedUntil, now) : boolean
     +lockoutUntil(failedAttempts, now) : Date?
+    +invitationExpiry(now) : Date
+    +isInvitationUsable(expiresAt, now) : boolean
+    +accountState(account) : AccountState
   }
 }
 
 package "apps/api — entrée HTTP" {
   class AuthController {
     +login(body, response) : SessionUser
+    +acceptInvitation(body, request) : { email }
     +logout(response) : void
     +me(user) : SessionUser
   }
@@ -79,6 +84,7 @@ package "apps/api — entrée HTTP" {
     +list(caller)
     +findOne(caller, id)
     +create(caller, body)
+    +invite(caller, id)
     +update(caller, id, body)
   }
 }
@@ -109,14 +115,18 @@ package "apps/api — services" {
   class AuthService {
     +hashPassword(plain) : Promise<string>
     +signIn(input, now) : Promise<SessionUser>
+    +issueInvitation(userId, now) : Promise<{ token, expiresAt }>
+    +acceptInvitation(input, now) : Promise<{ id, institutionId, email }>
     +signSession(user) : Promise<string>
     +verifySession(token) : Promise<SessionUser>
+    -hashToken(token) : string
   }
 
   class UsersService {
     +list(caller)
     +findOne(caller, id)
     +create(caller, input)
+    +invite(caller, id)
     +update(caller, id, input)
   }
 

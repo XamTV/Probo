@@ -116,6 +116,22 @@ verifie 200 GET /api/auth/me
 verifie 200 GET /api/campaigns
 verifie 201 POST /api/campaigns '{"name":"Campagne de recette"}'
 
+etape "US-02 — le lien d'invitation mène à un compte utilisable"
+# Le parcours complet, à travers la passerelle : l'administrateur crée un
+# compte, le compte invité ne peut pas se connecter, son propriétaire pose son
+# mot de passe, et le lien ne resert pas.
+invite="recette-$(date +%s)@probo.test"
+verifie 201 POST /api/users "{\"email\":\"$invite\",\"name\":\"Compte de recette\",\"role\":\"ADMISSIONS_OFFICER\"}"
+jeton=$(sed -n 's/.*"invitationToken":"\([^"]*\)".*/\1/p' "$journal/reponse")
+if [ -z "$jeton" ]; then
+  echo "✗ La création d'un compte n'a pas renvoyé de lien d'invitation."
+  exit 1
+fi
+verifie 401 POST /api/auth/login "{\"email\":\"$invite\",\"password\":\"ProboRecette2026!\"}"
+verifie 200 POST /api/auth/invitation "{\"token\":\"$jeton\",\"password\":\"ProboRecette2026!\"}"
+verifie 200 POST /api/auth/login "{\"email\":\"$invite\",\"password\":\"ProboRecette2026!\"}"
+verifie 401 POST /api/auth/invitation "{\"token\":\"$jeton\",\"password\":\"ProboRecette2026!\"}"
+
 etape "Un mot de passe faux reste un 401, pas une panne"
 verifie 401 POST /api/auth/login '{"email":"admin@probo.test","password":"ce-mot-de-passe-est-faux"}'
 

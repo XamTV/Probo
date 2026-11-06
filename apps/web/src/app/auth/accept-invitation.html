@@ -1,0 +1,68 @@
+<div class="flex min-h-dvh items-center justify-center bg-[#FBFBFA] p-11" *transloco="let t">
+  <form
+    [formGroup]="form"
+    (ngSubmit)="submit()"
+    class="flex w-full max-w-[384px] flex-col gap-[22px]"
+    novalidate
+  >
+    <div class="flex flex-col gap-1.5">
+      <h1 class="text-[21px] font-semibold tracking-tight text-[#14181D]">
+        {{ t('invitation.title') }}
+      </h1>
+      <p class="text-[13.5px] text-[#6C757F]">{{ t('invitation.subtitle') }}</p>
+    </div>
+
+    <div>
+      <label
+        for="new-password"
+        class="mb-[7px] block text-[11px] font-semibold uppercase tracking-[0.07em] text-[#6C757F]"
+      >
+        {{ t('auth.password') }}
+      </label>
+      <input
+        id="new-password"
+        type="password"
+        formControlName="password"
+        autocomplete="new-password"
+        [attr.minlength]="minLength"
+        class="h-[38px] w-full rounded border border-[#D7DBE0] bg-white px-3 text-sm text-[#14181D] focus:border-[#294B8A] focus:outline focus:outline-2 focus:outline-offset-1 focus:outline-[#C9D6EE]"
+      />
+      <p class="mt-1.5 text-[12.5px] text-[#6C757F]">
+        {{ t('invitation.minLength', { min: minLength }) }}
+      </p>
+    </div>
+
+    <button
+      type="submit"
+      [disabled]="submitting()"
+      class="h-10 rounded border border-[#294B8A] bg-[#294B8A] text-sm font-medium text-white disabled:opacity-60"
+    >
+      {{ submitting() ? t('invitation.submitting') : t('invitation.submit') }}
+    </button>
+
+    @if (refused()) {
+      <div
+        role="alert"
+        class="flex flex-col gap-1 rounded-[5px] border border-[#E8C4C0] bg-[#FCF2F1] px-3.5 py-3"
+      >
+        <span class="text-[13px] font-medium text-[#8A241D]">{{ t('invitation.refused') }}</span>
+        <span class="text-[12.5px] leading-snug text-[#8A241D]">
+          {{ t('invitation.refusedDetail') }}
+        </span>
+      </div>
+    }
+
+    @if (unavailable()) {
+      <div
+        role="alert"
+        class="rounded-[5px] border border-[#E8D5AE] bg-[#FDF8EF] px-3.5 py-3 text-[13px] text-[#8A5B14]"
+      >
+        {{ t('auth.unavailable') }}
+      </div>
+    }
+
+    <a routerLink="/login" class="text-[13px] text-[#294B8A] hover:underline">
+      {{ t('auth.title') }}
+    </a>
+  </form>
+</div>
