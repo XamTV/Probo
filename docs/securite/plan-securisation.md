@@ -52,7 +52,7 @@ Le garde est enregistré en `APP_GUARD`. Une route est protégée **sauf si** el
 
 ### Vérification
 
-`apps/api/test/cloisonnement.e2e-spec.ts`, contre la vraie base : le cloisonnement vit dans la requête, et un Prisma simulé ne prouverait rien. Sept cas, dont une création de compte où la charge utile tente d'imposer un autre établissement — il est ignoré, pas honoré.
+`apps/api/test/tenant-isolation.e2e-spec.ts`, contre la vraie base : le cloisonnement vit dans la requête, et un Prisma simulé ne prouverait rien. Sept cas, dont une création de compte où la charge utile tente d'imposer un autre établissement — il est ignoré, pas honoré.
 
 > **Un défaut trouvé par ce test, et par rien d'autre.** `@UsePipes` s'applique à tous les paramètres d'un gestionnaire : le schéma Zod du corps validait aussi l'objet de session et en retirait `institutionId`. Le cloisonnement disparaissait **en silence**, sans erreur ni avertissement. Seul un test de bout en bout pouvait le voir.
 

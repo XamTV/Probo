@@ -14,7 +14,7 @@ import { PrismaService } from '../src/prisma/prisma.service';
  * is held by a CHECK constraint the application cannot see, and a mocked
  * Prisma would accept exactly what Postgres refuses.
  */
-describe('Lot 2 — campagne et référentiel', () => {
+describe('Lot 2 — campaign and comparison reference', () => {
   let app: INestApplication;
   let prisma: PrismaService;
 
@@ -77,8 +77,8 @@ describe('Lot 2 — campagne et référentiel', () => {
     return (res.body as { id: string }).id;
   };
 
-  describe('US-04 — créer une campagne', () => {
-    it('la crée en brouillon, sans type attendu', async () => {
+  describe('US-04 — creating a campaign', () => {
+    it('creates it as a draft, with no expected type', async () => {
       const cookie = await connexion(adminA.email);
 
       const res = await request(serveur())
@@ -94,7 +94,7 @@ describe('Lot 2 — campagne et référentiel', () => {
       expect(body.expectedTypes).toEqual([]);
     });
 
-    it('refuse une fenêtre qui se ferme avant de s ouvrir', async () => {
+    it('refuses a window that closes before it opens', async () => {
       const cookie = await connexion(adminA.email);
 
       await request(serveur())
@@ -105,8 +105,8 @@ describe('Lot 2 — campagne et référentiel', () => {
     });
   });
 
-  describe('US-03 — une campagne ne franchit pas son établissement', () => {
-    it('répond 404 — jamais 403 — pour la campagne d un autre établissement', async () => {
+  describe('US-03 — a campaign never crosses its institution', () => {
+    it('returns 404 — never 403 — for another institution campaign', async () => {
       const id = await creer(await connexion(adminB.email));
 
       await request(serveur())
@@ -115,7 +115,7 @@ describe('Lot 2 — campagne et référentiel', () => {
         .expect(404);
     });
 
-    it('ne liste que les campagnes de l établissement appelant', async () => {
+    it('lists only the caller institution campaigns', async () => {
       const cookieB = await connexion(adminB.email);
       const idB = await creer(cookieB, 'Campagne de B');
 
@@ -129,8 +129,8 @@ describe('Lot 2 — campagne et référentiel', () => {
     });
   });
 
-  describe('US-02 — le chargé d admission consulte sans configurer', () => {
-    it('le laisse lire la campagne dans laquelle il importera', async () => {
+  describe('US-02 — an admissions officer reads but never configures', () => {
+    it('lets them read the campaign they will import into', async () => {
       const id = await creer(await connexion(adminA.email));
 
       await request(serveur())
@@ -139,8 +139,8 @@ describe('Lot 2 — campagne et référentiel', () => {
         .expect(200);
     });
 
-    it('lui refuse la création avec 403, pas 404', async () => {
-      // The campaign belongs to his own institution: its existence is no
+    it('refuses them the creation with 403, not 404', async () => {
+      // The campaign belongs to their own institution: its existence is no
       // secret, only the permission is.
       await request(serveur())
         .post('/api/campaigns')
@@ -149,7 +149,7 @@ describe('Lot 2 — campagne et référentiel', () => {
         .expect(403);
     });
 
-    it('lui refuse la configuration et l activation', async () => {
+    it('refuses them the settings and the activation', async () => {
       const id = await creer(await connexion(adminA.email));
       const cookie = await connexion(chargeA.email);
 
@@ -166,8 +166,8 @@ describe('Lot 2 — campagne et référentiel', () => {
     });
   });
 
-  describe('US-06 — seuil et pondération', () => {
-    it('accepte des poids qui ne totalisent pas 1 (RG-05)', async () => {
+  describe('US-06 — threshold and weighting', () => {
+    it('accepts weights that do not add up to 1 (RG-05)', async () => {
       const cookie = await connexion(adminA.email);
       const id = await creer(cookie);
 
@@ -178,7 +178,7 @@ describe('Lot 2 — campagne et référentiel', () => {
         .expect(200);
     });
 
-    it('refuse une pondération entièrement nulle', async () => {
+    it('refuses a weighting that is entirely zero', async () => {
       const cookie = await connexion(adminA.email);
       const id = await creer(cookie);
 
@@ -190,8 +190,8 @@ describe('Lot 2 — campagne et référentiel', () => {
     });
   });
 
-  describe('US-22, RG-08 — le référentiel conditionne l activation', () => {
-    it('refuse d activer une campagne sans type attendu', async () => {
+  describe('US-22, RG-08 — the comparison reference gates activation', () => {
+    it('refuses to activate a campaign with no expected type', async () => {
       const cookie = await connexion(adminA.email);
       const id = await creer(cookie);
 
@@ -203,7 +203,7 @@ describe('Lot 2 — campagne et référentiel', () => {
       expect((res.body as { blockers: string[] }).blockers).toContain('NO_EXPECTED_TYPE');
     });
 
-    it('refuse d activer tant qu un type attendu n a pas son référentiel', async () => {
+    it('refuses to activate while an expected type has no reference', async () => {
       const cookie = await connexion(adminA.email);
       const id = await creer(cookie);
 
@@ -227,7 +227,7 @@ describe('Lot 2 — campagne et référentiel', () => {
       expect((res.body as { blockers: string[] }).blockers).toContain('MISSING_REFERENCE_PROFILE');
     });
 
-    it('active la campagne une fois chaque type attendu pourvu', async () => {
+    it('activates the campaign once every expected type has one', async () => {
       const cookie = await connexion(adminA.email);
       const id = await creer(cookie);
 
@@ -251,7 +251,7 @@ describe('Lot 2 — campagne et référentiel', () => {
       expect((res.body as { status: string }).status).toBe('ACTIVE');
     });
 
-    it('garde un seul référentiel par type, quel que soit le nombre d envois', async () => {
+    it('keeps a single reference per type, however many times it is sent', async () => {
       const cookie = await connexion(adminA.email);
       const id = await creer(cookie);
 
@@ -271,14 +271,14 @@ describe('Lot 2 — campagne et référentiel', () => {
       expect(profils[0]?.text).toContain('Version revue');
     });
 
-    it('refuse la forme « document déposé », qui n existe pas encore', async () => {
+    it('refuses the uploaded-document form, which does not exist yet', async () => {
       const cookie = await connexion(adminA.email);
       const id = await creer(cookie);
 
-      // US-22 demande deux formes. L'API n'en sert qu'une : refuser un
-      // référentiel illisible suppose la chaîne d'extraction du lot 4, et
-      // accepter d'ici là un `storageKey` venu de l'appelant enregistrerait
-      // un pointeur vers un fichier que personne n'a écrit.
+      // US-22 asks for two forms. The API serves one: refusing an unreadable
+      // reference needs the lot 4 extraction chain, and accepting a caller
+      // supplied `storageKey` until then would store a pointer to a file
+      // nobody ever wrote.
       await request(serveur())
         .put(`/api/campaigns/${id}/references`)
         .set('Cookie', cookie)
@@ -291,7 +291,7 @@ describe('Lot 2 — campagne et référentiel', () => {
         .expect(400);
     });
 
-    it('refuse un référentiel portant les deux formes', async () => {
+    it('refuses a reference carrying both forms', async () => {
       const cookie = await connexion(adminA.email);
       const id = await creer(cookie);
 

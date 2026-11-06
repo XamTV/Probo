@@ -624,3 +624,21 @@ L'accent attrape la chaîne d'interface restée dans un gabarit — le mot que l
 **Ce que cela ne couvre pas.** Une chaîne d'interface en anglais écrite en dur passe : elle n'a pas d'accent et n'est dans aucune liste. Le mécanisme tient la dérive constatée, pas toutes les dérives imaginables.
 
 **Conséquence.** Le vérificateur passe de cinq invariants à sept. Il reste la seule chose qui s'exécute, et le cadre ne gagne pas une ligne de prose.
+
+---
+
+## 2026-11-06 — Le vérificateur de langue avait un angle mort, et quelque chose dedans
+
+**Contexte.** Le mécanisme installé le matin même couvrait `apps/web/src`, `apps/api/src` et `packages/shared/src`. Les tests end-to-end vivent dans `apps/api/test`, qui n'est sous aucune de ces racines. Ils n'étaient vérifiés par rien.
+
+Derrière l'angle mort : **`campagne.e2e-spec.ts`**, **`cloisonnement.e2e-spec.ts`**, et vingt et un intitulés de tests en français. Le renommage du 05/11 avait traité le front et laissé les tests de l'API.
+
+C'est le deuxième mécanisme de la semaine à révéler un défaut dans la minute qui suit son entrée en service, et le deuxième à le révéler **dans lui-même** plutôt que dans le dépôt. Le précédent était le corpus limité aux fichiers suivis par git.
+
+**Ce qui change.** `apps/api/test` entre dans la portée. Les fichiers deviennent `campaign.e2e-spec.ts` et `tenant-isolation.e2e-spec.ts`, les vingt et un intitulés passent en anglais, et le commentaire français qui expliquait pourquoi US-22 n'est servie qu'à moitié avec eux. Le plan de sécurisation, qui citait l'ancien nom, suit.
+
+**Un intitulé n'est pas du code, et ne se juge pas pareil.** Deux des vingt et un ne portaient ni accent ni mot métier : « accepte des poids qui ne totalisent pas 1 ». Le vocabulaire ne les trahissait pas — leurs mots outils, oui. Les intitulés sont donc jugés en plus sur une petite liste d'articles et de pronoms qui n'existent pas en anglais : `qui`, `que`, `sans`, `une`, `dans`, `chaque`. Cette liste ne s'applique **qu'aux intitulés** : un identifiant ne ressemble pas à une phrase, et l'y chercher ne produirait que du bruit.
+
+**Ce que cela ne couvre toujours pas.** Le corps d'un test reste exempt — ses jeux d'essai sont du français légitime —, donc un commentaire français y passe encore. Celui du lot 2 a été trouvé à la lecture, pas par le vérificateur.
+
+**Conséquence.** Huit invariants. Les vingt-huit tests end-to-end passent après renommage.

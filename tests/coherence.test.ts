@@ -191,7 +191,7 @@ export function clesAplaties(objet: Record<string, unknown>, prefixe = ''): stri
 // ---------------------------------------------------------------------------
 
 /** Le code du produit : le front, l'API et les contrats partagés. */
-const RACINES_PRODUIT = ['apps/web/src', 'apps/api/src', 'packages/shared/src'];
+const RACINES_PRODUIT = ['apps/web/src', 'apps/api/src', 'apps/api/test', 'packages/shared/src'];
 
 const CODE_PRODUIT = /\.(ts|html)$/;
 const EST_UN_TEST = /\.(spec|test|e2e-spec)\.ts$/;
@@ -218,6 +218,7 @@ const MOTS_FRANCAIS = new Set([
   'candidatures',
   'chargement',
   'classement',
+  'cloisonnement',
   'connexion',
   'deconnexion',
   'enregistrer',
@@ -255,6 +256,35 @@ const MOTS_FRANCAIS = new Set([
   'valider',
 ]);
 
+/**
+ * Les mots outils, appliqués aux seuls intitulés de tests.
+ *
+ * Un intitulé est de la prose : il trahit sa langue par ses articles et ses
+ * pronoms bien avant son vocabulaire métier. « accepte des poids qui ne
+ * totalisent pas 1 » ne porte aucun accent et aucun mot de la liste
+ * ci-dessus — mais il porte `qui`. Ces mots-là ne sont pas cherchés dans le
+ * code, où un identifiant ne ressemble pas à une phrase.
+ */
+const MOTS_OUTILS = new Set([
+  'aucun',
+  'aucune',
+  'avec',
+  'cette',
+  'chaque',
+  'dans',
+  'elle',
+  'les',
+  'leur',
+  'lui',
+  'que',
+  'qui',
+  'sans',
+  'ses',
+  'sont',
+  'tant',
+  'une',
+]);
+
 /** Les lignes qui portent un accent — une chaîne française restée dans le code. */
 /** Les fichiers de code du produit, tests compris. */
 const produit = () => suivis(...RACINES_PRODUIT).filter((chemin) => CODE_PRODUIT.test(chemin));
@@ -279,8 +309,21 @@ export function accentuees(contenu: string): { ligne: number; texte: string }[] 
  * Les identifiants sont ensuite découpés sur leurs bosses : sans cela,
  * `ParametresCampagne` ne ressemblerait à aucun mot connu.
  */
-export function motsFrancais(texte: string): string[] {
-  const mots = texte
+/**
+ * Les intitulés de `describe` et de `it`.
+ *
+ * Le contenu d'un test échappe à la vérification des accents — ses jeux
+ * d'essai sont du français légitime. Son intitulé, non : il décrit le produit,
+ * il se lit dans la sortie de la CI, et il suit la même règle que le code.
+ */
+export function intitules(contenu: string): string[] {
+  return [...contenu.matchAll(/\b(?:describe|it)\(\s*(['"])(.*?)\1/g)].flatMap((trouve) =>
+    trouve[2] ? [trouve[2]] : [],
+  );
+}
+
+function decoupe(texte: string): string[] {
+  return texte
     .replace(/\S+\.(?:dc\.html|md|puml|png|svg|pdf)\b/gi, ' ')
     .normalize('NFD')
     .replace(/[̀-ͯ]/g, '')
@@ -289,8 +332,18 @@ export function motsFrancais(texte: string): string[] {
     .toLowerCase()
     .split(' ')
     .filter(Boolean);
+}
 
-  return [...new Set(mots.filter((mot) => MOTS_FRANCAIS.has(mot)))];
+export function motsFrancais(texte: string): string[] {
+  return [...new Set(decoupe(texte).filter((mot) => MOTS_FRANCAIS.has(mot)))];
+}
+
+/** Un intitulé est jugé sur son vocabulaire métier **et** sur ses mots outils. */
+export function intituleFrancais(intitule: string): boolean {
+  return (
+    ACCENTS.test(intitule) ||
+    decoupe(intitule).some((mot) => MOTS_FRANCAIS.has(mot) || MOTS_OUTILS.has(mot))
+  );
 }
 
 // ---------------------------------------------------------------------------
@@ -389,6 +442,19 @@ describe('Le dossier de conception et le code se tiennent', () => {
       .filter((chemin) => !EST_UN_TEST.test(chemin))
       .flatMap((chemin) =>
         accentuees(lire(chemin)).map(({ ligne, texte }) => `${chemin}:${ligne} ${texte}`),
+      );
+
+    expect(fautes).toEqual([]);
+  });
+
+  it('intitule ses tests en anglais comme le reste du produit', () => {
+    // Les jeux d'essai d'un test sont du français légitime, son intitulé non.
+    const fautes = produit()
+      .filter((chemin) => EST_UN_TEST.test(chemin))
+      .flatMap((chemin) =>
+        intitules(lire(chemin))
+          .filter(intituleFrancais)
+          .map((intitule) => `${chemin} → ${intitule}`),
       );
 
     expect(fautes).toEqual([]);
@@ -501,6 +567,25 @@ describe('Les détections attrapent ce qu elles annoncent', () => {
   it('tolère un commentaire qui cite une maquette du dossier', () => {
     // Le dossier de conception est en français : le citer n'est pas dériver.
     expect(motsFrancais('/** US-01 — the screen specified by Connexion.dc.html. */')).toEqual([]);
+  });
+
+  it('isole l intitulé d un test de son jeu d essai', () => {
+    const extrait = [
+      "describe('CampaignSettings', () => {",
+      "  it('refuses to activate without a reference', () => {",
+      "    const campaign = { name: 'Mastère 2027' };",
+    ].join('\n');
+
+    expect(intitules(extrait)).toEqual([
+      'CampaignSettings',
+      'refuses to activate without a reference',
+    ]);
+  });
+
+  it('relève un intitulé français que son vocabulaire seul ne trahit pas', () => {
+    // Aucun accent, aucun mot métier : il reste `qui`.
+    expect(intituleFrancais('accepte des poids qui ne totalisent pas 1 (RG-05)')).toBe(true);
+    expect(intituleFrancais('normalises the weights by their sum (RG-05)')).toBe(false);
   });
 
   it('tolère les mots anglais qui ressemblent à du français', () => {
