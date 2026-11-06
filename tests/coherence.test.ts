@@ -234,6 +234,9 @@ const MOTS_FRANCAIS = new Set([
   'identifiants',
   'liste',
   'listes',
+  'mot',
+  'oublie',
+  'passe',
   'nouveau',
   'nouvelle',
   'ouvrir',
@@ -558,6 +561,16 @@ describe('Les détections attrapent ce qu elles annoncent', () => {
 
   it('relève un nom français jusque dans les bosses d un identifiant', () => {
     expect(motsFrancais('export class ParametresCampagne {}')).toEqual(['parametres', 'campagne']);
+  });
+
+  it('relève une route française, qui est la forme qu avait prise la dérive', () => {
+    // Celle-ci a survécu au renommage du 05/11 et pointait en plus vers un
+    // écran qui n'existe pas.
+    expect(motsFrancais('<a routerLink="/mot-de-passe-oublie">')).toEqual([
+      'mot',
+      'passe',
+      'oublie',
+    ]);
   });
 
   it('relève un dossier français dans un chemin', () => {

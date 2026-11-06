@@ -70,21 +70,23 @@ Il n'existe pas d'inscription : `POST /users` exige une session, qui exige un co
 
 ### Commandes
 
-| Commande             | Effet                                   |
-| -------------------- | --------------------------------------- |
-| `npm run dev`        | Contrats, API et front en watch         |
-| `npm test`           | Tests des trois workspaces              |
-| `npm run recette`    | Construit, démarre, et se connecte      |
-| `npm run coherence`  | Dossier de conception contre le code    |
-| `npm run test:hook`  | Garde-fou de publication de l'assistant |
-| `npm run lint`       | ESLint sur l'API et le front            |
-| `npm run format`     | Prettier en écriture sur tout le dépôt  |
-| `npm run build`      | Build ordonné : shared → api → web      |
-| `npm run infra:up`   | Démarre PostgreSQL et Redis             |
-| `npm run infra:down` | Arrête les conteneurs                   |
-| `npm run db:migrate` | Applique et crée les migrations Prisma  |
-| `npm run db:seed`    | Crée les comptes de développement       |
-| `npm run db:studio`  | Ouvre Prisma Studio                     |
+| Commande                          | Effet                                   |
+| --------------------------------- | --------------------------------------- |
+| `npm run dev`                     | Contrats, API et front en watch         |
+| `npm test`                        | Tests des trois workspaces              |
+| `npm run recette`                 | Construit, démarre, et se connecte      |
+| `npm run coherence`               | Dossier de conception contre le code    |
+| `npm run test:e2e -w @probo/api`  | Bout en bout contre la vraie base       |
+| `npm run test:hook`               | Garde-fou de publication de l'assistant |
+| `npm run lint`                    | ESLint sur l'API et le front            |
+| `npm run format`                  | Prettier en écriture sur tout le dépôt  |
+| `npm run build`                   | Build ordonné : shared → api → web      |
+| `npm run infra:up`                | Démarre PostgreSQL et Redis             |
+| `npm run infra:down`              | Arrête les conteneurs                   |
+| `npm run db:migrate`              | Applique et crée les migrations Prisma  |
+| `npm run db:deploy -w @probo/api` | Applique sans jamais en écrire une      |
+| `npm run db:seed`                 | Crée les comptes de développement       |
+| `npm run db:studio`               | Ouvre Prisma Studio                     |
 
 ---
 

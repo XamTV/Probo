@@ -1,7 +1,7 @@
 import { Component, inject, signal } from '@angular/core';
 import { HttpErrorResponse } from '@angular/common/http';
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
-import { ActivatedRoute, Router, RouterLink } from '@angular/router';
+import { ActivatedRoute, Router } from '@angular/router';
 import { TranslocoDirective } from '@jsverse/transloco';
 import { LoginInput, type Locale } from '@probo/shared';
 
@@ -11,7 +11,7 @@ import { SessionService } from './session.service';
 /** US-01 — the sign-in screen. Its specification is Connexion.dc.html. */
 @Component({
   selector: 'app-login',
-  imports: [ReactiveFormsModule, TranslocoDirective, RouterLink],
+  imports: [ReactiveFormsModule, TranslocoDirective],
   templateUrl: './login.html',
 })
 export class Login {
