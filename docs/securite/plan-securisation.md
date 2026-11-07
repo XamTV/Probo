@@ -123,7 +123,7 @@ Jeton en cookie `httpOnly`, `sameSite=lax`, `secure` en production, douze heures
 
 ### Pas d'inscription libre
 
-Les comptes sont créés par l'administrateur de l'établissement. Il n'y a aucun parcours d'inscription, donc aucune surface d'énumération ni de création automatisée. Un compte créé reçoit un mot de passe aléatoire inutilisable : il n'est pas joignable tant que son parcours d'invitation n'existe pas, ce qui vaut mieux qu'un compte atteignable entre-temps.
+Les comptes sont créés par l'administrateur de l'établissement. Il n'y a aucun parcours d'inscription, donc aucune surface d'énumération ni de création automatisée. Un compte créé n'a **aucune empreinte de mot de passe** : `password_hash` est nullable, et la connexion refuse une ligne qui n'en porte pas (voir A02). Il ne devient joignable que lorsque son titulaire parcourt le lien d'invitation, livré avec le lot 2 et décrit en A02, et choisit lui-même son mot de passe.
 
 ---
 

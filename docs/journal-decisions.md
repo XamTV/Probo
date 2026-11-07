@@ -683,3 +683,195 @@ Le vérificateur ne l'attrapait pas : ni `mot`, ni `passe`, ni `oublie` n'étaie
 **Les tests de bout en bout prennent trente secondes de délai, au lieu de cinq.** Le délai par défaut de Jest est dimensionné pour des tests unitaires. Ceux-ci montent une application Nest, parlent à un vrai PostgreSQL et vérifient des empreintes Argon2 — une fonction **à coût mémoire par construction**, donc lente dès que la machine est chargée. Sous charge, trois échecs se sont produits, chaque fois dans un fichier différent et jamais reproductibles à froid. Le code n'était pas en cause : le plafond l'était. Un exécutant de CI est plus lent que le poste, donc le risque y est plus grand, pas moindre.
 
 **Les tests de bout en bout passent aussi à un seul exécutant.** La quatrième suite a fait basculer leur exécution parallèle : quatre applications Nest complètes, chacune hachant des mots de passe en Argon2 — coûteux en mémoire par construction — sur une seule base. Les `beforeAll` ont commencé à expirer, puis une connexion a répondu 404 une fois, sans jamais se reproduire. Mettre `maxWorkers: 1` ne cache pas le problème : ces suites partagent une base et ne gagnent rien à être parallélisées. Les adresses d'essai portent en plus un suffixe propre à l'exécution, pour qu'une exécution interrompue avant son nettoyage n'entre jamais en collision avec la suivante.
+
+---
+
+## 2026-11-06 — Le lot 3 est cadré avant d'être écrit : trois contradictions levées
+
+**Contexte.** Le lot 2 fusionné, le lot 3 — import ZIP, `M-03`, US-07 — paraissait entièrement spécifié : RG-07 porte quatre conditions d'admission et trois contre-mesures nommées, les quatre maquettes d'import existent, et `ImportBatch`, `ImportBatchStatus` et `IdentitySource` sont au schéma depuis le MPD. Une relecture complète des livrables, menée **avant** d'écrire la première ligne, y a trouvé trois points où deux livrables se contredisent, ou bien où aucun ne se prononce.
+
+Les trois auraient été tranchés quand même : par le code, en silence, et découverts à la relecture du dossier — au moment précis où le dossier ne peut plus changer sans que le code change avec lui. C'est le coût qu'un cadrage préalable achète.
+
+### 1. RG-07 confondait deux familles de plafonds
+
+**Le conflit.** L'énoncé disait « Une entrée refusée n'interrompt pas l'import : elle est comptée dans `rejectedFileCount` ». Sa condition 4 englobait pourtant le **rapport de décompression**, et la maquette `ImportRefuse` montre l'inverse exact : archive entière refusée, fichiers déjà extraits supprimés, aucun document importé. US-07 tranchait déjà dans le sens de la maquette — « interrompue en cours d'extraction, sans attendre la fin » — mais l'énoncé de la règle ne le disait pas.
+
+**Options.** (a) Distinguer deux familles de plafonds. (b) Tout refuser par entrée, et refaire les maquettes. (c) Tout ou rien, et renoncer à `rejected_file_count`.
+
+**Décision.** (a).
+
+**Pourquoi.** Les deux familles ne protègent pas de la même chose. Un fichier trop gros, mal typé ou au chemin dangereux est un **accident local** : on l'écarte, on le dit, le reste du lot n'y est pour rien. Une archive dont le contenu décompressé explose est un **piège visant le serveur** : poursuivre, c'est continuer à écrire sur un disque qu'on sait qu'on va saturer. Un refus se compte ; une attaque s'interrompt.
+
+(b) et (c) condamnaient chacune des livrables déjà validés — les quatre maquettes pour l'une, `rejected_file_count` et un critère explicite d'US-07 pour l'autre.
+
+### 2. La liste des entrées refusées n'avait nulle part où vivre
+
+**Le conflit.** Les maquettes `ImportTermine` et `ImportRefuse` affichent un tableau des entrées refusées — chemin dans l'archive, taille, motif, règle citée — et proposent son export en CSV. Le schéma ne porte qu'un entier, `rejected_file_count`. Aucune des deux lectures n'était possible.
+
+**Options.** (a) Une entité dédiée. (b) Le journal d'audit seul, détail en JSON dans `details`. (c) S'en tenir au compteur.
+
+**Décision.** (a).
+
+**Pourquoi.** (b) se heurte à l'**écart n°8** du dossier, qui accepte la colonne JSON libre à une condition écrite noir sur blanc : « le journal n'est jamais interrogé par son contenu, seulement listé et filtré sur ses colonnes typées ». Construire un écran qui interroge `details` retirait sa justification à l'écart au moment même où on s'en servait. (c) contredisait US-07 — « listés à l'écran, jamais ignorés en silence » — et RG-07, qui exige un motif journalisé.
+
+Le compteur `rejected_file_count` **reste** : il sert l'affichage de liste des lots, qui n'a pas à agréger une table pour écrire « 7 entrées refusées ». C'est une dénormalisation assumée, à verser aux écarts MCD/MPD.
+
+Les incidents de sécurité — chemin sortant, entrée non régulière — continuent d'aller **aussi** au journal d'audit sous `ARCHIVE_ENTRY_REJECTED`, qui existe déjà. Les deux écritures ne font pas double emploi : la table sert l'écran du lot, le journal sert la traçabilité de l'établissement, et ils n'ont ni la même durée de vie ni le même lecteur.
+
+### 3. Un fichier sans indice de regroupement n'allait nulle part
+
+**Le conflit.** Au schéma, `document.application_id` est **non nul** et `application.candidate_name` l'est aussi. Un fichier posé à la racine de l'archive, sans sous-dossier ni préfixe exploitable, n'a donc aucune candidature où aller — et aucun livrable ne dit ce qu'il advient de lui.
+
+**Options.** (a) Il crée sa propre candidature, nommée d'après le fichier. (b) RG-07 le refuse, sous une cinquième condition. (c) Une candidature fourre-tout par lot.
+
+**Décision.** (a), avec `identity_source` à `FILENAME`.
+
+**Pourquoi.** US-07 donne déjà au nom de fichier le rôle d'**indice**, « confirmé ou infirmé par l'identité lue dans le contenu ». Un fichier isolé est le cas le plus faible de cet indice, pas un cas différent : la réconciliation du lot 4 le corrigera comme elle corrigera les autres, en lisant le texte, et fusionnera si c'est un doublon.
+
+(b) aurait changé la nature de RG-07, dont les quatre conditions portent toutes sur la **sécurité** et aucune sur la forme de l'archive — refuser un fichier correct parce qu'il est mal rangé n'est pas une décompression défensive. (c) aurait créé une candidature ne correspondant à personne, qui porterait un score agrégé dénué de sens si elle atteignait l'analyse.
+
+> **Caduque le jour même, 06/11/2026.** La décision (a) est **abandonnée**. Elle a été prise sans avoir lu RG-09 jusqu'au bout, et elle réintroduisait mot pour mot un mécanisme que cette règle avait écarté le 03/09/2026 : « l'extension 6a du CU-04 prévoyait "aucun regroupement déductible → une candidature par fichier". À 412 candidatures et 1 248 documents, cela produit 1 248 candidatures d'un document : ce n'est pas une dégradation gracieuse, c'est un **échec silencieux**. »
+>
+> Deux livrables disaient déjà ce qu'il fallait faire, et ni l'un ni l'autre n'avait été consulté : **`CU-04`, extension 8a** — le document est « présenté comme orphelin à la réconciliation, à rattacher à la main » — et la maquette `Reconciliation`, qui montre exactement ce cas, bouton « Écarter du lot » compris.
+>
+> **La sortie retenue est donc celle du dossier, pas une nouvelle :** un document sans indice de regroupement **n'est rattaché à aucune candidature** et attend un arbitrage humain. Aucune règle, aucun identifiant ne change ; c'est la décision du matin qui disparaît.
+>
+> **Ce que ça coûte, et qui n'était pas visible le matin.** `document.application_id` est non nul : un document orphelin n'a aujourd'hui nulle part où exister. Le même mur arrête le bouton « Écarter du lot » de la même maquette. Le point est ouvert, il n'est pas tranché ici.
+>
+> **Comment la faute a été trouvée.** Par la passe d'audit du 06/11, qui a lu RG-09, CU-04 et la maquette ensemble — les trois sources que la décision du matin avait manquées. Une décision prise sur trois livrables lus et un quatrième supposé n'est pas une décision, c'est un pari.
+
+**Conséquences.**
+
+- RG-07 est **réécrite dans son énoncé**, deuxième fois sous ce numéro, annoncée dans sa section « Historique ». Les quatre conditions ne changent pas ; leur effet en cas d'échec se sépare en deux.
+- Une entité d'entrées refusées entre au modèle, avec son énumération de motifs. MCD, MLD, MPD, dictionnaire des données, écarts et migration se font **dans la séance** de l'implémentation, pas avant.
+- US-07 gagne deux critères d'acceptation : le sort d'un fichier sans indice — **voir le renvoi ci-dessus, il n'est pas celui décidé ici** — et la distinction entre refus par entrée et interruption d'archive.
+- Les plafonds annoncés par la maquette `ImportDepot` — PDF seul, 20 Mo par fichier, 500 fichiers, 500 Mo d'archive — et le rapport de × 100 de `ImportRefuse` deviennent les valeurs par défaut des variables `INGESTION_*`. **La taille totale décompressée, quatrième plafond nommé par RG-07, n'a de valeur dans aucun livrable** : elle est enregistrée au registre sous `Q-04`.
+
+---
+
+## 2026-11-06 — Un document peut exister sans candidature
+
+**Contexte.** La passe d'audit du jour a rendu au dossier sa propre réponse sur le fichier sans indice de regroupement : `CU-04` 8a et la maquette `Reconciliation` le présentent comme **orphelin**, à rattacher à la main. Restait le mur que la décision abandonnée du matin contournait sans le voir — `document.application_id` est **non nul**, donc un document non rattaché n'a nulle part où exister.
+
+Le même mur arrête le bouton « Écarter du lot » de cette même maquette : écarter un document, c'est le détacher, et rien ne permet de le détacher.
+
+**Options.** (a) Rendre `application_id` nullable. (b) Une entité d'attente séparée, dont les orphelins sortiraient en devenant des `Document`. (c) Une candidature technique par lot.
+
+**Décision.** (a).
+
+**Pourquoi.** « Importé, pas encore rattaché » est un **état réel du produit**, pas un trou : l'écran de réconciliation existe précisément pour le terminer, et RG-09 exige qu'un regroupement reste explicable et contestable — ce qu'un rattachement arbitraire rend impossible. C'est le raisonnement qui a rendu `password_hash` nullable ce matin, appliqué au même endroit : ce qui n'existe pas ne se remplit pas.
+
+(b) dupliquait les colonnes de `Document` — empreinte, taille, type, clé de stockage — et faisait changer d'identité à un fichier déjà écrit sur disque : deux écritures et deux identifiants pour un même octet. (c) est l'option écartée le matin même, pour une raison inchangée : une candidature qui ne correspond à personne porterait un score agrégé dénué de sens si elle atteignait l'analyse.
+
+**Le cloisonnement ne bouge pas.** `Document` porte `institution_id` en propre, indépendamment de la candidature. Détacher un document ne le fait sortir d'aucun établissement — c'était le point à vérifier avant de rendre la colonne nullable, et il était déjà acquis.
+
+**Conséquences.**
+
+- `document.application_id` devient nullable, avec MCD, MLD, MPD, dictionnaire, écarts et migration **dans la séance** de l'implémentation.
+- La cardinalité `CANDIDATURE → DOCUMENT` est à revoir en même temps que celle de `LOT D'IMPORT → DOCUMENT`, que l'audit a trouvée fausse dans les trois modèles.
+- « Écarter du lot » (US-23, lot 4) est servi par la même colonne : le geste existe désormais au modèle, il reste à l'écrire.
+- Toute lecture qui joint un document à sa candidature doit traiter l'absence de lien. C'est le prix, et il est payé une fois.
+
+---
+
+## 2026-11-06 — La volumétrie de référence est celle du persona, pas celle du cahier des charges
+
+**Contexte.** Trois chiffres incompatibles décrivaient la même chose, et la passe d'audit les a mis côte à côte pour la première fois.
+
+| Où                                                             | Ce qui est écrit                                          |
+| -------------------------------------------------------------- | --------------------------------------------------------- |
+| Maquette `ImportDepot`, `ListeVide`, variables d'environnement | **500 fichiers** par archive                              |
+| Cinq maquettes et RG-09 elle-même                              | **1 248 documents** dans une seule archive                |
+| Cahier des charges, deux fois, dont le critère de réussite n°5 | **200 documents** par lot                                 |
+| `personas.md`, Claire                                          | **400 à 700 candidatures**, trois à cinq fichiers chacune |
+
+Le scénario de référence du dossier est donc **impossible sous les plafonds que le dossier annonce** : 1 248 fichiers dans une archive plafonnée à 500 déclenche, depuis la précision de RG-07 du matin, l'interruption du lot entier.
+
+**Options.** (a) La volumétrie du persona fait foi, les plafonds et le cahier des charges s'alignent. (b) Le plafond de 500 fait foi, on corrige cinq maquettes et RG-09 et on retire la promesse d'US-07. (c) Un plafond réglable par établissement.
+
+**Décision.** (a).
+
+**Pourquoi.** Le rôle d'un plafond est d'arrêter une archive piégée, pas un usage normal. Ce qui arrête une bombe de décompression, ce sont le **rapport** et la **taille totale décompressée** — pas le nombre de fichiers, qui ne protège de rien qu'ils ne protègent déjà. Plafonner à 500 ne durcit donc pas la sécurité : ça rend le produit inutilisable pour la personne à qui il est destiné.
+
+(b) obligeait Claire à découper sa campagne en trois à sept archives, c'est-à-dire exactement « réorganiser ses fichiers » — ce que `personas.md` désigne comme rédhibitoire et qu'US-07 promet d'éviter dans sa première phrase. (c) déplaçait vers l'exploitation un choix qui est d'abord un choix produit, au prix d'une colonne, d'un écran de réglage et d'un cas de test.
+
+**Ce qui se déduit sans supposition.** 700 candidatures × 5 fichiers = **3 500 documents**. Le plafond du nombre de fichiers par archive est porté à **4 000**, qui couvre le haut de la fourchette du persona avec une marge. Le cahier des charges passe de 200 à la volumétrie du persona, critère de réussite n°5 compris.
+
+**Ce qui ne se déduit pas, et qui n'est donc pas tranché ici.** Le plafond de **taille d'archive** reposait sur 500 fichiers ; il est à reprendre. Mais le recalculer demande un **poids moyen de document** qu'aucun livrable n'énonce, et il se heurte à la même inconnue que le plafond de taille totale décompressée : le disque réellement provisionné. Les deux rejoignent `Q-04`.
+
+**Conséquences.**
+
+- Relever la taille d'archive **rend `Q-04` plus urgente, pas moins** : à rapport × 100 inchangé, une archive plus grosse autorise un volume extrait plus grand. La taille totale décompressée devient le dernier garde-fou, et c'est précisément celui qui n'a pas de valeur.
+- RG-07 est inchangée dans son énoncé comme dans ses quatre conditions. Seules des valeurs bougent, et elles vivent dans l'environnement — c'est ce pour quoi elles y avaient été mises.
+- À mettre à jour : les maquettes `ImportDepot` et `ListeVide`, les variables d'environnement, et le cahier des charges.
+
+---
+
+## 2026-11-06 — Ce que le lot 3 écrit en base est arrêté avant d'être codé
+
+**Contexte.** Quatre points du modèle du lot 3 n'étaient fixés par aucun livrable. Aucun n'aurait arrêté le développement : chacun se serait tranché au clavier, en quelques secondes, et serait devenu irréversible à la première migration. C'est la famille de décisions que personne ne se souvient d'avoir prises.
+
+**Les six motifs de refus d'une entrée d'archive.** La maquette `ImportTermine` en affiche six ; RG-07 ne nomme que quatre _conditions_. L'énumération retenue suit la maquette, parce que c'est elle qui dit ce que l'utilisateur lit : `PATH_ESCAPE`, `NOT_REGULAR_FILE`, `FORBIDDEN_TYPE`, `SYSTEM_ENTRY`, `FILE_TOO_LARGE`, `ARCHIVE_LIMIT`.
+
+Deux remarques la rendent lisible. `SYSTEM_ENTRY` est attrapée par la **même condition** que `FORBIDDEN_TYPE` — un fichier AppleDouble n'est pas un PDF quoi qu'en dise son nom, ce qui est exactement la thèse du produit — mais garde son libellé : dire « entrée système, sans contenu exploitable » vaut mieux que « type réel hors liste blanche » pour un `._cv.pdf` que l'utilisateur n'a pas créé. Et `ARCHIVE_LIMIT` est la seule qui **ne se compte pas** : elle fait échouer le lot entier, conformément aux deux familles de plafonds distinguées le matin même.
+
+`PATH_ESCAPE` et `NOT_REGULAR_FILE` sont les deux incidents de sécurité : ils partent **aussi** au journal d'audit sous `ARCHIVE_ENTRY_REJECTED`, comme la maquette le montre en les surlignant.
+
+**`original_filename` porte le chemin dans l'archive**, pas le nom de base — `dubois_marie/cv.pdf`. La décision était quasiment forcée et c'est ce qui la rendait dangereuse : rien ne la signalait, et aucune autre colonne ne porte le chemin. `IdentitySource.FOLDER` affirme qu'un regroupement vient d'un sous-dossier ; sans le chemin, cette affirmation devient invérifiable **dès l'`INSERT`, définitivement**, et RG-09 exige qu'un regroupement reste explicable et contestable après coup. Une colonne de plus pour le nom de base a été écartée : il se déduit du chemin, l'inverse est faux.
+
+**`RUNNING` se scinde.** Il couvrait indistinctement la décompression et l'analyse, alors que `ImportEnCours` affiche trois phases avec des états propres. Reconstituer « décompression terminée » depuis `file_count > 0` est une déduction qu'aucun livrable ne porte, et qui casse au premier lot dont toutes les entrées sont refusées — lot qui a zéro document et n'est pourtant pas en cours. Les valeurs suivent les phases de la maquette.
+
+**`mime_type` est supprimée.** RG-07 n'admet que le PDF et `ImportDepot` l'annonce avant le dépôt : la colonne vaudrait `application/pdf` sur toutes les lignes. C'est le cas que vise la règle du dépôt sur les colonnes sans information, et son corollaire s'applique tel quel — réintroduire coûte une migration, mentir au jury coûte plus cher. Le type réel reste **vérifié** à la décompression par la condition 3 ; on cesse seulement de stocker un résultat constant.
+
+**Conséquences.** Une énumération et une suppression de colonne entrent au modèle, avec MCD, MLD, MPD, dictionnaire, écarts et migration **dans la séance** de l'implémentation. La description de `original_filename` au dictionnaire est à préciser : c'est elle qui était ambiguë, pas la colonne.
+
+---
+
+## 2026-11-06 — Les maquettes cessent de promettre ce que le produit n'a pas
+
+**Contexte.** Ce matin, un lien « Mot de passe oublié » qui pointait vers un écran inexistant a été retiré de l'écran de connexion. La passe d'audit de l'après-midi en a trouvé **cinq autres cas**, tous construits pareil : une maquette offre un geste, et aucun `M-xx`, aucune US, aucun cas d'utilisation ne le porte.
+
+| Ce qui était promis                                     | Où                                         | Ce que le périmètre en dit                                                                                                   |
+| ------------------------------------------------------- | ------------------------------------------ | ---------------------------------------------------------------------------------------------------------------------------- |
+| Bouton « Interrompre »                                  | `ImportEnCours`, `AnalyseEnCours`          | Rien. RG-07 ne connaît qu'une interruption **système**, déclenchée par un plafond                                            |
+| « relancez l'analyse depuis la fiche du lot »           | `ConfigCampagne`, `Referentiel`            | `C-04`, « pourrait être fait — uniquement si tout le reste est terminé ». L'écran cité n'existe dans aucune des 19 maquettes |
+| « Signaler une analyse erronée »                        | `DetailDocument`, `DetailDocumentAtypique` | RG-10 ne couvre que la contestation d'un document **atypique**, « rien de plus »                                             |
+| Export CSV du journal d'audit                           | `JournalAudit`                             | US-21 ne porte que la consultation                                                                                           |
+| Télécharger le rapport d'import (CSV)                   | `ImportTermine`                            | Aucun `M-xx`. `M-13` porte l'export CSV **du classement**, pas celui d'une liste de rejets                                   |
+| « l'utilisateur est prévenu quand le fichier est prêt » | US-18                                      | Le seul canal documenté est `C-03`, et le produit revendique de n'envoyer aucun courriel                                     |
+
+**Options.** (a) Retirer les cinq. (b) Les porter au périmètre, avec un `M-xx` et une US chacune. (c) Les examiner une par une.
+
+**Décision.** (a), pour les quatre premières. La cinquième est d'une autre nature et est traitée à part.
+
+**Pourquoi.** La règle du dépôt ne laisse pas de marge : il ne revendique aucune capacité qu'il n'a pas. Une maquette est la **spécification** d'un écran, pas une esquisse d'intention : ce qu'elle montre sera implémenté par quelqu'un qui ne relira pas le périmètre. Deux de ces gestes — interrompre un lot, relancer une analyse — touchent la file de traitement, c'est-à-dire la partie la plus coûteuse à modifier, et ils seraient arrivés dans le lot 6 sans qu'aucune décision n'ait été prise.
+
+(b) ajoutait cinq fonctionnalités à quatre mois du gel. (c) a été écartée parce que les cinq relèvent du même défaut, et que les examiner séparément revenait à rediscuter cinq fois la même règle.
+
+**La cinquième n'est pas un bouton, c'est un critère d'acceptation.** US-18 exige que l'utilisateur soit prévenu quand son PDF est prêt. Le retirer amputerait une US du périmètre « doit être fait » ; le garder sans canal serait le mensonge que cette entrée corrige. Il est donc **rattaché à `Q-05`**, qui tranche le mécanisme d'avancement : le canal qui portera la progression d'un lot portera aussi cette notification, et c'est une raison de plus de trancher Q-05 au lot 3 plutôt qu'au lot 7.
+
+**Ce qui n'est pas retiré, et pourquoi c'est dit ici.** L'avertissement « un changement de référentiel ne réévalue pas l'existant » reste : il est exact et utile. C'est la promesse de relance qui saute, pas l'information. De même, « Contredire un verdict » reste sur l'écran du document atypique — c'est US-24 sous `M-18`, au périmètre.
+
+**Trouvé en corrigeant, et c'est le plus instructif.** Le cinquième cas est de mon fait, daté du matin même : en précisant US-07 d'après la maquette `ImportTermine`, j'y ai écrit que la liste des entrées refusées « s'exporte en CSV » — sans vérifier qu'aucun `M-xx` ne le porte. La promesse a donc traversé la maquette **puis la user story**, en quelques heures, pendant une séance consacrée à traquer ce défaut précis. Recopier une maquette dans une US sans passer par le périmètre est le chemin le plus court pour élargir celui-ci sans le dire.
+
+**Conséquences.** Huit maquettes modifiées, et un critère d'acceptation retiré d'US-07. Si l'une de ces capacités revient en v2, elle repart d'un `M-xx` et d'une US, pas d'un bouton déjà dessiné.
+
+---
+
+## 2026-11-06 — Le modèle porte ce que les écrans montrent, et rien de plus
+
+**Contexte.** Deux données affichées par les maquettes n'avaient aucune colonne, et le remède naïf aurait été le même dans les deux cas : l'écrire dans une chaîne libre, ou l'ajouter plus tard.
+
+**Les trois nombres d'une archive refusée.** `ImportRefuse` affiche « 42 Mo », « Extrait avant interruption 6,1 Go » et « Rapport constaté × 148 », et le journal d'audit réaffiche le même rapport. Le lot ne porte qu'`error_message`, une chaîne libre.
+
+Les y encoder revenait à envoyer **des valeurs brutes à l'écran**, ce que la règle de traduction interdit — c'est exactement le défaut que la mise en énumération d'`AuditAction` avait corrigé le 05/10 — et à interdire de les réafficher séparément, comme la maquette les montre. Le lot gagne donc trois colonnes, nullables : seul un lot interrompu les porte. `error_message` redevient ce qu'il doit être, du diagnostic.
+
+Écarté : porter les trois nombres dans `audit_entry.details`. L'écart n°8 justifie cette colonne JSON par le fait que « le journal n'est jamais interrogé par son contenu » — s'en servir pour alimenter un écran retirait sa justification à l'écart au moment même où on l'invoquait. C'est l'argument déjà retenu le matin pour la table des entrées refusées.
+
+**Le nombre de pages d'un document.** Quatre écrans du lot 6 l'affichent. Il n'est connu qu'à l'**ouverture du PDF**, donc à l'extraction du lot 4 — où le fichier est déjà ouvert et où le relever ne coûte rien.
+
+La colonne est donc ajoutée **au lot 4**, trois lots avant d'être affichée. C'est inhabituel et c'est délibéré : l'ajouter au lot 6 obligerait à relire tous les fichiers du dépôt pour remplir le passé, ou à vivre avec une colonne vide sur tout le stock existant. C'est le raisonnement qui a fait stocker `sha256` dès le premier jour.
+
+**Ce que ces deux décisions ont en commun.** Dans les deux cas, l'option paresseuse ne coûtait rien **au moment où on la prenait**, et tout plus tard : une chaîne libre se relit mal et une colonne tardive se remplit mal. Les deux auraient été prises au clavier sans que personne n'ait à les défendre.
+
+**Conséquences.** Trois colonnes sur le lot d'import, une sur le document, avec MCD, MLD, MPD, dictionnaire, écarts et migration **dans la séance** de l'implémentation — au lot 3 pour les trois premières, au lot 4 pour la quatrième.

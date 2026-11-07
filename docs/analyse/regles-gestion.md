@@ -109,7 +109,14 @@ _US-13, US-14 · testé_
 3. son extension et son type MIME réel appartiennent à la liste blanche ;
 4. les plafonds du lot sont respectés : taille par fichier, nombre de fichiers, taille totale décompressée, et rapport de décompression.
 
-Une entrée refusée n'interrompt pas l'import : elle est comptée dans `rejectedFileCount` et journalisée avec son motif.
+**L'échec de ces conditions n'a pas partout le même effet, et c'est délibéré.**
+
+| Ce qui échoue                                                                                         | Portée         | Effet                                                                                                                                     |
+| ----------------------------------------------------------------------------------------------------- | -------------- | ----------------------------------------------------------------------------------------------------------------------------------------- |
+| Conditions 1, 2, 3, et le plafond de **taille par fichier**                                           | l'entrée seule | Elle est refusée, comptée dans `rejectedFileCount`, enregistrée avec son motif. **L'import se poursuit.**                                 |
+| Les plafonds d'**archive** — nombre de fichiers, taille totale décompressée, rapport de décompression | le lot entier  | L'extraction est **interrompue**, ce qui avait déjà été écrit est supprimé, et **aucun document n'est importé**. Le lot passe à `FAILED`. |
+
+Un fichier trop gros, mal typé ou au chemin dangereux est un **accident local** : on l'écarte, on le dit, le reste du lot n'y est pour rien. Une archive dont le contenu décompressé explose est un **piège visant le serveur** : poursuivre, c'est continuer à écrire sur un disque qu'on sait qu'on va saturer. Un refus se compte ; une attaque s'interrompt.
 
 **Pourquoi.** L'archive ZIP est devenue le **seul** canal d'entrée du produit (voir le journal de décisions, 31/08/2026). Toute la surface d'attaque de l'ingestion se concentre donc ici, et son contenu est intégralement contrôlé par l'utilisateur.
 
@@ -126,6 +133,8 @@ Trois attaques classiques, toutes rattachées à l'OWASP Top 10 :
 Le rapport de décompression est vérifié **en cours d'extraction**, sur le flux, et non à partir de l'en-tête de l'archive : une archive malveillante déclare une taille décompressée mensongère.
 
 **Portée de la règle.** Contrairement à RG-01 à RG-06, cette règle ne porte pas sur la valeur métier d'un document mais sur les conditions de son admission. Elle est néanmoins une règle de gestion et non un simple détail d'implémentation : elle décide si un fichier entre ou non dans le lot, et ce refus est visible par l'utilisateur.
+
+**Historique — énoncé précisé le 06/11/2026.** L'énoncé disait « Une entrée refusée n'interrompt pas l'import » sans réserver le cas des plafonds d'archive, alors que la condition 4 les englobait. US-07 et les maquettes `ImportRefuse` et `ImportTermine` décrivaient déjà l'interruption : c'est la règle qui était en retard sur elles. Les quatre conditions sont inchangées, seul l'effet de leur échec est désormais explicite. Voir l'entrée du 06/11/2026 au journal.
 
 **Historique.** Sous ce numéro figurait auparavant une règle sur l'origine d'un import Google Drive — un import ne pouvait citer qu'une `DriveConnection` enregistrée, jamais un identifiant de dossier reçu en requête. L'abandon de l'import Drive rend cette règle sans objet. Le raisonnement qui la fondait, sur la référence directe non sécurisée entre locataires, est conservé dans le journal de décisions.
 

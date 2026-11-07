@@ -8,11 +8,16 @@ Les arbitrages identifiés mais pas encore rendus. Ce registre existe parce que 
 
 ## Registre
 
-| Clé  | Question                                                         | Posée le   | Échéance            | État     |
-| ---- | ---------------------------------------------------------------- | ---------- | ------------------- | -------- |
-| Q-01 | L'extraction d'identité : appel dédié ou greffée sur le niveau 1 | 03/09/2026 | Lot 4               | Ouverte  |
-| Q-02 | Le jeton d'invitation : une table ou deux colonnes               | 05/10/2026 | Lot 2               | Tranchée |
-| Q-03 | Créer le premier administrateur d'un établissement en production | 03/11/2026 | Avant mise en ligne | Ouverte  |
+| Clé  | Question                                                          | Posée le   | Échéance            | État     |
+| ---- | ----------------------------------------------------------------- | ---------- | ------------------- | -------- |
+| Q-01 | L'extraction d'identité : appel dédié ou greffée sur le niveau 1  | 03/09/2026 | Lot 4               | Ouverte  |
+| Q-02 | Le jeton d'invitation : une table ou deux colonnes                | 05/10/2026 | Lot 2               | Tranchée |
+| Q-03 | Créer le premier administrateur d'un établissement en production  | 03/11/2026 | Avant mise en ligne | Ouverte  |
+| Q-04 | La valeur du plafond de taille totale décompressée                | 06/11/2026 | Lot 3               | Ouverte  |
+| Q-05 | Le mécanisme d'avancement : SSE, WebSocket ou scrutation          | 06/11/2026 | Lot 3               | Ouverte  |
+| Q-06 | Le seuil de confiance sur l'identité lue                          | 06/11/2026 | Lot 4               | Ouverte  |
+| Q-07 | `prompt_version` quand RG-03 interdit l'appel au modèle           | 06/11/2026 | Lot 4               | Ouverte  |
+| Q-08 | Le nommage des clés de stockage et le cloisonnement sur le volume | 06/11/2026 | Lot 3               | Ouverte  |
 
 ---
 
@@ -51,3 +56,75 @@ Probo n'a pas d'inscription libre — c'est voulu, le produit se vend à des ét
 **Échéance.** Avant la mise en ligne, donc au plus tard au lot 7. Trancher plus tôt serait mieux : la réponse change le périmètre, et le périmètre est cité partout.
 
 **Attention.** C'est la seule question ouverte qui bloque un usage réel du produit. Les deux autres bloquent une implémentation.
+
+---
+
+## Q-04 · La valeur du plafond de taille totale décompressée
+
+**Posée le** 06/11/2026, dans l'entrée de cadrage du lot 3.
+
+RG-07 nomme quatre plafonds : taille par fichier, nombre de fichiers, **taille totale décompressée**, et rapport de décompression. Les trois autres ont une valeur, annoncée à l'utilisateur avant le dépôt par la maquette `ImportDepot` — 20 Mo, 500 fichiers, 500 Mo d'archive — et le rapport vaut × 100 selon `ImportRefuse`. Le troisième n'a de valeur nulle part.
+
+**Ce qui est en jeu.** Il ne fait pas doublon avec le rapport : une archive de 400 Mo déjà peu compressible atteint 20 Go de contenu extrait avec un rapport de × 50, très en dessous du plafond, et sature quand même le disque. Le rapport attrape la bombe ; la taille totale attrape le volume honnête mais ingérable. L'un sans l'autre laisse un trou.
+
+**Pourquoi elle n'est pas tranchée d'office.** Une valeur trop basse refuse des lots légitimes — 1 248 documents est le volume de référence des maquettes —, une valeur trop haute ne protège rien. Le choix dépend du disque réellement provisionné sur le VPS, qui n'est pas arbitré, et doit apparaître au diagramme de déploiement.
+
+**Échéance.** Lot 3, à l'implémentation de RG-07. La règle est codable sans elle — le plafond est lu de l'environnement —, mais elle ne sera pas _testable_ sous son identifiant tant que la valeur par défaut n'existe pas.
+
+**Élargie le 06/11/2026.** La décision du jour sur la volumétrie — le volume du persona fait foi — porte le nombre de fichiers par archive de 500 à 4 000. Le plafond de **taille d'archive**, qui valait 500 Mo sur la base de 500 fichiers, perd sa justification et rejoint cette question : le recalculer demande un **poids moyen de document** qu'aucun livrable n'énonce. Les deux plafonds dépendent de la même inconnue, et la décision les rend **plus** urgents : à rapport × 100 inchangé, une archive plus grosse autorise un volume extrait plus grand.
+
+---
+
+## Q-05 · Le mécanisme d'avancement : SSE, WebSocket ou scrutation
+
+**Posée le** 06/11/2026, par la passe d'audit du lot 3.
+
+Les maquettes `ImportEnCours` et `AnalyseEnCours` affichent une progression document par document, une estimation de durée, et précisent qu'on peut fermer l'écran sans interrompre le traitement. **Aucun livrable ne dit comment le navigateur l'apprend** : ni SSE, ni WebSocket, ni scrutation n'apparaissent nulle part, et le diagramme de déploiement ne porte qu'un `HTTP /api` entre le front et l'API. BullMQ est tranché depuis le 15/08/2026, mais c'est la file **serveur** — elle ne dit rien du chemin vers l'écran.
+
+**Ce qui est en jeu.** Le choix engage le déploiement — proxy, délais d'inactivité, maintien de connexion —, la forme des routes et la structure du front. Il resservira tel quel pour US-18, dont le critère « l'utilisateur est prévenu quand le fichier est prêt » n'a aujourd'hui aucun canal : le courriel est exclu du produit et relégué à C-03.
+
+**Une seconde inconnue dans la même question.** L'estimation « environ 6 minutes restantes » n'a **aucune définition**. Les seules données qui permettraient de la calculer — `duration_ms`, `level1_tokens`, `level2_tokens` — sont justifiées à l'écart n°6 par le fait qu'elles « ne participent à aucune règle de gestion ». Soit l'écart se nuance, soit l'estimation se retire de la maquette.
+
+**Échéance.** Lot 3, avant d'écrire l'écran de suivi.
+
+---
+
+## Q-06 · Le seuil de confiance sur l'identité lue
+
+**Posée le** 06/11/2026, par la passe d'audit.
+
+La maquette `Reconciliation` affiche « confiance 42 % — **sous le seuil** » sur une identité lue. RG-09 parle de « confiance insuffisante » sur l'identité **sans donner de valeur**. Le seul seuil du modèle est `campaign.confidence_threshold`, par défaut 70, que RG-01 réserve explicitement à la **confiance de classification du type de document**.
+
+**Ce qui est en jeu.** Deux décisions de nature différente — scorer ou non un document, soumettre ou non un regroupement à l'arbitrage — seraient pilotées par un réglage unique sans que ce soit écrit. Un établissement qui durcit son seuil de classification verrait mécaniquement changer son nombre d'arbitrages de réconciliation, sans rapport avec ce qu'il voulait régler.
+
+**Ce qui n'est pas en jeu.** L'existence d'un seuil : RG-09 l'impose déjà. Seules sa valeur et son indépendance vis-à-vis de RG-01 sont ouvertes.
+
+**Échéance.** Lot 4, à l'implémentation d'US-23. La valeur demande des mesures, pas un raisonnement a priori.
+
+**Dépend de** `tests/jeu-essai/` — encore à constituer, comme Q-01.
+
+---
+
+## Q-07 · `prompt_version` quand RG-03 interdit l'appel au modèle
+
+**Posée le** 06/11/2026, par la passe d'audit.
+
+`document_analysis.prompt_version` est **obligatoire**, sans valeur par défaut. Or RG-03 veut qu'un document illisible soit marqué atypique « sans aucun appel au modèle » — et son verdict vit pourtant dans cette table. Aucun livrable, aucune constante partagée ne dit ce que vaut la colonne dans ce cas, et `Level1Result` ne porte pas de version de prompt.
+
+**Ce qui est en jeu.** L'écriture du premier verdict du lot 4 est bloquée tant que la question n'est pas tranchée, et les sorties possibles ne s'équivalent pas : une valeur conventionnelle ment sur ce qui s'est passé, une colonne nullable affaiblit la traçabilité que l'écart n°5 justifie précisément par l'explicabilité d'un score, et sortir le verdict de `document_analysis` touche au modèle.
+
+**Échéance.** Lot 4, avant la première écriture d'un verdict.
+
+---
+
+## Q-08 · Le nommage des clés de stockage et le cloisonnement sur le volume
+
+**Posée le** 06/11/2026, par la passe d'audit.
+
+`document.storage_key` est obligatoire et `reference_profile.storage_key` existe, mais **aucun livrable ne dit comment une clé est construite** : ni schéma de nommage, ni arborescence, ni règle de cloisonnement entre établissements sur le volume. L'écart n°4 décrit à quoi la colonne sert, jamais comment elle est formée ; le plan de sécurisation ne traite que le chiffrement au repos.
+
+**Ce qui est en jeu.** C'est une question de sécurité, pas de convention. Deux établissements dont les fichiers cohabitent dans la même arborescence ne sont séparés que par le filtrage applicatif sur `institution_id` — alors que le cloisonnement est l'argument commercial du produit et le sujet entier du lot 1. Une traversée de chemin, une requête fautive ou une sauvegarde mal découpée exposent les candidatures d'un client à un autre.
+
+**Ce qui la rend urgente.** Le lot 3 écrit les **premiers fichiers sur disque**. La convention sera inventée à l'écriture si elle n'est pas tranchée avant, et elle coûte cher à changer ensuite : les clés sont stockées en base et les fichiers déjà posés.
+
+**Échéance.** Lot 3, avant la première écriture sur le volume.

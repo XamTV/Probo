@@ -6,7 +6,7 @@
 ' consultable d'un coup d'œil ce qu'une lecture de 300 lignes donne lentement.
 '
 ' Règle de tenue : se met à jour dans la même séance que la migration.
-' Dernière synchronisation : migration 20261006075909_login_attempt_throttling.
+' Dernière synchronisation : migration 20261106101100_invitation_audit_actions.
 '
 ' Ce que le MCD ignore et qui apparaît ici — clés techniques, horodatages,
 ' empreintes, dénormalisation de institution_id, index — est justifié

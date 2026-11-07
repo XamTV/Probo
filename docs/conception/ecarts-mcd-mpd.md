@@ -46,7 +46,7 @@ Chaque écart est un choix, pas un oubli — et aucun n'est aujourd'hui une faib
 
 ## 7. Index
 
-**L'écart.** Huit index, dont `(campaign_id, overall_score DESC)`, `(institution_id, occurred_at DESC)`, `purge_due_at` et `sha256`.
+**L'écart.** Onze index (`@@index`), auxquels s'ajoutent deux contraintes d'unicité (`@unique` sur `user.email`, `@@unique` sur le couple campagne et type de document du référentiel). Parmi les index : `(campaign_id, overall_score DESC)`, `(institution_id, occurred_at DESC)`, `purge_due_at` et `sha256`.
 
 **Pourquoi.** Performance de lecture. Un index ne change jamais ce que les données signifient.
 

@@ -21,7 +21,9 @@ Soit **huit mois**, dont un dernier mois sans aucun ajout et une dernière semai
 
 > **Correction du 02/11/2026.** Ce document déduisait jusqu'ici le gel d'une « soutenance visée à six mois », faute de date de session connue : il annonçait le 15 janvier. La date réelle était disponible, elle n'avait simplement jamais été versée au dossier. Le calendrier s'ancre désormais sur le rendu, et non sur une durée choisie. Voir le journal de décisions.
 
-> **État au 02/11/2026.** Le **lot 1 est livré** — authentification, cloisonnement, comptes, écran de connexion, tests de bout en bout contre une vraie base. Les six autres restent. Il s'est écoulé 33 % du calendrier pour un lot sur sept, mais les sept premières semaines ont produit l'intégralité du dossier de conception, qui pèse 70 des 277 heures. Restent **18 semaines avant le gel**, soit environ trois semaines par lot — ce qui tient, à condition que les lots 4 et 5, les plus lourds, ne débordent pas sur les autres.
+> **État au 06/11/2026.** Les **lots 1 et 2 sont livrés** — authentification, cloisonnement et comptes d'un côté ; campagne, types de documents attendus, seuil, pondération et profil de référence de l'autre. Le lot 2 a soldé en passant la dette du lot 1 : le **lien d'invitation** existe, et un compte sans mot de passe l'admet désormais dans son état plutôt que de le masquer. Restent cinq lots et **environ 17 semaines avant le gel**, soit un peu plus de trois semaines par lot — ce qui tient, à condition que les lots 4 et 5, les plus lourds, ne débordent pas sur les autres.
+>
+> **US-22 reste ouverte**, scindée le 02/11 : son profil décrit est livré, son document de référence déposé attend la chaîne d'extraction du lot 4. Un critère d'US-02 n'est pas davantage démontrable avant le lot 3, faute de lots d'import à rendre visibles.
 
 ## Pourquoi des lots et non une user story à la fois
 

@@ -16,7 +16,7 @@ Il est **privé** : personne ne peut l'ouvrir tant qu'il n'est pas partagé depu
 
 > **Les sources font foi, pas le canvas.** Le canvas est un confort de consultation, reconstruit depuis `artboards/`. En cas de divergence, ce sont les fichiers versionnés qui ont raison.
 
-## Les 18 artboards
+## Les 19 artboards
 
 **Parcours — consultation.** Connexion · Classement dans ses trois états, liste pleine, analyse en cours, liste vide · Détail d'une candidature · Confirmation de suppression · Détail d'un document, en cas normal et en cas atypique.
 
@@ -51,11 +51,6 @@ python3 injecte-nav.py
 L'assemblage et la publication passent par la commande `/design` de Claude Code, qui porte les artboards dans l'Artifact ci-dessus.
 
 > **Un premier canvas a existé jusqu'au 05/10/2026**, publié avec une préversion de l'éditeur. Son format empaquetait l'éditeur et le contenu dans un seul fichier de deux mégaoctets, assemblé par un script qui n'a pas survécu à la session. Le canvas actuel conserve son contenu sous forme de fichiers, un par artboard — donc réutilisable et modifiable sans outillage disparu. Le changement a coûté le lien précédent.
-
-## Reste à produire
-
-- `charte-graphique.md` — couleurs, typographies, échelle d'espacement, inventaire des composants, à extraire des artboards
-- `accessibilite-rgaa.md` — la position d'accessibilité, à partir des choix effectivement retenus
 
 ## Les cinq problèmes de conception
 

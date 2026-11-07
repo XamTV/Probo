@@ -40,23 +40,23 @@ Cette séparation est la garantie que le classement final repose sur des donnée
 
 ## Exigences fonctionnelles
 
-Détaillées en 21 user stories réparties en six épopées : accès et administration, campagne, import, analyse, consultation, sortie et conformité. Voir [`user-stories.md`](user-stories.md) et [`cas-utilisation.md`](cas-utilisation.md).
+Détaillées en 24 user stories déclarées (US-01 à US-24), dont 22 au périmètre v1 — US-08 et US-09 sont hors périmètre avec M-14, abandonné le 31/08/2026 — réparties en six épopées : accès et administration, campagne, import, analyse, consultation, sortie et conformité. Voir [`user-stories.md`](user-stories.md) et [`cas-utilisation.md`](cas-utilisation.md).
 
 Les règles métier sont énoncées dans [`regles-gestion.md`](regles-gestion.md) et implémentées sous test.
 
 ## Exigences non fonctionnelles
 
-| Domaine           | Exigence                                                                                                                        |
-| ----------------- | ------------------------------------------------------------------------------------------------------------------------------- |
-| **Souveraineté**  | Aucune donnée candidat ne quitte l'Union européenne, y compris lors des appels au modèle                                        |
-| **Conservation**  | Suppression automatique des candidatures 90 jours après leur création                                                           |
-| **Traçabilité**   | Toute opération sur des données personnelles est journalisée, et le journal survit à la purge                                   |
-| **Explicabilité** | Aucun score n'est affiché sans sa justification textuelle. Le modèle et la version de prompt sont conservés avec chaque analyse |
-| **Cloisonnement** | Un établissement n'accède en aucun cas aux données d'un autre. Vérifié par des tests automatisés                                |
-| **Volumétrie**    | Un lot de 200 documents doit être traité sans intervention manuelle                                                             |
-| **Résilience**    | Le traitement survit à un redémarrage du serveur : les analyses en cours reprennent                                             |
-| **Accessibilité** | Contrastes, navigation clavier et libellés de formulaires conformes aux principes du RGAA                                       |
-| **Sécurité**      | OWASP Top 10 passé en revue point par point dans le plan de sécurisation                                                        |
+| Domaine           | Exigence                                                                                                                                                                  |
+| ----------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| **Souveraineté**  | Aucune donnée candidat ne quitte l'Union européenne, y compris lors des appels au modèle                                                                                  |
+| **Conservation**  | Suppression automatique des candidatures 90 jours après leur création                                                                                                     |
+| **Traçabilité**   | Toute opération sur des données personnelles est journalisée, et le journal survit à la purge                                                                             |
+| **Explicabilité** | Aucun score n'est affiché sans sa justification textuelle. Le modèle et la version de prompt sont conservés avec chaque analyse                                           |
+| **Cloisonnement** | Un établissement n'accède en aucun cas aux données d'un autre. Vérifié par des tests automatisés                                                                          |
+| **Volumétrie**    | Une campagne porte 400 à 700 candidatures de trois à cinq fichiers, soit **1 200 à 3 500 documents** ; un lot de cette taille doit être traité sans intervention manuelle |
+| **Résilience**    | Le traitement survit à un redémarrage du serveur : les analyses en cours reprennent                                                                                       |
+| **Accessibilité** | Contrastes, navigation clavier et libellés de formulaires conformes aux principes du RGAA                                                                                 |
+| **Sécurité**      | OWASP Top 10 passé en revue point par point dans le plan de sécurisation                                                                                                  |
 
 ## Contraintes
 
@@ -80,8 +80,8 @@ Le démarrage date du 15 août 2026, ce qui donne **huit mois**, et non six comm
 
 Le projet est considéré comme réussi si, à la soutenance :
 
-1. Un lot de 200 documents réels est importé, analysé et classé de bout en bout, sans intervention manuelle
+1. Un lot de 1 200 documents réels au moins est importé, analysé et classé de bout en bout, sans intervention manuelle
 2. Le taux de classification correcte du niveau 1 est **mesuré et chiffré** contre le corpus annoté, et non affirmé
 3. Les documents atypiques sont visibles dans toutes les vues, exports compris
 4. L'application est en ligne sur un domaine réel, déployée par la chaîne d'intégration continue
-5. Les 21 user stories du périmètre « doit être fait » sont livrées et recettées
+5. Les 22 user stories du périmètre v1 (« doit être fait »), sur les 24 déclarées, sont livrées et recettées

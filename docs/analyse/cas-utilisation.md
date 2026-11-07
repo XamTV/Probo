@@ -107,10 +107,10 @@ Le cas le plus riche, et celui qui porte le plus de règles de gestion.
 **Scénario nominal**
 
 1. L'utilisateur choisit une campagne et dépose une archive ZIP
-2. Le système vérifie que la campagne appartient à l'établissement de l'utilisateur, et que l'archive respecte les plafonds globaux — taille et rapport de décompression annoncé _(RG-07)_
+2. Le système vérifie que la campagne appartient à l'établissement de l'utilisateur
 3. Le système crée un lot d'import au statut « en cours »
 4. Le système énumère les entrées de l'archive
-5. Pour chaque entrée, le système contrôle la sûreté du chemin résolu, la nature de l'entrée, le type MIME réel et la taille _(RG-07)_
+5. Pour chaque entrée, le système contrôle la sûreté du chemin résolu, la nature de l'entrée, le type MIME réel et la taille, puis l'extrait ; les plafonds d'archive — nombre de fichiers, taille totale décompressée, rapport de décompression — sont vérifiés **en cours d'extraction, sur le flux**, jamais d'après l'en-tête de l'archive, dont la taille déclarée peut être mensongère _(RG-07)_
 6. Le système extrait le texte de chaque document et y lit l'identité du candidat _(RG-09)_
 7. Le système regroupe les documents par candidat, l'arborescence et le préfixe du nom servant d'indices que l'identité lue confirme ou infirme
 8. Si un regroupement est douteux, le lot passe au statut « à réconcilier » et attend un arbitrage _(inclut CU-15)_
@@ -125,10 +125,10 @@ Le cas le plus riche, et celui qui porte le plus de règles de gestion.
 - **5b.** Le chemin résolu d'une entrée sort du répertoire de destination → rejet sans écriture sur disque, incident journalisé _(RG-07)_
 - **5c.** Une entrée est un lien symbolique ou une entrée spéciale → rejet sans écriture, incident journalisé _(RG-07)_
 - **5d.** Le rapport de décompression dépasse le plafond en cours d'extraction → interruption immédiate du lot, statut « erreur », fichiers déjà écrits supprimés _(RG-07)_
+- **6b.** L'extraction de texte échoue → document marqué `UNREADABLE`, **sans appel au modèle** _(RG-03)_. _Renumérotée depuis `7a` le 06/11/2026 : deux extensions portaient ce numéro, et celle-ci se rattache à l'étape 6._ **`6a` reste vacante** : elle portait le repli « aucun regroupement déductible → une candidature par fichier », écarté le 03/09/2026 et cité sous ce numéro au journal. La réattribuer ferait pointer ces citations vers autre chose.
 - **7a.** Le nom de fichier et l'identité lue se contredisent → le cas est soumis à réconciliation, jamais tranché en silence _(RG-09)_
 - **7b.** Deux candidatures du lot portent le même nom → homonymie soumise à réconciliation
 - **8a.** Aucune identité n'est lisible sur un document → il est présenté comme orphelin à la réconciliation, à rattacher à la main
-- **7a.** L'extraction de texte échoue → document marqué `UNREADABLE`, **sans appel au modèle** _(RG-03)_
 
 ---
 

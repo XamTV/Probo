@@ -120,6 +120,9 @@ _Périmètre : M-03_
 - Une entrée qui n'est pas un fichier régulier — lien symbolique en particulier — est rejetée (RG-07)
 - Une archive dont le rapport de décompression dépasse le plafond est interrompue en cours d'extraction, sans attendre la fin (RG-07)
 - Un rejet n'interrompt pas l'import : le lot se poursuit et le compte des entrées refusées est affiché
+- **Un plafond d'archive dépassé — nombre de fichiers, taille totale décompressée, rapport — interrompt tout** : ce qui avait été extrait est supprimé et aucun document n'est importé (RG-07)
+- Chaque entrée refusée est consultable avec son chemin dans l'archive, sa taille et son motif
+- **Un fichier sans indice de regroupement** — ni sous-dossier, ni préfixe exploitable — n'est rattaché à aucune candidature : il est importé et **présenté comme orphelin à la réconciliation**, à rattacher à la main (`CU-04` 8a, RG-09). Une candidature par fichier a été explicitement écartée : à 1 248 documents, elle produit un échec silencieux
 - L'écran affiche l'avancement document par document
 
 > **L'archive ZIP est le seul canal d'ingestion** depuis le 31/08/2026. Cette US n'est donc plus un chemin parmi deux : elle est la porte d'entrée unique du produit, et RG-07 en est la serrure.
@@ -278,7 +281,7 @@ _Périmètre : M-15_
 - Tableau du classement, pagination et numérotation
 - **Les documents atypiques sont visibles dans l'export** — un rapport qui les masquerait reproduirait le défaut que Probo dénonce
 - Pied de page mentionnant la date de suppression prévue des données
-- La génération est asynchrone : l'utilisateur est prévenu quand le fichier est prêt
+- La génération est asynchrone : l'utilisateur est prévenu quand le fichier est prêt — **par le canal que tranche `Q-05`**, le même qui porte l'avancement d'un lot. Le courriel est exclu du produit, et `C-03` n'est pas au périmètre
 
 ### US-19 · Supprimer une candidature
 

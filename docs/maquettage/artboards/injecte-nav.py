@@ -8,14 +8,19 @@ import re
 import sys
 import glob
 
+# Chaque entrée porte les rôles qui la voient. Source : US-02 (« un chargé d'admission
+# ne peut ni créer de compte ni modifier une campagne »), US-21 (journal réservé aux
+# administrateurs), CU-02, CU-03 et CU-13 (acteur : Administrateur), CU-04 (import : chargé).
+ADMIN = {"marc"}
+TOUS = {"claire", "marc"}
 ITEMS = [
-    ("Candidatures", None),
-    (None, ("Classement", '<path d="M4 6h16"/><path d="M4 12h11"/><path d="M4 18h7"/>')),
-    (None, ("Importer un lot", '<path d="M12 19V7"/><path d="M7 12l5-5 5 5"/><path d="M4 20h16"/>')),
-    ("Administration", None),
-    (None, ("Campagnes", '<rect x="3" y="4" width="18" height="16" rx="2"/><path d="M3 9h18"/>')),
-    (None, ("Comptes", '<circle cx="9" cy="8" r="3.2"/><path d="M3.5 19a5.5 5.5 0 0 1 11 0"/><path d="M17 8.5h4"/><path d="M19 6.5v4"/>')),
-    (None, ("Journal d'audit", '<path d="M12 3l7 3v6c0 4.2-2.9 7.6-7 9-4.1-1.4-7-4.8-7-9V6z"/><path d="M9.5 12l1.8 1.8 3.4-3.6"/>')),
+    ("Candidatures", None, TOUS),
+    (None, ("Classement", '<path d="M4 6h16"/><path d="M4 12h11"/><path d="M4 18h7"/>'), TOUS),
+    (None, ("Importer un lot", '<path d="M12 19V7"/><path d="M7 12l5-5 5 5"/><path d="M4 20h16"/>'), TOUS),
+    ("Administration", None, ADMIN),
+    (None, ("Campagnes", '<rect x="3" y="4" width="18" height="16" rx="2"/><path d="M3 9h18"/>'), ADMIN),
+    (None, ("Comptes", '<circle cx="9" cy="8" r="3.2"/><path d="M3.5 19a5.5 5.5 0 0 1 11 0"/><path d="M17 8.5h4"/><path d="M19 6.5v4"/>'), ADMIN),
+    (None, ("Journal d'audit", '<path d="M12 3l7 3v6c0 4.2-2.9 7.6-7 9-4.1-1.4-7-4.8-7-9V6z"/><path d="M9.5 12l1.8 1.8 3.4-3.6"/>'), ADMIN),
 ]
 
 PERSONAS = {
@@ -52,7 +57,9 @@ def nav(active, persona):
            '        </a>',
            '      </div>',
            '    </div>']
-    for section, item in ITEMS:
+    for section, item, roles in ITEMS:
+        if persona not in roles:
+            continue
         if section:
             out.append('    <div class="navsec">%s</div>' % section)
             continue
@@ -84,13 +91,27 @@ def nav(active, persona):
     return "\n".join(out)
 
 
+MARQUEUR = re.compile(r'^\s*<!--NAV:([^|]+)\|(\w+)-->\s*$', re.M)
+# Le marqueur est consommé à l'injection : on retrouve donc aussi une coquille déjà posée,
+# ce qui rend le script relançable (page active et persona lus dans le bloc existant).
+# Tolère l'indentation et les retours à la ligne ajoutés par le formateur (prettier).
+COQUILLE = re.compile(r'^[ \t]*<!-- Coquille de navigation[^\n]*-->\s*<nav\b.*?</nav>', re.M | re.S)
+ACTIF = re.compile(r'<div\s+class="navitem on"\s*>.*?</svg\s*>\s*([^<]+?)\s*</div>', re.S)
+
 count = 0
 for fn in sorted(glob.glob("*.dc.html")):
     s = io.open(fn, encoding="utf-8").read()
-    m = re.search(r'^\s*<!--NAV:([^|]+)\|(\w+)-->\s*$', s, re.M)
-    if not m:
-        continue
-    active, persona = m.group(1).strip(), m.group(2).strip().lower()
+    m = MARQUEUR.search(s)
+    if m:
+        active, persona = m.group(1).strip(), m.group(2).strip().lower()
+    else:
+        m = COQUILLE.search(s)
+        if not m:
+            continue
+        bloc = m.group(0)
+        persona = next((k for k, v in PERSONAS.items() if v[1] in bloc), None)
+        a = ACTIF.search(bloc)
+        active = a.group(1).strip() if a else ""
     if persona not in PERSONAS:
         sys.exit("persona inconnu dans %s : %s" % (fn, persona))
     s = s[:m.start()] + nav(active, persona) + s[m.end():]

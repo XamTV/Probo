@@ -24,14 +24,14 @@ L'extension PlantUML de VS Code donne un aperçu en direct, utile pendant l'écr
 | Schéma                          | Fichier                           | État                                                        |
 | ------------------------------- | --------------------------------- | ----------------------------------------------------------- |
 | Cas d'utilisation               | `diagramme-cas-utilisation.puml`  | Écrit — 14 CU, CU-11 exclu car reporté                      |
-| MCD Merise                      | `mcd.puml`                        | Écrit — 10 entités, 12 associations, aucune technique       |
-| MLD                             | `mld.md`, `mld.puml`              | Écrit — 11 relations, sans table de jonction                |
-| MPD                             | `mpd.puml`                        | Écrit — 11 tables, index et comportements de suppression    |
-| Écarts MCD / MPD                | `ecarts-mcd-mpd.md`               | Écrit — 10 écarts, dont 1 signalé comme faiblesse           |
-| Dictionnaire de données         | `dictionnaire-donnees.md`         | Écrit — 11 tables, dérivé de schema.prisma                  |
-| Diagramme de classes            | `diagramme-classes.puml`          | À produire                                                  |
+| MCD Merise                      | `mcd.puml`                        | Écrit — 10 entités, 13 associations, aucune technique       |
+| MLD                             | `mld.md`, `mld.puml`              | Écrit — 10 relations, sans table de jonction                |
+| MPD                             | `mpd.puml`                        | Écrit — 10 tables, index et comportements de suppression    |
+| Écarts MCD / MPD                | `ecarts-mcd-mpd.md`               | Écrit — 11 écarts, aucun signalé comme faiblesse            |
+| Dictionnaire de données         | `dictionnaire-donnees.md`         | Écrit — 10 tables, dérivé de schema.prisma                  |
+| Diagramme de classes            | `diagramme-classes.puml`          | Écrit                                                       |
 | Diagramme de séquence — analyse | `diagramme-sequence-analyse.puml` | À produire **pendant** le lot d'implémentation de l'analyse |
-| Diagramme de déploiement        | `diagramme-deploiement.puml`      | À produire                                                  |
+| Diagramme de déploiement        | `diagramme-deploiement.puml`      | Écrit                                                       |
 
 ## Deux règles reprises de `docs/README.md`
 
