@@ -1,5 +1,5 @@
 import { execFileSync } from 'node:child_process';
-import { readFileSync } from 'node:fs';
+import { readFileSync, readdirSync } from 'node:fs';
 import { dirname, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { describe, expect, it } from 'vitest';
@@ -204,6 +204,13 @@ const ACCENTS = /[àâäéèêëîïôöùûüÿçœæÀÂÄÉÈÊËÎÏÔÖÙÛ
  * `analyse`, `importer`, `modifier`, `precedent` et `rapport` en sont absents :
  * ce sont aussi des mots anglais, et un vérificateur qui crie sur du code
  * correct est désarmé avant la fin du mois.
+ *
+ * Le même vocabulaire juge les noms de variables d'environnement, qui sont du
+ * produit au même titre que le reste. Le prix de cette prudence est connu :
+ * `INGESTION_RATIO_DECOMPRESSION_MAX` et `MISTRAL_CONCURRENCE_MAX`, tous deux
+ * français le 06/11/2026, n'étaient bâtis que de mots qui existent aussi en
+ * anglais — seul l'ordre des mots les trahissait, et ce contrôle ne juge pas
+ * l'ordre des mots. Six des huit noms fautifs étaient attrapés.
  */
 const MOTS_FRANCAIS = new Set([
   'accueil',
@@ -230,11 +237,19 @@ const MOTS_FRANCAIS = new Set([
   'etablissement',
   'etablissements',
   'fermer',
+  'fichier',
+  'fichiers',
   'identifiant',
   'identifiants',
+  'jour',
+  'jours',
   'liste',
   'listes',
+  'modele',
+  'modeles',
   'mot',
+  'niveau',
+  'niveaux',
   'oublie',
   'passe',
   'nouveau',
@@ -253,6 +268,8 @@ const MOTS_FRANCAIS = new Set([
   'seuil',
   'suivant',
   'supprimer',
+  'taille',
+  'tailles',
   'telecharger',
   'utilisateur',
   'utilisateurs',
@@ -347,6 +364,182 @@ export function intituleFrancais(intitule: string): boolean {
     ACCENTS.test(intitule) ||
     decoupe(intitule).some((mot) => MOTS_FRANCAIS.has(mot) || MOTS_OUTILS.has(mot))
   );
+}
+
+// ---------------------------------------------------------------------------
+// Le dictionnaire des données et le schéma physique
+//
+// Le dictionnaire est dérivé de `schema.prisma`, qui fait foi, et c'est lui que
+// le jury lit. Rien ne les reliait : les quatre colonnes de requalification
+// (RG-10) ont vécu des semaines au schéma sans figurer au dictionnaire.
+// ---------------------------------------------------------------------------
+
+const SCHEMA = 'apps/api/prisma/schema.prisma';
+const DICTIONNAIRE = 'docs/conception/dictionnaire-donnees.md';
+
+export type Colonne = { table: string; colonne: string };
+
+/**
+ * Les colonnes scalaires du schéma, sous leur nom physique.
+ *
+ * Deux pièges, et chacun fabrique un faux positif :
+ *
+ * - **Un champ de relation n'est pas une colonne.** `documents Document[]` et
+ *   `institution Institution @relation(...)` portent le lien ; seule la clé
+ *   étrangère, `institutionId`, est une colonne. On les reconnaît à leur type,
+ *   qui est un autre `model` — un type d'énumération, lui, est bien une
+ *   colonne, liste comprise (`expectedTypes DocumentType[]`).
+ * - **Le nom physique est celui de `@map(...)`** quand il y en a un, et celui
+ *   de la table celui de `@@map(...)`, qui n'arrive qu'en fin de bloc.
+ */
+export function colonnesDuSchema(contenu: string): Colonne[] {
+  const modeles = new Set(
+    [...contenu.matchAll(/^model\s+(\w+)\s*\{/gm)].flatMap((trouve) =>
+      trouve[1] ? [trouve[1]] : [],
+    ),
+  );
+
+  return [...contenu.matchAll(/^model\s+(\w+)\s*\{([\s\S]*?)^\}/gm)].flatMap(
+    ([, modele, corps]) => {
+      if (!modele || !corps) return [];
+      const table = /@@map\("([^"]+)"\)/.exec(corps)?.[1] ?? modele;
+
+      return corps.split('\n').flatMap((ligne) => {
+        // Un champ est indenté et commence par un mot : ni `//`, ni `///`,
+        // ni `@@index`, ni une ligne vide.
+        const champ = /^\s{2,}(\w+)\s+(\w+)/.exec(ligne);
+        const nom = champ?.[1];
+        const type = champ?.[2];
+        if (!nom || !type || modeles.has(type)) return [];
+        return [{ table, colonne: /@map\("([^"]+)"\)/.exec(ligne)?.[1] ?? nom }];
+      });
+    },
+  );
+}
+
+/**
+ * Les colonnes que le dictionnaire décrit, table par table.
+ *
+ * Seule la **première cellule** d'une ligne de tableau nomme une colonne. Les
+ * cellules de type et de description citent des énumérations et d'autres
+ * colonnes entre accents graves, et les compter inventerait des colonnes qui
+ * n'existent nulle part.
+ *
+ * Un titre de section qui n'est pas un nom de table physique — « Conventions »,
+ * capitale comprise — n'ouvre aucune table.
+ */
+export function colonnesDuDictionnaire(contenu: string): Colonne[] {
+  const colonnes: Colonne[] = [];
+  let table: string | null = null;
+
+  for (const ligne of contenu.split('\n')) {
+    if (/^#/.test(ligne)) {
+      table = /^## ([a-z][a-z0-9_]*)\b/.exec(ligne)?.[1] ?? null;
+      continue;
+    }
+    if (table === null) continue;
+    const colonne = /^\| *`([a-z][a-z0-9_]*)` *\|/.exec(ligne)?.[1];
+    if (colonne) colonnes.push({ table, colonne });
+  }
+
+  return colonnes;
+}
+
+/**
+ * Les colonnes que le dictionnaire annonce ne pas répéter.
+ *
+ * Sa section « Conventions » les déclare une fois pour toutes — `created_at` et
+ * `updated_at` au 06/11/2026, parce qu'elles n'ont aucune valeur métier. Les
+ * lire dans le document plutôt que les écrire ici est ce qui rend ce contrôle
+ * tenable : une convention ajoutée demain est honorée sans toucher à ce
+ * fichier, et un contrôle qui crie au loup est désarmé à la première gêne.
+ * Celui-ci annonçait six colonnes manquantes quand il y en avait quatre.
+ *
+ * Les liens vers d'autres documents ne sont pas des colonnes : seuls les
+ * identifiants en minuscules sont retenus, ce qui écarte `ecarts-mcd-mpd.md`.
+ */
+export function colonnesParConvention(contenu: string): string[] {
+  const texte = `\n${contenu}`;
+  const debut = texte.indexOf('\n## Conventions');
+  if (debut < 0) return [];
+
+  const reste = texte.slice(debut + 1);
+  const suivante = reste.indexOf('\n## ');
+  const section = suivante < 0 ? reste : reste.slice(0, suivante);
+
+  return [
+    ...new Set(
+      [...section.matchAll(/`([^`]+)`/g)].flatMap(([, nom]) =>
+        nom && /^[a-z][a-z0-9_]*$/.test(nom) ? [nom] : [],
+      ),
+    ),
+  ];
+}
+
+/** L'écart entre le schéma, qui fait foi, et le dictionnaire qui le décrit. */
+export function ecartsDictionnaire(schema: string, dictionnaire: string): string[] {
+  const omises = new Set(colonnesParConvention(dictionnaire));
+  const auSchema = colonnesDuSchema(schema);
+  const auDictionnaire = colonnesDuDictionnaire(dictionnaire);
+
+  const decrites = new Set(auDictionnaire.map(({ table, colonne }) => `${table}.${colonne}`));
+  const reelles = new Set(auSchema.map(({ table, colonne }) => `${table}.${colonne}`));
+  const tablesDecrites = new Set(auDictionnaire.map(({ table }) => table));
+
+  // Une table entière absente se dit en une ligne, pas en quinze.
+  const tablesAbsentes = [...new Set(auSchema.map(({ table }) => table))]
+    .filter((table) => !tablesDecrites.has(table))
+    .map((table) => `la table ${table} n'a aucune section au dictionnaire`);
+
+  const manquantes = auSchema
+    .filter(({ table, colonne }) => tablesDecrites.has(table) && !omises.has(colonne))
+    .filter(({ table, colonne }) => !decrites.has(`${table}.${colonne}`))
+    .map(({ table, colonne }) => `${table}.${colonne} est au schéma et manque au dictionnaire`);
+
+  const inventees = auDictionnaire
+    .filter(({ table, colonne }) => !reelles.has(`${table}.${colonne}`))
+    .map(({ table, colonne }) => `${table}.${colonne} est au dictionnaire et pas au schéma`);
+
+  return [...tablesAbsentes, ...manquantes, ...inventees];
+}
+
+// ---------------------------------------------------------------------------
+// Les fichiers d'environnement
+//
+// Une variable d'environnement est du produit : elle se nomme en anglais. Le
+// commentaire qui la documente est de l'outillage et reste en français, et sa
+// valeur ne regarde que l'exploitation. Seul le **nom** est jugé.
+//
+// C'est le troisième angle mort de la règle de langue en deux jours : la portée
+// du vérificateur s'arrêtait au code, et sept variables françaises vivaient
+// dans `.env.example` au milieu d'une vingtaine en anglais.
+// ---------------------------------------------------------------------------
+
+/**
+ * Les fichiers d'environnement, listés sur le disque et non par `git ls-files`.
+ *
+ * `.env` est ignoré par git — c'est le but — et c'est pourtant celui que
+ * personne ne relit en revue. `.env.example`, lui, est suivi. En intégration
+ * continue, seul le second existe : le contrôle porte sur ce qu'il trouve.
+ */
+function fichiersEnv(): string[] {
+  return readdirSync(racine)
+    .filter((nom) => /^\.env(\..+)?$/.test(nom))
+    .sort();
+}
+
+/**
+ * Les noms de variables d'un fichier d'environnement, avec leur ligne.
+ *
+ * La valeur n'est jamais retenue : elle porte des secrets, et ce fichier écrit
+ * ses constats dans la sortie de la CI. Une ligne commentée ne déclare rien.
+ */
+export function variablesEnv(contenu: string): { ligne: number; nom: string }[] {
+  return contenu.split('\n').flatMap((texte, index) => {
+    if (/^\s*#/.test(texte)) return [];
+    const nom = /^\s*(?:export\s+)?([^\s=]+)\s*=/.exec(texte)?.[1];
+    return nom ? [{ ligne: index + 1, nom }] : [];
+  });
 }
 
 // ---------------------------------------------------------------------------
@@ -486,6 +679,29 @@ describe('Le dossier de conception et le code se tiennent', () => {
 
     expect([...chemins, ...identifiants]).toEqual([]);
   });
+
+  it('porte chaque colonne du schéma au dictionnaire des données', () => {
+    // Le dictionnaire est dérivé du schéma, qui fait foi, et c'est lui que le
+    // jury lit. Les colonnes que sa section « Conventions » annonce ne pas
+    // répéter n'en sont pas absentes : elles y sont déclarées une fois pour
+    // toutes, et les réclamer table par table serait crier au loup.
+    expect(ecartsDictionnaire(lire(SCHEMA), lire(DICTIONNAIRE))).toEqual([]);
+  });
+
+  it("nomme en anglais chaque variable d'environnement", () => {
+    // Le nom est du produit. Le commentaire qui le documente est de
+    // l'outillage et reste en français, la valeur ne regarde personne — et
+    // aucune des deux n'est lue ici.
+    const fautes = fichiersEnv().flatMap((fichier) =>
+      variablesEnv(lire(fichier)).flatMap(({ ligne, nom }) => {
+        const motifs = motsFrancais(nom);
+        if (ACCENTS.test(nom)) motifs.push('accentué');
+        return motifs.length ? [`${fichier}:${ligne} ${nom} → ${motifs.join(', ')}`] : [];
+      }),
+    );
+
+    expect(fautes).toEqual([]);
+  });
 });
 
 // ---------------------------------------------------------------------------
@@ -603,5 +819,156 @@ describe('Les détections attrapent ce qu elles annoncent', () => {
 
   it('tolère les mots anglais qui ressemblent à du français', () => {
     expect(motsFrancais('const analysis = analyse(document, modifier, precedent);')).toEqual([]);
+  });
+
+  it('lit une colonne sous son nom physique, et écarte les champs de relation', () => {
+    const extrait = [
+      'model Document {',
+      '  id            String   @id @default(uuid()) @db.Uuid',
+      '  institutionId String   @map("institution_id") @db.Uuid',
+      '  sha256        String   @db.Char(64)',
+      '  createdAt     DateTime @default(now()) @map("created_at")',
+      '',
+      '  /// Un champ de relation ne porte aucune colonne.',
+      '  institution Institution       @relation(fields: [institutionId], references: [id])',
+      '  analysis    DocumentAnalysis?',
+      '',
+      '  @@index([sha256])',
+      '  @@map("document")',
+      '}',
+      'model Institution {',
+      '  id String @id',
+      '  @@map("institution")',
+      '}',
+      'model DocumentAnalysis {',
+      '  documentId String @id @map("document_id")',
+      '  @@map("document_analysis")',
+      '}',
+    ].join('\n');
+
+    // La clé étrangère reste une colonne ; le champ de relation qui la porte,
+    // non — avec ou sans `@relation`, c'est son type qui le dit.
+    expect(colonnesDuSchema(extrait).filter(({ table }) => table === 'document')).toEqual([
+      { table: 'document', colonne: 'id' },
+      { table: 'document', colonne: 'institution_id' },
+      { table: 'document', colonne: 'sha256' },
+      { table: 'document', colonne: 'created_at' },
+    ]);
+  });
+
+  it('ne lit une colonne du dictionnaire que dans sa première cellule', () => {
+    const extrait = [
+      '## document_analysis — Résultat des deux niveaux',
+      '',
+      '| Colonne         | Type            | Oblig. | Description             |',
+      '| --------------- | --------------- | ------ | ----------------------- |',
+      '| `detected_type` | `document_type` | non    | Type établi au niveau 1 |',
+      '',
+      '> Les quatre colonnes `override_rationale` et consorts sont décrites ici.',
+    ].join('\n');
+
+    // Ni l'énumération citée en cellule de type, ni la colonne citée dans une
+    // note : seule la première cellule nomme une colonne.
+    expect(colonnesDuDictionnaire(extrait)).toEqual([
+      { table: 'document_analysis', colonne: 'detected_type' },
+    ]);
+  });
+
+  it('honore la convention que le dictionnaire déclare lui-même', () => {
+    const extrait = [
+      '## Conventions',
+      '',
+      'Les colonnes `created_at` et `updated_at` sont présentes sur la plupart',
+      'des tables sans valeur métier — voir [`ecarts-mcd-mpd.md`](ecarts-mcd-mpd.md).',
+      'Elles ne sont pas répétées ci-dessous.',
+      '',
+      '## institution — Établissement client',
+      '',
+      '| `id` | UUID | oui | Identifiant |',
+    ].join('\n');
+
+    // Le lien vers un autre document n'est pas une colonne, et la convention
+    // s'arrête à sa section : `id` est décrit, pas dispensé.
+    expect(colonnesParConvention(extrait)).toEqual(['created_at', 'updated_at']);
+  });
+
+  it("relève une colonne du schéma que le dictionnaire n'a jamais portée", () => {
+    // Le trou qui a vécu des semaines : les colonnes de requalification
+    // (RG-10) ajoutées au schéma, jamais reportées au dictionnaire.
+    const schema = [
+      'model DocumentAnalysis {',
+      '  documentId     String        @id @map("document_id")',
+      '  detectedType   DocumentType? @map("detected_type")',
+      '  overriddenType DocumentType? @map("overridden_type")',
+      '  createdAt      DateTime      @default(now()) @map("created_at")',
+      '  @@map("document_analysis")',
+      '}',
+    ].join('\n');
+
+    const dictionnaire = [
+      '## Conventions',
+      '',
+      'Les colonnes `created_at` et `updated_at` ne sont pas répétées ci-dessous.',
+      '',
+      '## document_analysis — Résultat des deux niveaux',
+      '',
+      '| `document_id`   | UUID            | oui | Identifiant |',
+      '| `detected_type` | `document_type` | non | Type        |',
+    ].join('\n');
+
+    // `created_at` manque aussi, et c'est voulu : la convention le dispense.
+    expect(ecartsDictionnaire(schema, dictionnaire)).toEqual([
+      'document_analysis.overridden_type est au schéma et manque au dictionnaire',
+    ]);
+  });
+
+  it("relève une colonne du dictionnaire qui n'existe plus au schéma", () => {
+    const schema = [
+      'model DocumentText {',
+      '  documentId String @id @map("document_id")',
+      '  content    String',
+      '  @@map("document_text")',
+      '}',
+    ].join('\n');
+
+    const dictionnaire = [
+      '## document_text — Texte extrait',
+      '',
+      '| `document_id` | UUID   | oui | Identifiant     |',
+      '| `content`     | texte  | oui | Texte intégral  |',
+      '| `word_count`  | entier | oui | Colonne retirée |',
+    ].join('\n');
+
+    expect(ecartsDictionnaire(schema, dictionnaire)).toEqual([
+      'document_text.word_count est au dictionnaire et pas au schéma',
+    ]);
+  });
+
+  it("lit le nom des variables d'environnement, jamais leur valeur", () => {
+    const extrait = [
+      '# --- Ingestion : garde-fous (RG-07) ---',
+      "# Taille maximale d'un fichier déposé : ce commentaire reste en français.",
+      'INGESTION_MAX_FILE_SIZE_MB=20',
+      'DATABASE_URL=postgresql://probo:probo@localhost:5433/probo?schema=public',
+      '# RETENTION_JOURS=90',
+    ].join('\n');
+
+    // Le commentaire français est toléré, la valeur n'est pas même lue, et une
+    // ligne commentée ne déclare rien.
+    expect(variablesEnv(extrait)).toEqual([
+      { ligne: 3, nom: 'INGESTION_MAX_FILE_SIZE_MB' },
+      { ligne: 4, nom: 'DATABASE_URL' },
+    ]);
+  });
+
+  it('relève un nom de variable français, troisième angle mort de la règle', () => {
+    expect(motsFrancais('INGESTION_TAILLE_MAX_FICHIER_MO')).toEqual(['taille', 'fichier']);
+    expect(motsFrancais('MISTRAL_MODELE_NIVEAU_1')).toEqual(['modele', 'niveau']);
+    expect(motsFrancais('RETENTION_JOURS')).toEqual(['jours']);
+
+    // Les noms anglais qui les ont remplacées passent.
+    expect(motsFrancais('INGESTION_MAX_FILE_SIZE_MB')).toEqual([]);
+    expect(motsFrancais('MISTRAL_LEVEL_1_MODEL')).toEqual([]);
+    expect(motsFrancais('RETENTION_DAYS')).toEqual([]);
   });
 });

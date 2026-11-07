@@ -151,6 +151,10 @@ Clé primaire partagée avec `document` : un document porte au plus une analyse.
 | `clarity_rationale`        | texte             | non    | Justification de la clarté                                                                  |
 | `formal_quality_rationale` | texte             | non    | Justification de la qualité formelle                                                        |
 | `document_score`           | réel              | non    | Moyenne pondérée des trois sous-scores (RG-05)                                              |
+| `overridden_type`          | `document_type`   | non    | Type retenu par une personne à la place de `detected_type` (RG-10)                          |
+| `overridden_by_id`         | UUID              | non    | Utilisateur ayant requalifié le document                                                    |
+| `overridden_at`            | horodatage        | non    | Date de la requalification                                                                  |
+| `override_rationale`       | texte             | non    | Motif de la requalification                                                                 |
 | `level1_model`             | texte             | non    | Modèle utilisé pour la classification                                                       |
 | `level2_model`             | texte             | non    | Modèle utilisé pour le scoring                                                              |
 | `prompt_version`           | texte             | oui    | **Obligatoire.** Sans elle, deux scores différents pour le même document sont inexplicables |
@@ -161,25 +165,25 @@ Clé primaire partagée avec `document` : un document porte au plus une analyse.
 
 Les six colonnes vides au niveau 2 sont la trace d'un document atypique : RG-04 interdit son exécution.
 
-> **Le verdict du modèle n'est jamais écrasé.** `detected_type`, `confidence` et `is_atypical` conservent ce que le modèle a établi ; les quatre colonnes `override_*` enregistrent la décision humaine à côté. Un score reste donc explicable jusqu'au bout, y compris quand l'explication est « une personne en a décidé autrement » (RG-10).
+> **Le verdict du modèle n'est jamais écrasé.** `detected_type`, `confidence` et `is_atypical` conservent ce que le modèle a établi ; les quatre colonnes de requalification (`overridden_type`, `overridden_by_id`, `overridden_at` et `override_rationale`) enregistrent la décision humaine à côté. Un score reste donc explicable jusqu'au bout, y compris quand l'explication est « une personne en a décidé autrement » (RG-10).
 
 ## audit_entry — Journal d'audit
 
 Rattaché à l'établissement et non à la candidature : la purge des candidatures laisse la piste intacte.
 
-| Colonne          | Type       | Oblig. | Description                                                                          |
-| ---------------- | ---------- | ------ | ------------------------------------------------------------------------------------ |
-| `id`             | UUID       | oui    | Identifiant                                                                          |
-| `institution_id` | UUID       | oui    | Établissement concerné                                                               |
-| `user_id`        | UUID       | non    | Auteur de l'action ; vide pour les traitements automatiques et les comptes supprimés |
-| `action`         | texte      | oui    | Nature de l'opération                                                                |
-| `entity_type`    | texte      | oui    | Type de ressource visée                                                              |
-| `entity_id`      | UUID       | non    | Référence de la ressource, qui peut déjà avoir été supprimée                         |
-| `ip_address`     | texte      | non    | Adresse d'origine de la requête                                                      |
-| `user_agent`     | texte      | non    | Client utilisé                                                                       |
-| `details`        | JSON       | non    | Contenu variable selon l'action                                                      |
-| `occurred_at`    | horodatage | oui    | Date de survenue                                                                     |
+| Colonne          | Type                | Oblig. | Description                                                                          |
+| ---------------- | ------------------- | ------ | ------------------------------------------------------------------------------------ |
+| `id`             | UUID                | oui    | Identifiant                                                                          |
+| `institution_id` | UUID                | oui    | Établissement concerné                                                               |
+| `user_id`        | UUID                | non    | Auteur de l'action ; vide pour les traitements automatiques et les comptes supprimés |
+| `action`         | `audit_action`      | oui    | Nature de l'opération                                                                |
+| `entity_type`    | `audit_entity_type` | oui    | Type de ressource visée                                                              |
+| `entity_id`      | texte               | non    | Référence de la ressource, qui peut déjà avoir été supprimée                         |
+| `ip_address`     | texte               | non    | Adresse d'origine de la requête                                                      |
+| `user_agent`     | texte               | non    | Client utilisé                                                                       |
+| `details`        | JSON                | non    | Contenu variable selon l'action                                                      |
+| `occurred_at`    | horodatage          | oui    | Date de survenue                                                                     |
 
 > **`action` et `entity_type` sont des énumérations** depuis le 05/10/2026. Elles étaient des chaînes libres, ce qui rendait le filtrage approximatif et envoyait des valeurs brutes à l'écran — contre la règle i18n du projet, qui veut qu'aucune valeur brute n'atteigne une interface. Le prix est une migration à chaque nouvelle action journalisée ; le jeu est borné et connaissable d'après les cas d'utilisation.
 >
-> `action` prend 16 valeurs, de `USER_LOGGED_IN` à `RANKING_EXPORTED`. `entity_type` en prend 8, une par entité du modèle plus `SESSION`.
+> `action` prend 18 valeurs, de `USER_LOGGED_IN` à `RANKING_EXPORTED`. `entity_type` en prend 8 : sept des dix entités du modèle (`INSTITUTION`, `USER`, `CAMPAIGN`, `REFERENCE_PROFILE`, `IMPORT_BATCH`, `APPLICATION`, `DOCUMENT`) plus `SESSION`, qui n'est pas une entité du modèle. Le texte extrait, l'analyse et l'entrée d'audit elle-même n'y figurent pas. `entity_id` est un texte et non un UUID : `SESSION` n'a pas d'identifiant de cette forme, et la référence peut viser une ressource déjà supprimée.
