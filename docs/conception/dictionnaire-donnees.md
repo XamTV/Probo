@@ -71,21 +71,45 @@ Ce à quoi le niveau 2 compare chaque document. Un par type attendu : contrainte
 | `storage_key`    | texte           | non    | Emplacement du fichier sur le volume                            |
 | `extracted_text` | texte           | non    | Texte du document déposé, extrait une fois pour toutes          |
 
-> **Contrainte non portée par le schéma.** RG-08 exige exactement une des deux formes — `text`, ou le trio de colonnes de fichier. Prisma ne génère pas de contrainte `CHECK` : la règle est tenue par le code. Écart signalé comme faiblesse dans `ecarts-mcd-mpd.md`.
+> **Contrainte non portée par le schéma.** RG-08 exige exactement une des deux formes — `text`, ou le trio de colonnes de fichier. Prisma ne génère pas de contrainte `CHECK` : elle vit dans une migration écrite à la main, `reference_profile_exactly_one_form`, et la base la tient elle-même depuis le 05/10/2026. Voir l'écart n°10.
 
 ## import_batch — Dépôt d'une archive
 
-| Colonne               | Type                  | Oblig. | Description                                                               |
-| --------------------- | --------------------- | ------ | ------------------------------------------------------------------------- |
-| `id`                  | UUID                  | oui    | Identifiant                                                               |
-| `campaign_id`         | UUID                  | oui    | Campagne de destination                                                   |
-| `user_id`             | UUID                  | non    | Auteur du dépôt ; vidé si le compte est supprimé, le lot reste            |
-| `archive_name`        | texte                 | oui    | Nom de l'archive déposée, conservé pour la piste d'audit                  |
-| `status`              | `import_batch_status` | oui    | `PENDING`, `RUNNING`, `AWAITING_RECONCILIATION`, `COMPLETED` ou `FAILED`  |
-| `file_count`          | entier                | oui    | Documents effectivement extraits                                          |
-| `rejected_file_count` | entier                | oui    | Entrées refusées à la décompression — chemin, type ou plafond (RG-07)     |
-| `error_message`       | texte                 | non    | Motif d'un échec global, par exemple un rapport de décompression excessif |
-| `completed_at`        | horodatage            | non    | Vide tant que le lot n'est pas terminé                                    |
+| Colonne                    | Type                  | Oblig. | Description                                                                                                        |
+| -------------------------- | --------------------- | ------ | ------------------------------------------------------------------------------------------------------------------ |
+| `id`                       | UUID                  | oui    | Identifiant                                                                                                        |
+| `campaign_id`              | UUID                  | oui    | Campagne de destination                                                                                            |
+| `user_id`                  | UUID                  | non    | Auteur du dépôt ; vidé si le compte est supprimé, le lot reste                                                     |
+| `archive_name`             | texte                 | oui    | Nom de l'archive déposée, conservé pour la piste d'audit                                                           |
+| `status`                   | `import_batch_status` | oui    | `PENDING`, `UNPACKING`, `READING_IDENTITY`, `AWAITING_RECONCILIATION`, `ANALYSING`, `COMPLETED` ou `FAILED`        |
+| `file_count`               | entier                | oui    | Documents effectivement extraits                                                                                   |
+| `rejected_file_count`      | entier                | oui    | Entrées refusées une à une à la décompression (RG-07). Dénormalisé depuis `rejected_entry` — écart n°12            |
+| `archive_limit`            | `archive_limit`       | non    | Plafond d'archive qui a interrompu le lot : `FILE_COUNT`, `EXTRACTED_SIZE` ou `DECOMPRESSION_RATIO`                |
+| `archive_size_bytes`       | grand entier          | non    | Taille de l'archive déposée, relevée sur un lot interrompu                                                         |
+| `extracted_bytes_at_abort` | grand entier          | non    | Volume déjà décompressé au moment de l'interruption, puis supprimé                                                 |
+| `observed_ratio`           | réel                  | non    | Rapport de décompression constaté au moment de l'interruption                                                      |
+| `error_message`            | texte                 | non    | Diagnostic technique d'un échec. **Jamais affiché** : l'écran lit les quatre colonnes ci-dessus, qui se traduisent |
+| `completed_at`             | horodatage            | non    | Vide tant que le lot n'est pas terminé                                                                             |
+
+> **Un statut par phase.** `RUNNING` couvrait indistinctement la décompression et l'analyse ; il s'est scindé le 06/11/2026 pour suivre les trois phases que montre l'écran d'import. `READING_IDENTITY` précède `AWAITING_RECONCILIATION`, qui précède `ANALYSING` : aucune analyse ne démarre tant qu'un regroupement attend un arbitrage (RG-09).
+>
+> **Les quatre colonnes d'interruption vont ensemble**, et seul un lot que RG-07 a interrompu les porte. Elles sont typées plutôt que glissées dans `error_message` parce que l'écran les réaffiche séparément, et qu'une chaîne libre enverrait des valeurs brutes à l'écran. Les tailles sont de grands entiers : une archive de 3 Go dépasse la capacité d'un entier.
+
+## rejected_entry — Entrée d'archive refusée (RG-07)
+
+Ce qui n'a pas été importé, et pourquoi — « listé à l'écran, jamais ignoré en silence » (US-07).
+
+| Colonne           | Type               | Oblig. | Description                                                                                        |
+| ----------------- | ------------------ | ------ | -------------------------------------------------------------------------------------------------- |
+| `id`              | UUID               | oui    | Identifiant                                                                                        |
+| `import_batch_id` | UUID               | oui    | Lot dans lequel l'entrée a été refusée                                                             |
+| `path`            | texte              | oui    | Chemin de l'entrée dans l'archive, tel que l'archive l'écrit. Affiché, jamais utilisé comme chemin |
+| `size_bytes`      | grand entier       | non    | Taille connue de l'entrée ; vide pour un lien ou une entrée spéciale, qui n'a pas de contenu       |
+| `reason`          | `rejection_reason` | oui    | Motif du refus, l'une des six valeurs ci-dessous                                                   |
+
+> **Six motifs pour quatre conditions.** `PATH_ESCAPE` (condition 1) et `NOT_REGULAR_FILE` (condition 2) sont les deux incidents de sécurité, inscrits aussi au journal d'audit. `FORBIDDEN_TYPE` et `SYSTEM_ENTRY` relèvent tous deux de la condition 3, mais un `__MACOSX/._cv.pdf` mérite un autre libellé qu'un fichier hors liste blanche. `FILE_TOO_LARGE` est le plafond par fichier ; `ARCHIVE_LIMIT` marque l'entrée qui a franchi un plafond d'archive, et **n'est pas comptée** dans `rejected_file_count` : le lot a échoué à la place.
+>
+> **Pourquoi une table et non le journal d'audit.** Le journal porte ses détails en JSON libre, que l'écart n°8 justifie par le fait qu'il n'est jamais interrogé par son contenu. Alimenter un écran depuis ce JSON retirerait sa justification à l'écart au moment même où on l'invoque.
 
 ## application — Candidature d'une personne
 
@@ -108,19 +132,24 @@ Ce à quoi le niveau 2 compare chaque document. Un par type attendu : contrainte
 | Colonne                    | Type                | Oblig. | Description                                                              |
 | -------------------------- | ------------------- | ------ | ------------------------------------------------------------------------ |
 | `id`                       | UUID                | oui    | Identifiant                                                              |
-| `application_id`           | UUID                | oui    | Candidature de rattachement                                              |
+| `application_id`           | UUID                | non    | Candidature de rattachement ; vide tant que le document est orphelin     |
 | `import_batch_id`          | UUID                | oui    | Lot par lequel le document est arrivé                                    |
 | `institution_id`           | UUID                | oui    | Établissement — dénormalisé pour le cloisonnement                        |
-| `original_filename`        | texte               | oui    | Nom du fichier dans l'archive, conservé tel quel                         |
-| `storage_key`              | texte               | oui    | Emplacement du fichier sur le volume                                     |
+| `original_filename`        | texte               | oui    | **Chemin** du fichier dans l'archive, pas son nom de base                |
+| `storage_key`              | texte               | oui    | Emplacement sur le volume, construit par le serveur seul                 |
 | `sha256`                   | char(64)            | oui    | Empreinte du contenu, pour détecter un même fichier déposé deux fois     |
 | `size_bytes`               | entier              | oui    | Taille du fichier                                                        |
-| `mime_type`                | texte               | oui    | Type réel constaté, non déduit de l'extension                            |
 | `detected_candidate_name`  | texte               | non    | Identité **lue dans le texte** du document (RG-09)                       |
 | `detected_name_confidence` | entier              | non    | Confiance de 0 à 100 sur cette lecture                                   |
 | `extraction_method`        | `extraction_method` | non    | `NATIVE`, `OCR` ou `FAILED` ; vide tant que l'extraction n'a pas eu lieu |
 | `status`                   | `document_status`   | oui    | De `PENDING` à `COMPLETED`, en passant par les deux niveaux d'analyse    |
 | `error_message`            | texte               | non    | Motif d'un échec de traitement                                           |
+
+> **Un document peut n'appartenir à aucune candidature.** « Importé, pas encore rattaché » est un état réel : c'est le cas d'un fichier sans indice de regroupement, présenté comme orphelin à la réconciliation (`CU-04` 8a). Le cloisonnement n'en dépend pas — `institution_id` est porté en propre.
+>
+> **Pas de type MIME.** RG-07 n'admet que le PDF : la colonne vaudrait `application/pdf` sur toutes les lignes, et a été supprimée le 06/11/2026. Le type réel reste **vérifié** à la décompression ; on cesse seulement de stocker un résultat constant.
+>
+> **La clé de stockage ne contient rien de ce que l'utilisateur a fourni** : `{institution}/{campagne}/{lot}/{uuid}.pdf`. Le chemin dans l'archive vit dans `original_filename`, et n'atteint jamais le disque (Q-08).
 
 ## document_text — Texte extrait
 
@@ -186,4 +215,4 @@ Rattaché à l'établissement et non à la candidature : la purge des candidatur
 
 > **`action` et `entity_type` sont des énumérations** depuis le 05/10/2026. Elles étaient des chaînes libres, ce qui rendait le filtrage approximatif et envoyait des valeurs brutes à l'écran — contre la règle i18n du projet, qui veut qu'aucune valeur brute n'atteigne une interface. Le prix est une migration à chaque nouvelle action journalisée ; le jeu est borné et connaissable d'après les cas d'utilisation.
 >
-> `action` prend 18 valeurs, de `USER_LOGGED_IN` à `RANKING_EXPORTED`. `entity_type` en prend 8 : sept des dix entités du modèle (`INSTITUTION`, `USER`, `CAMPAIGN`, `REFERENCE_PROFILE`, `IMPORT_BATCH`, `APPLICATION`, `DOCUMENT`) plus `SESSION`, qui n'est pas une entité du modèle. Le texte extrait, l'analyse et l'entrée d'audit elle-même n'y figurent pas. `entity_id` est un texte et non un UUID : `SESSION` n'a pas d'identifiant de cette forme, et la référence peut viser une ressource déjà supprimée.
+> `action` prend 18 valeurs, de `USER_LOGGED_IN` à `RANKING_EXPORTED`. `entity_type` en prend 8 : sept des onze entités du modèle (`INSTITUTION`, `USER`, `CAMPAIGN`, `REFERENCE_PROFILE`, `IMPORT_BATCH`, `APPLICATION`, `DOCUMENT`) plus `SESSION`, qui n'est pas une entité du modèle. Le texte extrait, l'analyse, l'entrée refusée et l'entrée d'audit elle-même n'y figurent pas : une entrée refusée se journalise sous le lot qui la porte. `entity_id` est un texte et non un UUID : `SESSION` n'a pas d'identifiant de cette forme, et la référence peut viser une ressource déjà supprimée.

@@ -102,10 +102,25 @@
   },
   "importBatchStatus": {
     "PENDING": "Pending",
-    "RUNNING": "Running",
+    "UNPACKING": "Unpacking",
+    "READING_IDENTITY": "Reading identities",
     "AWAITING_RECONCILIATION": "To reconcile",
+    "ANALYSING": "Analysing documents",
     "COMPLETED": "Completed",
     "FAILED": "Failed"
+  },
+  "rejectionReason": {
+    "PATH_ESCAPE": "Path leaving the destination directory",
+    "NOT_REGULAR_FILE": "Symbolic link or special entry, not a regular file",
+    "FORBIDDEN_TYPE": "Format not accepted — PDF only",
+    "SYSTEM_ENTRY": "System entry, no usable content",
+    "FILE_TOO_LARGE": "Exceeds the maximum size per file ({{maxMb}} MB)",
+    "ARCHIVE_LIMIT": "Tripped an archive ceiling"
+  },
+  "archiveLimit": {
+    "FILE_COUNT": "Number of files",
+    "EXTRACTED_SIZE": "Total unpacked size",
+    "DECOMPRESSION_RATIO": "Decompression ratio"
   },
   "auth": {
     "pitch": "Probo first checks what each file is, then only scores the ones it is sure about. Doubtful documents are flagged, never graded at random.",

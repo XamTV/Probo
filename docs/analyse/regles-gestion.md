@@ -138,7 +138,7 @@ Le rapport de décompression est vérifié **en cours d'extraction**, sur le flu
 
 **Historique.** Sous ce numéro figurait auparavant une règle sur l'origine d'un import Google Drive — un import ne pouvait citer qu'une `DriveConnection` enregistrée, jamais un identifiant de dossier reçu en requête. L'abandon de l'import Drive rend cette règle sans objet. Le raisonnement qui la fondait, sur la référence directe non sécurisée entre locataires, est conservé dans le journal de décisions.
 
-_US-07 · à implémenter au lot 3_
+_US-07 · testé_
 
 ---
 
@@ -213,7 +213,7 @@ _US-24 · à implémenter au lot 5_
 | RG-04 | Niveau 2 sur documents retenus uniquement                 | US-11, US-12 | Testée        |
 | RG-05 | Score document = moyenne pondérée normalisée              | US-06, US-12 | Testée        |
 | RG-06 | Score candidature = moyenne des retenus ; `null` si aucun | US-13, US-14 | Testée        |
-| RG-07 | Décompression défensive : chemin, type, plafonds          | US-07        | À implémenter |
+| RG-07 | Décompression défensive : chemin, type, plafonds          | US-07        | Testée        |
 | RG-08 | Un référentiel de comparaison par type attendu            | US-04, US-22 | Testée        |
 | RG-09 | Identité lue dans le contenu, réconciliation si doute     | US-23        | À implémenter |
 | RG-10 | Contradiction humaine d'un verdict, sauf `UNREADABLE`     | US-24        | À implémenter |

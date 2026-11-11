@@ -12,7 +12,7 @@ Les entrées non encore écrites portent le lot qui les produira. Une entrée vi
 | ------------------------------------------- | -------------------------------------------- |
 | A01 — Contrôle d'accès défaillant           | **Écrite** — lot 1                           |
 | A02 — Défaillances cryptographiques         | **Écrite** — lot 1                           |
-| A03 — Injection                             | Lot 3, à la décompression de l'archive       |
+| A03 — Injection                             | **Écrite** — lot 3                           |
 | A04 — Conception non sécurisée              | Lot 4, avec l'analyse et la réconciliation   |
 | A05 — Mauvaise configuration                | Lot 7, au déploiement                        |
 | A06 — Composants vulnérables                | Lot 7, avec la chaîne d'intégration continue |
@@ -49,6 +49,16 @@ Le 404 est ici une **conséquence de la requête**, pas un second contrôle : co
 ### L'authentification est globale, pas opt-in
 
 Le garde est enregistré en `APP_GUARD`. Une route est protégée **sauf si** elle déclare `@Public()`. Oublier le décorateur verrouille une route ; oublier un garde l'aurait ouverte. Le mode de défaillance pointe du bon côté.
+
+### Le volume de documents est cloisonné lui aussi
+
+Une clé de stockage est `{établissement}/{campagne}/{lot}/{uuid}.pdf` : construite par le serveur, à partir d'identifiants qu'il a lui-même produits, et jamais à partir d'un nom fourni par l'utilisateur (Q-08, 11/11/2026).
+
+`StorageService` est le seul code qui touche le volume. Avant toute lecture ou écriture, il vérifie la forme de la clé, puis que son chemin résolu commence par le dossier de **l'établissement de la session**. La base filtre déjà par établissement ; cette garde est une seconde barrière, qui ne dépend pas de la première. Une requête fautive qui remettrait la clé d'un autre client s'arrête là au lieu de servir le fichier.
+
+Les deux contrôles sont nécessaires, et aucun ne suffit seul : la forme arrête `..` et les chemins absolus, le préfixe arrête une clé parfaitement formée qui appartient à quelqu'un d'autre.
+
+**Vérifié** par `apps/api/src/storage/storage.service.spec.ts`, avec une clé forgée vers un autre établissement. Sans la garde de préfixe, c'est exactement ce test qui tombe — essayé exprès.
 
 ### Vérification
 
@@ -95,6 +105,36 @@ Les données candidats ne quittent pas l'Union européenne : Mistral AI est héb
 
 ---
 
+## A03 — Injection
+
+L'archive ZIP est le seul canal d'entrée du produit, et chacun de ses octets est choisi par celui qui la dépose — noms d'entrées compris. C'est la seule surface où un contenu entièrement contrôlé par l'utilisateur touche le système de fichiers. RG-07 la ferme ; le code vit dans `apps/api/src/ingestion/`.
+
+### Trois attaques, trois conditions
+
+| Attaque         | Ce qu'elle tente                                                              | Ce qui l'arrête                                                                                            |
+| --------------- | ----------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------- |
+| _Zip slip_      | Une entrée `../../etc/cron.d/x` écrit hors du répertoire de destination       | Le chemin est **résolu** puis comparé, jamais fouillé à la recherche de `..` ; `\` compte comme séparateur |
+| Lien symbolique | Une entrée `cv.pdf → /etc/passwd`, lue ensuite comme un document              | Le mode Unix de l'entrée est lu : seul un fichier régulier passe                                           |
+| _Zip bomb_      | Quelques kilo-octets qui se décompressent en gigaoctets et saturent le disque | Les octets sont comptés **sur le flux** ; rapport, taille totale et nombre de fichiers interrompent le lot |
+
+### Le nom d'une entrée n'atteint jamais le disque
+
+C'est la défense qui rend les autres moins critiques. Un fichier accepté est écrit sous un UUID tiré par le serveur ; le chemin que l'archive lui donne est **affiché**, jamais utilisé pour le placer. La vérification du chemin détecte donc une attaque pour la signaler — elle n'est pas la seule chose qui se tienne entre l'attaque et le disque.
+
+### Ce que la bibliothèque aurait fait à notre place
+
+`yauzl`, par défaut, valide lui-même les noms : un `../` y lève une erreur qui **ferme toute l'archive**. Le comportement est sûr mais contraire à RG-07, qui veut cette seule entrée refusée et les autres examinées — sans quoi une seule entrée piégée suffirait à faire refuser le lot de 1 200 documents d'un établissement. Les noms sont donc décodés par le code du produit, et les tailles déclarées ne sont jamais crues : une en-tête peut mentir, le flux ne le peut pas.
+
+### « Avant toute écriture », au sens littéral
+
+Une entrée est lue en mémoire — au plus 20 Mo, le plafond par fichier — et n'est écrite qu'une fois toutes les conditions vérifiées, signature PDF comprise. Un fichier refusé n'a donc jamais existé sur le disque, même brièvement. Quand un plafond d'archive est franchi, ce qui avait été écrit est supprimé et aucun document n'est importé.
+
+### Vérification
+
+`apps/api/src/ingestion/*.spec.ts`, sur des archives **écrites octet par octet** par les tests eux-mêmes : les archives que RG-07 doit refuser sont précisément celles que les outils honnêtes refusent de fabriquer. Trois défenses ont été sabotées une à une — recherche naïve de `..`, nettoyage omis après interruption, rapport calculé sur la taille déclarée — et chaque sabotage fait tomber au moins un test.
+
+---
+
 ## A07 — Défaillances d'identification et d'authentification
 
 ### Un seul message d'échec
@@ -138,8 +178,6 @@ C'est un bénéfice de sécurité **non recherché** de la réduction de périm�
 ---
 
 ## Entrées à écrire
-
-**A03 — Injection**, au lot 3. La décompression d'archive est la seule surface où un contenu entièrement contrôlé par l'utilisateur touche le système de fichiers : RG-07 porte déjà le confinement du chemin résolu, le rejet des entrées non régulières et les plafonds de décompression.
 
 **A04 — Conception non sécurisée**, au lot 4. Les règles RG-01 à RG-06 et la réconciliation RG-09 sont des choix de conception dictés par le risque : un regroupement erroné corrompt deux scores en silence.
 

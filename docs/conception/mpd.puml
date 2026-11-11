@@ -6,7 +6,7 @@
 ' consultable d'un coup d'œil ce qu'une lecture de 300 lignes donne lentement.
 '
 ' Règle de tenue : se met à jour dans la même séance que la migration.
-' Dernière synchronisation : migration 20261106101100_invitation_audit_actions.
+' Dernière synchronisation : migration 20261111190000_import_phases_and_rejected_entries.
 '
 ' Ce que le MCD ignore et qui apparaît ici — clés techniques, horodatages,
 ' empreintes, dénormalisation de institution_id, index — est justifié
@@ -101,11 +101,29 @@ entity "**import_batch**" as import_batch {
   *status : import_batch_status
   *file_count : int
   *rejected_file_count : int
+  .. interruption (RG-07) ..
+  archive_limit : archive_limit
+  archive_size_bytes : bigint
+  extracted_bytes_at_abort : bigint
+  observed_ratio : float
+  ..
   error_message : text
   *created_at : timestamp
   completed_at : timestamp
   --
   idx (campaign_id)
+}
+
+entity "**rejected_entry**" as rejected_entry {
+  *id : uuid <<PK>>
+  --
+  *import_batch_id : uuid <<FK>>
+  *path : text
+  size_bytes : bigint
+  *reason : rejection_reason
+  *created_at : timestamp
+  --
+  idx (import_batch_id)
 }
 
 entity "**application**" as application {
@@ -132,14 +150,13 @@ entity "**application**" as application {
 entity "**document**" as document {
   *id : uuid <<PK>>
   --
-  *application_id : uuid <<FK>>
+  application_id : uuid <<FK>>
   *import_batch_id : uuid <<FK>>
   *institution_id : uuid <<FK>>
   *original_filename : text
   *storage_key : text
   *sha256 : char(64)
   *size_bytes : int
-  *mime_type : text
   detected_candidate_name : text
   detected_name_confidence : int
   extraction_method : extraction_method
@@ -223,8 +240,9 @@ app_user ||--o{ import_batch : "set null"
 app_user ||--o{ audit_entry : "set null"
 app_user ||--o{ document_analysis : "set null"
 
-import_batch ||--|{ document : cascade
-application ||--|{ document : cascade
+import_batch ||--o{ document : cascade
+import_batch ||--o{ rejected_entry : cascade
+application |o--|{ document : cascade
 
 document ||--o| document_text : cascade
 document ||--o| document_analysis : cascade

@@ -13,19 +13,41 @@ export const ApplicationStatus = z.enum(['PENDING', 'RUNNING', 'ANALYSED', 'FAIL
 export type ApplicationStatus = z.infer<typeof ApplicationStatus>;
 
 /**
- * Where an import batch stands.
+ * Where an import batch stands — one value per phase the import screen shows.
  *
  * `AWAITING_RECONCILIATION` blocks the analysis until a human has settled an
  * ambiguous grouping (RG-09).
  */
 export const ImportBatchStatus = z.enum([
   'PENDING',
-  'RUNNING',
+  'UNPACKING',
+  'READING_IDENTITY',
   'AWAITING_RECONCILIATION',
+  'ANALYSING',
   'COMPLETED',
   'FAILED',
 ]);
 export type ImportBatchStatus = z.infer<typeof ImportBatchStatus>;
+
+/** Why an archive entry was not imported (RG-07). */
+export const RejectionReason = z.enum([
+  /** The resolved path leaves the destination directory. A security incident. */
+  'PATH_ESCAPE',
+  /** A symbolic link or another special entry. A security incident. */
+  'NOT_REGULAR_FILE',
+  /** The extension or the actual content is outside the allow-list. */
+  'FORBIDDEN_TYPE',
+  /** Same condition as FORBIDDEN_TYPE, named apart: the user did not make it. */
+  'SYSTEM_ENTRY',
+  'FILE_TOO_LARGE',
+  /** The entry that tripped an archive ceiling. Not counted: the batch failed. */
+  'ARCHIVE_LIMIT',
+]);
+export type RejectionReason = z.infer<typeof RejectionReason>;
+
+/** The archive ceilings of RG-07, whose breach interrupts the whole batch. */
+export const ArchiveLimit = z.enum(['FILE_COUNT', 'EXTRACTED_SIZE', 'DECOMPRESSION_RATIO']);
+export type ArchiveLimit = z.infer<typeof ArchiveLimit>;
 
 /** Nature of a document, as determined by level 1 analysis. */
 export const DocumentType = z.enum([

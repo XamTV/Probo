@@ -20,7 +20,7 @@ credentials/
 *-service-account*.json
 
 # Stockage local des documents candidats (données personnelles)
-storage/
+/storage/
 
 # Canvas de maquettes assemblé : 2 Mo d'éditeur embarqué, régénéré depuis
 # docs/maquettage/artboards/

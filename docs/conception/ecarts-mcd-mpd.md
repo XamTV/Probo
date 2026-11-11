@@ -46,7 +46,7 @@ Chaque écart est un choix, pas un oubli — et aucun n'est aujourd'hui une faib
 
 ## 7. Index
 
-**L'écart.** Onze index (`@@index`), auxquels s'ajoutent deux contraintes d'unicité (`@unique` sur `user.email`, `@@unique` sur le couple campagne et type de document du référentiel). Parmi les index : `(campaign_id, overall_score DESC)`, `(institution_id, occurred_at DESC)`, `purge_due_at` et `sha256`.
+**L'écart.** Douze index (`@@index`), auxquels s'ajoutent deux contraintes d'unicité (`@unique` sur `user.email`, `@@unique` sur le couple campagne et type de document du référentiel). Parmi les index : `(campaign_id, overall_score DESC)`, `(institution_id, occurred_at DESC)`, `purge_due_at` et `sha256`.
 
 **Pourquoi.** Performance de lecture. Un index ne change jamais ce que les données signifient.
 
@@ -91,3 +91,11 @@ C'est le seul « écart » qui soit une absence volontaire plutôt qu'un ajout.
 **Pourquoi SHA-256 et non Argon2.** Un mot de passe est court, choisi par un humain, et se devine : il lui faut un hachage lent. Ce jeton est tiré de 256 bits aléatoires — il n'y a rien à deviner, et la seule menace qui compte est la lecture de la base elle-même.
 
 **Ce que l'écart ne cache pas.** Le jeton en clair n'existe qu'une fois, dans la réponse qui le produit. Il n'est stocké nulle part, ni journalisé : c'est pourquoi l'écran d'administration l'affiche immédiatement, et pourquoi un lien perdu se régénère au lieu de se relire.
+
+## 12. Le nombre d'entrées refusées est stocké deux fois
+
+**L'écart.** `import_batch.rejected_file_count` compte des lignes de `rejected_entry`. Au MCD, le lot n'a pas cet attribut : il se déduit de l'association `ÉCARTER`.
+
+**Pourquoi.** La liste des lots affiche « 7 entrées refusées » sur chaque ligne. Sans le compteur, elle agrège une table pour chacune ; avec, elle lit une colonne. C'est une dénormalisation de lecture, décidée en même temps que la table, le 06/11/2026.
+
+**Le risque accepté.** Le compteur et la table peuvent diverger. Ils sont écrits ensemble, dans la même transaction, par le seul code qui décompresse une archive — et une entrée refusée n'est jamais modifiée ni supprimée isolément : elle disparaît avec son lot. Une entrée `ARCHIVE_LIMIT` n'est **pas** comptée, et c'est voulu : elle n'a pas été écartée, elle a fait échouer le lot.

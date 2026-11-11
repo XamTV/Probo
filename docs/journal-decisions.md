@@ -922,3 +922,33 @@ La colonne est donc ajoutée **au lot 4**, trois lots avant d'être affichée. C
 - **Le proxy du lot 7** doit laisser vivre une connexion sans données : délai d'inactivité relevé et mise en mémoire tampon désactivée sur la route du flux. Le serveur envoie un commentaire de maintien à intervalle régulier. C'est porté au diagramme de déploiement.
 - Le front gère la reconnexion d'`EventSource`, qui est native, et relit l'état complet à chaque reconnexion.
 - **US-18** reçoit son canal : la notification « le fichier est prêt » passera par ce même mécanisme au lot 7, comme l'entrée du 06/11/2026 le prévoyait.
+
+---
+
+## 2026-11-11 — Un lot interrompu dit quel plafond l'a arrêté
+
+**Contexte.** L'entrée du 06/11/2026 a donné au lot trois colonnes pour l'écran `ImportRefuse` : taille de l'archive, volume extrait avant l'interruption, rapport constaté. En écrivant la migration, il est apparu qu'aucune ne dit **lequel** des trois plafonds d'archive de RG-07 a été franchi. La maquette ne montre que le cas du rapport, mais le nombre de fichiers et la taille totale décompressée interrompent le lot de la même façon, et l'écran doit dire lequel.
+
+**Options.** (a) Une quatrième colonne, énumérée. (b) Le déduire à la lecture en comparant les trois mesures aux plafonds. (c) L'écrire dans `error_message`.
+
+**Décision.** (a) : `import_batch.archive_limit`, de type `archive_limit` — `FILE_COUNT`, `EXTRACTED_SIZE`, `DECOMPRESSION_RATIO`.
+
+**Pourquoi.** (b) compare une mesure passée à un plafond présent : les plafonds vivent dans l'environnement précisément pour bouger sans redéploiement, et un lot refusé en novembre changerait de motif affiché le jour où un plafond est relevé. (c) envoie une valeur brute à l'écran, ce que l'entrée du 06/11/2026 vient d'écarter pour les trois mesures voisines — `error_message` redevient du diagnostic, jamais affiché.
+
+**Conséquences.** La colonne entre dans la migration `import_phases_and_rejected_entries`, avec les autres décisions du 06/11/2026 sur le modèle du lot 3. MCD, MLD, MPD, dictionnaire et écarts suivent dans la même séance ; l'écart n°12 consigne le compteur d'entrées refusées, dénormalisé depuis la nouvelle table.
+
+---
+
+## 2026-11-11 — Ce que « sous-dossier » et « préfixe » veulent dire
+
+**Contexte.** US-07 et `CU-04` font du sous-dossier et du préfixe du nom de fichier des **indices** de regroupement, que l'identité lue au lot 4 confirme ou infirme (RG-09). Aucun livrable ne dit ce qu'est un sous-dossier quand toute l'archive est rangée sous un dossier unique, ni ce qu'est le préfixe de `dubois_marie_lettre_motivation.pdf`. Le code les aurait définis en silence.
+
+**Décision.** Trois règles, dans `apps/api/src/ingestion/grouping.ts`.
+
+1. **Le dossier qui enveloppe toute l'archive ne nomme personne.** Zipper un dossier `candidatures_2026/` le place devant chaque chemin ; il est ignoré, et le sous-dossier qui compte est le premier qui distingue des fichiers entre eux.
+2. **Le préfixe est le nom privé de son dernier mot**, et un préfixe se rattache au plus court qu'il prolonge mot pour mot — sans quoi `dubois_marie_cv` et `dubois_marie_lettre_motivation` feraient deux candidats.
+3. **Un préfixe n'est un indice que s'il est partagé.** Seul, `scan_001` ou `CV_final` ne désigne personne : le fichier est orphelin, et attend un rattachement humain (`CU-04` 8a).
+
+**Pourquoi la troisième.** C'est elle qui tient la promesse de RG-09. Grouper un préfixe isolé reviendrait à créer une candidature par fichier dès que les noms sont tous différents — exactement l'échec silencieux que la règle a écarté le 03/09/2026.
+
+**Ce que ces règles font mal, et qui est accepté.** Une archive d'un seul candidat rangée sous son nom perd l'indice de dossier : le dossier enveloppe tout, il est ignoré, et des fichiers nommés `cv.pdf` et `lettre.pdf` deviennent orphelins. Inversement, cinquante fichiers `document_N.pdf` partagent le préfixe `document` et sont proposés comme un seul candidat. Les deux erreurs sont **visibles** — des orphelins à rattacher, une candidature dont les identités lues se contredisent — et la réconciliation du lot 4 existe pour les rattraper. Une heuristique plus fine se tromperait autrement, sans être plus vraie : la seule autorité est le texte.

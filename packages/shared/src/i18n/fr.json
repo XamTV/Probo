@@ -102,10 +102,25 @@
   },
   "importBatchStatus": {
     "PENDING": "En attente",
-    "RUNNING": "En cours",
+    "UNPACKING": "Décompression",
+    "READING_IDENTITY": "Lecture des identités",
     "AWAITING_RECONCILIATION": "À réconcilier",
+    "ANALYSING": "Analyse des documents",
     "COMPLETED": "Terminé",
     "FAILED": "Erreur"
+  },
+  "rejectionReason": {
+    "PATH_ESCAPE": "Chemin sortant du répertoire de destination",
+    "NOT_REGULAR_FILE": "Lien symbolique ou entrée spéciale, pas un fichier régulier",
+    "FORBIDDEN_TYPE": "Format non accepté — PDF uniquement",
+    "SYSTEM_ENTRY": "Entrée système, sans contenu exploitable",
+    "FILE_TOO_LARGE": "Dépasse la taille maximale par fichier ({{maxMb}} Mo)",
+    "ARCHIVE_LIMIT": "A déclenché un plafond d'archive"
+  },
+  "archiveLimit": {
+    "FILE_COUNT": "Nombre de fichiers",
+    "EXTRACTED_SIZE": "Taille totale décompressée",
+    "DECOMPRESSION_RATIO": "Rapport de décompression"
   },
   "auth": {
     "pitch": "Probo vérifie d'abord la nature de chaque fichier, puis n'évalue que ceux dont il est sûr. Les documents douteux sont signalés, jamais notés au hasard.",

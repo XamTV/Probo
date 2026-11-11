@@ -15,11 +15,13 @@ Convention : <u>clé primaire</u>, _#clé étrangère_.
 **REFERENTIEL** (<u>id_referentiel</u>, type_de_document, profil_decrit, document_de_reference, _#id_campagne_)
 → contrainte d'unicité sur (_#id_campagne_, type_de_document) : un référentiel et un seul par type attendu (RG-08)
 
-**LOT_IMPORT** (<u>id_lot</u>, nom_archive, statut, nombre_fichiers, nombre_fichiers_refuses, message_erreur, date_achevement, _#id_campagne_, _#id_utilisateur_)
+**LOT_IMPORT** (<u>id_lot</u>, nom_archive, statut, nombre_fichiers, plafond_franchi, taille_archive, volume_extrait_avant_interruption, rapport_constate, date_achevement, _#id_campagne_, _#id_utilisateur_)
+
+**ENTREE_REFUSEE** (<u>id_entree_refusee</u>, chemin_archive, taille, motif, _#id_lot_)
 
 **CANDIDATURE** (<u>id_candidature</u>, nom_candidat, adresse_candidat, reference_externe, statut, origine_identite, score_global, nombre_documents_atypiques, echeance_purge, _#id_campagne_)
 
-**DOCUMENT** (<u>id_document</u>, nom_origine, taille, type_fichier, identite_detectee, confiance_identite, methode_extraction, statut, _#id_candidature_, _#id_lot_)
+**DOCUMENT** (<u>id_document</u>, chemin_archive, taille, identite_detectee, confiance_identite, methode_extraction, statut, _#id_candidature_, _#id_lot_)
 
 **TEXTE_EXTRAIT** (<u>_#id_document_</u>, contenu, nombre_caracteres)
 
@@ -36,6 +38,8 @@ Convention : <u>clé primaire</u>, _#clé étrangère_.
 Ce n'est donc pas un raccourci : c'est ce que le MCD prescrit. Et c'est ce qui garantit structurellement qu'un document ne porte qu'un texte et qu'une analyse — là où une clé autonome aurait laissé la porte ouverte aux doublons.
 
 **Les clés étrangères facultatives traduisent des cardinalités minimales à zéro.** `LOT_IMPORT.#id_utilisateur` et `ENTREE_AUDIT.#id_utilisateur` sont nullables : un compte supprimé ne doit pas emporter les lots qu'il a importés ni les traces qu'il a laissées. C'est ce qui permet au journal d'audit de survivre à la suppression d'un compte.
+
+`DOCUMENT.#id_candidature` l'est aussi, depuis le 06/11/2026 : la cardinalité du document vers la candidature est `(0,1)`. Un document sans indice de regroupement est importé **orphelin** et attend un rattachement humain à la réconciliation.
 
 ## Ce que le MLD ne dit pas encore
 

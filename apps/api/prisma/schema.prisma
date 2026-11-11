@@ -193,14 +193,21 @@ model ReferenceProfile {
 // Ingestion
 // ---------------------------------------------------------------------------
 
+/// One value per phase the import screen shows. A single RUNNING could not
+/// tell unpacking from analysis, and deducing it from `file_count` breaks on a
+/// batch whose entries were all refused. See the 2026-11-06 journal entry.
 enum ImportBatchStatus {
   PENDING
-  RUNNING
+  UNPACKING
+
+  /// Unpacked; the identity of each candidate is being read from the text.
+  READING_IDENTITY
 
   /// Documents are unpacked and their identity read, but at least one grouping
   /// is ambiguous. No analysis starts until a human has arbitrated (RG-09).
   AWAITING_RECONCILIATION
 
+  ANALYSING
   COMPLETED
   FAILED
 
@@ -238,19 +245,86 @@ model ImportBatch {
   status    ImportBatchStatus @default(PENDING)
   fileCount Int               @default(0) @map("file_count")
 
-  /// Entries refused while unpacking — unsafe path, forbidden type, or a
-  /// per-file or per-archive limit exceeded (RG-07).
-  rejectedFileCount Int       @default(0) @map("rejected_file_count")
-  errorMessage      String?   @map("error_message")
-  createdAt         DateTime  @default(now()) @map("created_at")
-  completedAt       DateTime? @map("completed_at")
+  /// Entries refused one by one while unpacking (RG-07). Denormalised from
+  /// `rejected_entry` so that a list of batches never aggregates a table to
+  /// print "7 entries refused". An `ARCHIVE_LIMIT` row is not counted: it
+  /// failed the whole batch instead.
+  rejectedFileCount Int @default(0) @map("rejected_file_count")
 
-  campaign  Campaign   @relation(fields: [campaignId], references: [id], onDelete: Cascade)
-  user      User?      @relation(fields: [userId], references: [id], onDelete: SetNull)
-  documents Document[]
+  /// Which archive ceiling stopped the unpacking. Set only on a batch that
+  /// RG-07 interrupted, with the three measures below.
+  archiveLimit          ArchiveLimit? @map("archive_limit")
+  archiveSizeBytes      BigInt?       @map("archive_size_bytes")
+  extractedBytesAtAbort BigInt?       @map("extracted_bytes_at_abort")
+  observedRatio         Float?        @map("observed_ratio")
+
+  /// Diagnostic only — never shown to a user, who reads the columns above.
+  errorMessage String?   @map("error_message")
+  createdAt    DateTime  @default(now()) @map("created_at")
+  completedAt  DateTime? @map("completed_at")
+
+  campaign        Campaign        @relation(fields: [campaignId], references: [id], onDelete: Cascade)
+  user            User?           @relation(fields: [userId], references: [id], onDelete: SetNull)
+  documents       Document[]
+  rejectedEntries RejectedEntry[]
 
   @@index([campaignId])
   @@map("import_batch")
+}
+
+/// The archive ceilings of RG-07. Exceeding one interrupts the whole batch,
+/// where a per-entry refusal only sets the entry aside.
+enum ArchiveLimit {
+  FILE_COUNT
+  EXTRACTED_SIZE
+  DECOMPRESSION_RATIO
+
+  @@map("archive_limit")
+}
+
+/// Why an archive entry was not imported (RG-07). One value per reason the
+/// import screen shows, which is why there are six and not four conditions.
+enum RejectionReason {
+  /// The resolved path leaves the destination directory — a security incident.
+  PATH_ESCAPE
+  /// A symbolic link or another special entry — a security incident.
+  NOT_REGULAR_FILE
+  /// The extension or the actual content is not in the allow-list.
+  FORBIDDEN_TYPE
+  /// Caught by the same condition as FORBIDDEN_TYPE, but named apart: a
+  /// `__MACOSX/._cv.pdf` is not something the user made.
+  SYSTEM_ENTRY
+  FILE_TOO_LARGE
+  /// The entry that tripped an archive ceiling. Never counted in
+  /// `rejected_file_count`: the batch failed instead.
+  ARCHIVE_LIMIT
+
+  @@map("rejection_reason")
+}
+
+/// An archive entry refused while unpacking, kept so the import screen can list
+/// it — "listed on screen, never silently ignored" (US-07).
+///
+/// The audit trail is not a substitute: its `details` column is never queried
+/// by content (gap n°8). See the 2026-11-06 journal entry.
+model RejectedEntry {
+  id            String @id @default(uuid()) @db.Uuid
+  importBatchId String @map("import_batch_id") @db.Uuid
+
+  /// The entry's path inside the archive, as the archive spells it. Hostile
+  /// input: it is displayed, never used to build a path on disk.
+  path String
+
+  /// Size as far as it is known: null for a link or a special entry, which has
+  /// no content of its own.
+  sizeBytes BigInt?         @map("size_bytes")
+  reason    RejectionReason
+  createdAt DateTime        @default(now()) @map("created_at")
+
+  importBatch ImportBatch @relation(fields: [importBatchId], references: [id], onDelete: Cascade)
+
+  @@index([importBatchId])
+  @@map("rejected_entry")
 }
 
 // ---------------------------------------------------------------------------
@@ -325,19 +399,29 @@ enum DocumentStatus {
 }
 
 model Document {
-  id            String @id @default(uuid()) @db.Uuid
-  applicationId String @map("application_id") @db.Uuid
-  importBatchId String @map("import_batch_id") @db.Uuid
-  institutionId String @map("institution_id") @db.Uuid
+  id String @id @default(uuid()) @db.Uuid
 
+  /// Null while the document is an orphan: imported, attached to no
+  /// candidate, waiting for a human at reconciliation (CU-04 8a). The
+  /// institution does not depend on it — `institution_id` is carried apart.
+  applicationId String? @map("application_id") @db.Uuid
+  importBatchId String  @map("import_batch_id") @db.Uuid
+  institutionId String  @map("institution_id") @db.Uuid
+
+  /// The path inside the archive, not the base name — `dubois_marie/cv.pdf`.
+  /// Without it, a grouping by FOLDER could never be checked again (RG-09).
   originalFilename String @map("original_filename")
-  storageKey       String @map("storage_key")
+
+  /// Built by the server, `{institutionId}/{campaignId}/{batchId}/{uuid}.pdf`.
+  /// The uploaded name never reaches a path. See the 2026-11-11 journal entry.
+  storageKey String @map("storage_key")
 
   /// Content fingerprint: detects the same file uploaded twice in one batch.
   sha256 String @db.Char(64)
 
-  sizeBytes Int    @map("size_bytes")
-  mimeType  String @map("mime_type")
+  /// No MIME type column: RG-07 admits PDF only, so it would hold one value on
+  /// every row. The actual type is still checked while unpacking.
+  sizeBytes Int @map("size_bytes")
 
   /// Candidate identity read from the document's own text (RG-09).
   ///
@@ -355,7 +439,7 @@ model Document {
   createdAt DateTime @default(now()) @map("created_at")
   updatedAt DateTime @updatedAt @map("updated_at")
 
-  application Application       @relation(fields: [applicationId], references: [id], onDelete: Cascade)
+  application Application?      @relation(fields: [applicationId], references: [id], onDelete: Cascade)
   importBatch ImportBatch       @relation(fields: [importBatchId], references: [id], onDelete: Cascade)
   institution Institution       @relation(fields: [institutionId], references: [id], onDelete: Cascade)
   text        DocumentText?

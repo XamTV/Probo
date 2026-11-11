@@ -61,10 +61,16 @@ entity "**CANDIDATURE**" as candidature {
   #id_campagne
 }
 
+entity "**ENTREE_REFUSEE**" as refus {
+  <u>id_entree_refusee</u>
+  --
+  #id_lot
+}
+
 entity "**DOCUMENT**" as document {
   <u>id_document</u>
   --
-  #id_candidature
+  #id_candidature  (nullable)
   #id_lot
 }
 
@@ -97,8 +103,9 @@ utilisateur ||--o{ lot
 utilisateur ||--o{ audit
 utilisateur ||--o{ analyse
 
-candidature ||--|{ document
-lot ||--|{ document
+candidature |o--|{ document
+lot ||--o{ document
+lot ||--o{ refus
 
 document ||--o| texte
 document ||--o| analyse

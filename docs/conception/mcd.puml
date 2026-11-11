@@ -38,9 +38,10 @@ rectangle "**ÉTABLISSEMENT**\n--\n<u>id établissement</u>\nnom\nsiret\nactif" 
 rectangle "**UTILISATEUR**\n--\n<u>id utilisateur</u>\nadresse électronique\nmot de passe\nnom\nrôle\nactif\ndernière connexion\ntentatives échouées\nverrouillé jusqu'à\njeton d'invitation\nexpiration de l'invitation" as UTILISATEUR
 rectangle "**CAMPAGNE**\n--\n<u>id campagne</u>\nnom\ndescription\nstatut\ntypes attendus\nseuil de confiance\npoids adéquation\npoids clarté\npoids qualité formelle\ndate d'ouverture\ndate de clôture" as CAMPAGNE
 rectangle "**RÉFÉRENTIEL**\n--\n<u>id référentiel</u>\ntype de document\nprofil décrit\ndocument de référence" as REFERENTIEL
-rectangle "**LOT D'IMPORT**\n--\n<u>id lot</u>\nnom de l'archive\nstatut\nnombre de fichiers\nnombre de fichiers refusés\nmessage d'erreur\ndate d'achèvement" as LOT
+rectangle "**LOT D'IMPORT**\n--\n<u>id lot</u>\nnom de l'archive\nstatut\nnombre de fichiers\nplafond franchi\ntaille de l'archive\nvolume extrait avant interruption\nrapport constaté\ndate d'achèvement" as LOT
+rectangle "**ENTRÉE REFUSÉE**\n--\n<u>id entrée refusée</u>\nchemin dans l'archive\ntaille\nmotif" as REFUS
 rectangle "**CANDIDATURE**\n--\n<u>id candidature</u>\nnom du candidat\nadresse du candidat\nréférence externe\nstatut\norigine de l'identité\nscore global\nnombre de documents atypiques\néchéance de purge" as CANDIDATURE
-rectangle "**DOCUMENT**\n--\n<u>id document</u>\nnom d'origine\ntaille\ntype de fichier\nidentité détectée\nconfiance sur l'identité\nméthode d'extraction\nstatut" as DOCUMENT
+rectangle "**DOCUMENT**\n--\n<u>id document</u>\nchemin dans l'archive\ntaille\nidentité détectée\nconfiance sur l'identité\nméthode d'extraction\nstatut" as DOCUMENT
 rectangle "**TEXTE EXTRAIT**\n--\n<u>(R) par DOCUMENT</u>\ncontenu\nnombre de caractères" as TEXTE
 rectangle "**ANALYSE**\n--\n<u>(R) par DOCUMENT</u>\ntype détecté\nconfiance\natypique\nmotif d'atypie\njustification niveau 1\nscore adéquation\nscore clarté\nscore qualité formelle\njustification adéquation\njustification clarté\njustification qualité formelle\nscore du document\nversion de prompt\ndate d'analyse\n--\ntype requalifié\nmotif de requalification\ndate de requalification" as ANALYSE
 rectangle "**ENTRÉE D'AUDIT**\n--\n<u>id entrée</u>\naction\ntype de ressource\nréférence de ressource\ndate de survenue" as AUDIT
@@ -52,6 +53,7 @@ usecase "RECEVOIR" as RECEVOIR
 usecase "DÉPOSER" as DEPOSER
 usecase "REGROUPER" as REGROUPER
 usecase "APPORTER" as APPORTER
+usecase "ÉCARTER" as ECARTER
 usecase "RASSEMBLER" as RASSEMBLER
 usecase "PORTER\n(R)" as PORTER
 usecase "ÉVALUER\n(R)" as EVALUER
@@ -77,11 +79,14 @@ DEPOSER -- LOT : (0,1)
 CAMPAGNE -- REGROUPER : (0,n)
 REGROUPER -- CANDIDATURE : (1,1)
 
-LOT -- APPORTER : (1,n)
+LOT -- APPORTER : (0,n)
 APPORTER -- DOCUMENT : (1,1)
 
+LOT -- ECARTER : (0,n)
+ECARTER -- REFUS : (1,1)
+
 CANDIDATURE -- RASSEMBLER : (1,n)
-RASSEMBLER -- DOCUMENT : (1,1)
+RASSEMBLER -- DOCUMENT : (0,1)
 
 DOCUMENT -- PORTER : (0,1)
 PORTER -- TEXTE : (1,1)
@@ -107,6 +112,16 @@ note bottom of TEXTE
   qu'un document porte deux textes ou
   deux analyses — une clé autonome aurait
   laissé la porte ouverte au doublon.
+end note
+
+note right of DOCUMENT
+  **(0,1) vers CANDIDATURE** : un document
+  sans indice de regroupement est
+  importé **orphelin**, et attend qu'une
+  personne le rattache (CU-04 8a).
+  Un lot dont toutes les entrées sont
+  refusées n'apporte aucun document :
+  d'où **(0,n)** côté LOT D'IMPORT.
 end note
 
 note right of CANDIDATURE
