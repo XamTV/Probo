@@ -129,7 +129,17 @@ C'est la défense qui rend les autres moins critiques. Un fichier accepté est �
 
 Une entrée est lue en mémoire — au plus 20 Mo, le plafond par fichier — et n'est écrite qu'une fois toutes les conditions vérifiées, signature PDF comprise. Un fichier refusé n'a donc jamais existé sur le disque, même brièvement. Quand un plafond d'archive est franchi, ce qui avait été écrit est supprimé et aucun document n'est importé.
 
+### Une attaque se journalise, un refus se compte
+
+Les deux refus qui sont des attaques — chemin sortant, entrée non régulière — partent **aussi** au journal d'audit de l'établissement, sous `ARCHIVE_ENTRY_REJECTED`, attribués à l'auteur du dépôt. Les autres refus ne vont qu'à la liste du lot : un `.docx` déposé par erreur n'est pas un incident. Une archive interrompue par un plafond laisse une entrée `BATCH_REJECTED` qui nomme le plafond franchi.
+
+### L'archive elle-même
+
+Elle est écrite **en flux** sur le disque à mesure qu'elle arrive, jamais chargée en mémoire, sous un nom tiré par le serveur et hors du dossier de tout établissement. Le plafond de 3 Go est tenu par la réception elle-même : au-delà, la requête reçoit un 413 avant qu'aucun lot n'existe. Un fichier qui n'est pas un ZIP lisible est refusé à la réception, avec un motif que l'utilisateur peut comprendre. L'archive est supprimée une fois décompressée.
+
 ### Vérification
+
+`apps/api/test/import.e2e-spec.ts`, contre la vraie base et le vrai Redis, avec le vrai travailleur : une archive mêlant documents valides, type interdit et chemin sortant ; une bombe de décompression ; un fichier qui n'est pas un ZIP ; une campagne en brouillon ; et les trois routes vues depuis un autre établissement.
 
 `apps/api/src/ingestion/*.spec.ts`, sur des archives **écrites octet par octet** par les tests eux-mêmes : les archives que RG-07 doit refuser sont précisément celles que les outils honnêtes refusent de fabriquer. Trois défenses ont été sabotées une à une — recherche naïve de `..`, nettoyage omis après interruption, rapport calculé sur la taille déclarée — et chaque sabotage fait tomber au moins un test.
 

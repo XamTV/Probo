@@ -952,3 +952,19 @@ La colonne est donc ajoutée **au lot 4**, trois lots avant d'être affichée. C
 **Pourquoi la troisième.** C'est elle qui tient la promesse de RG-09. Grouper un préfixe isolé reviendrait à créer une candidature par fichier dès que les noms sont tous différents — exactement l'échec silencieux que la règle a écarté le 03/09/2026.
 
 **Ce que ces règles font mal, et qui est accepté.** Une archive d'un seul candidat rangée sous son nom perd l'indice de dossier : le dossier enveloppe tout, il est ignoré, et des fichiers nommés `cv.pdf` et `lettre.pdf` deviennent orphelins. Inversement, cinquante fichiers `document_N.pdf` partagent le préfixe `document` et sont proposés comme un seul candidat. Les deux erreurs sont **visibles** — des orphelins à rattacher, une candidature dont les identités lues se contredisent — et la réconciliation du lot 4 existe pour les rattraper. Une heuristique plus fine se tromperait autrement, sans être plus vraie : la seule autorité est le texte.
+
+---
+
+## 2026-11-11 — La file d'import tient sur BullMQ 5 et `@nestjs/bullmq` 11
+
+**Contexte.** BullMQ est au choix de stack depuis le 15/08/2026 ; le lot 3 est le premier à l'installer. `npm install` donne les dernières versions : BullMQ 6 et `@nestjs/bullmq` 12, que leurs plages de pairs déclarent compatibles avec Nest 11.
+
+**Ce que les plages de pairs ne disaient pas.** BullMQ 6 rend son client Redis **facultatif** — il sait aussi parler à PostgreSQL — et ne l'installe plus : la connexion échouait au typage, faute d'`ioredis`. `@nestjs/bullmq` 12 n'est publié **qu'en ESM** : l'application démarrait, Node sachant charger un module ESM depuis CommonJS, et les tests de bout en bout passaient, parce qu'ils tournent sous `--experimental-vm-modules`. Le premier test unitaire qui touchait au module a échoué sur `export`, que Jest en CommonJS ne sait pas lire.
+
+**Options.** (a) Les dernières versions, et un Jest reconfiguré pour l'ESM. (b) BullMQ 5 et `@nestjs/bullmq` 11, tous deux en CommonJS.
+
+**Décision.** (b) : `bullmq` 5.81, qui embarque `ioredis`, et `@nestjs/bullmq` 11.0.5.
+
+**Pourquoi.** (a) déplaçait toute la suite de l'API sous un drapeau expérimental pour une seule dépendance, et ajoutait une couche de moteurs interchangeables dont le produit n'a pas l'usage. Le piège est celui que le cadre du projet nomme déjà — vérifier le format de module avant d'ajouter un paquet — et il a été vu par un test, pas par une lecture : la plage de pairs était exacte, c'est le format qui ne l'était pas.
+
+**Conséquences.** Une montée de version de ces deux paquets se fera ensemble, et après vérification de leur format. La CI gagne un service Redis : l'application ne démarre plus sans lui.

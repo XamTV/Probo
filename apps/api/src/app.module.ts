@@ -1,5 +1,6 @@
+import { BullModule } from '@nestjs/bullmq';
 import { Module } from '@nestjs/common';
-import { ConfigModule } from '@nestjs/config';
+import { ConfigModule, ConfigService } from '@nestjs/config';
 import { APP_GUARD } from '@nestjs/core';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
@@ -7,6 +8,8 @@ import { AuthGuard } from './auth/auth.guard';
 import { AuthModule } from './auth/auth.module';
 import { CampaignsModule } from './campaigns/campaigns.module';
 import { envFile } from './common/monorepo-root';
+import { redisConnection } from './imports/import-queue';
+import { ImportsModule } from './imports/imports.module';
 import { PrismaModule } from './prisma/prisma.module';
 import { UsersModule } from './users/users.module';
 
@@ -18,10 +21,15 @@ import { UsersModule } from './users/users.module';
       // not by counting directories from the compiled file.
       envFilePath: envFile(),
     }),
+    BullModule.forRootAsync({
+      inject: [ConfigService],
+      useFactory: (config: ConfigService) => ({ connection: redisConnection(config) }),
+    }),
     PrismaModule,
     AuthModule,
     UsersModule,
     CampaignsModule,
+    ImportsModule,
   ],
   controllers: [AppController],
   providers: [

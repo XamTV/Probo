@@ -32,11 +32,26 @@ jobs:
           --health-timeout 5s
           --health-retries 5
 
+      # La file BullMQ du lot 3 : l'application ne démarre pas sans elle, et
+      # le test de l'import fait tourner le vrai travailleur.
+      redis:
+        image: redis:7-alpine
+        ports:
+          - 6380:6379
+        options: >-
+          --health-cmd "redis-cli ping"
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+
     env:
       DATABASE_URL: postgresql://probo:probo@localhost:5433/probo?schema=public
       # Secret d'intégration continue : il ne signe que des sessions de test,
       # jetées avec le conteneur. Le secret de production vit chez l'hébergeur.
       JWT_SECRET: ci-secret-de-test-sans-valeur-hors-integration-continue
+      REDIS_URL: redis://localhost:6380
+      # Le volume des documents, jeté avec la machine d'intégration.
+      STORAGE_DIR: ./storage
 
     steps:
       - uses: actions/checkout@v4

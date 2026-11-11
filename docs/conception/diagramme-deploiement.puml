@@ -63,12 +63,14 @@ node "Poste de développement\n<<en place>>" as POSTE {
 node "GitHub Actions\n<<en place>>" as CI {
   artifact "Qualité, tests et build\nformat · lint · unitaires · e2e" as JOB
   database "postgres:17-alpine\nservice éphémère" as PG_CI
+  database "redis:7-alpine\nservice éphémère" as REDIS_CI
 }
 
 WEB_DEV --> API_DEV : HTTP /api
 API_DEV --> PG_DEV : TCP 5433
-API_DEV ..> REDIS_DEV : TCP 6380\n<<dès le lot 4>>
+API_DEV --> REDIS_DEV : TCP 6380\nfile d'import
 JOB --> PG_CI : migrations + e2e
+JOB --> REDIS_CI : e2e de l'import
 
 ' ───────────────────────────── CIBLE, LOT 7 ─────────────────────────
 
@@ -95,7 +97,9 @@ JOB ..> VPS : déploiement\n<<lot 7>>
 note bottom of VPS
   **Rien de ceci n'existe au 02/11/2026.**
   Pas de Dockerfile, pas de VPS provisionné,
-  ni BullMQ ni client Mistral installés.
+  pas de client Mistral. BullMQ est installé
+  depuis le lot 3 ; son travailleur tourne
+  dans le processus de l'API.
 
   Livré au lot 7, avec la configuration
   (A05) et la chaîne de dépendances (A06).

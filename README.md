@@ -96,6 +96,7 @@ Il n'existe pas d'inscription : `POST /users` exige une session, qui exige un co
 [Front Angular]
       ↓ API REST (même domaine, /api)
 [NestJS]
+      ↓ 1 job BullMQ par archive : décompression (RG-07)
       ↓ 1 job BullMQ par document
 [Workers]
       ↓
@@ -136,21 +137,21 @@ Les deux locales sont embarquées dans le bundle plutôt que chargées à la dem
 
 Les choix sont arrêtés et justifiés au [journal des décisions](docs/journal-decisions.md). Ils ne sont pas tous installés : une dépendance s'ajoute au [lot](docs/analyse/plan-livraison.md) qui s'en sert, pas avant. L'installer en avance donnerait une bibliothèque inutilisée, dont la version serait à reprendre le jour du premier appel. La colonne d'état dit donc ce qui tourne aujourd'hui.
 
-| Couche           | Technologie                                    | État                            |
-| ---------------- | ---------------------------------------------- | ------------------------------- |
-| Langage          | TypeScript, front et back                      | En place                        |
-| Front            | Angular · Tailwind CSS · Angular CDK           | En place                        |
-| Backend          | NestJS                                         | En place                        |
-| Base de données  | PostgreSQL · Prisma                            | En place                        |
-| File de tâches   | BullMQ · Redis                                 | Redis en place, BullMQ au lot 4 |
-| Validation       | Zod, partagé front et back                     | En place                        |
-| Extraction PDF   | `pdftotext` (poppler) · `tesseract` en secours | Au lot 4                        |
-| IA               | Mistral AI                                     | Au lot 4                        |
-| Export PDF       | pdfmake                                        | Au lot 7                        |
-| Authentification | Argon2 · JWT en cookie httpOnly                | En place                        |
-| i18n             | Transloco — français et anglais                | En place                        |
-| Tests            | Vitest (front, shared) · Jest (API)            | En place                        |
-| Infrastructure   | Docker · GitHub Actions · VPS Scaleway         | Docker et CI en place           |
+| Couche           | Technologie                                    | État                       |
+| ---------------- | ---------------------------------------------- | -------------------------- |
+| Langage          | TypeScript, front et back                      | En place                   |
+| Front            | Angular · Tailwind CSS · Angular CDK           | En place                   |
+| Backend          | NestJS                                         | En place                   |
+| Base de données  | PostgreSQL · Prisma                            | En place                   |
+| File de tâches   | BullMQ · Redis                                 | En place — import au lot 3 |
+| Validation       | Zod, partagé front et back                     | En place                   |
+| Extraction PDF   | `pdftotext` (poppler) · `tesseract` en secours | Au lot 4                   |
+| IA               | Mistral AI                                     | Au lot 4                   |
+| Export PDF       | pdfmake                                        | Au lot 7                   |
+| Authentification | Argon2 · JWT en cookie httpOnly                | En place                   |
+| i18n             | Transloco — français et anglais                | En place                   |
+| Tests            | Vitest (front, shared) · Jest (API)            | En place                   |
+| Infrastructure   | Docker · GitHub Actions · VPS Scaleway         | Docker et CI en place      |
 
 ### Choix de Mistral AI
 
