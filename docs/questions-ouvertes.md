@@ -13,11 +13,11 @@ Les arbitrages identifiés mais pas encore rendus. Ce registre existe parce que 
 | Q-01 | L'extraction d'identité : appel dédié ou greffée sur le niveau 1  | 03/09/2026 | Lot 4               | Ouverte  |
 | Q-02 | Le jeton d'invitation : une table ou deux colonnes                | 05/10/2026 | Lot 2               | Tranchée |
 | Q-03 | Créer le premier administrateur d'un établissement en production  | 03/11/2026 | Avant mise en ligne | Ouverte  |
-| Q-04 | La valeur du plafond de taille totale décompressée                | 06/11/2026 | Lot 3               | Ouverte  |
-| Q-05 | Le mécanisme d'avancement : SSE, WebSocket ou scrutation          | 06/11/2026 | Lot 3               | Ouverte  |
+| Q-04 | La valeur du plafond de taille totale décompressée                | 06/11/2026 | Lot 3               | Tranchée |
+| Q-05 | Le mécanisme d'avancement : SSE, WebSocket ou scrutation          | 06/11/2026 | Lot 3               | Tranchée |
 | Q-06 | Le seuil de confiance sur l'identité lue                          | 06/11/2026 | Lot 4               | Ouverte  |
 | Q-07 | `prompt_version` quand RG-03 interdit l'appel au modèle           | 06/11/2026 | Lot 4               | Ouverte  |
-| Q-08 | Le nommage des clés de stockage et le cloisonnement sur le volume | 06/11/2026 | Lot 3               | Ouverte  |
+| Q-08 | Le nommage des clés de stockage et le cloisonnement sur le volume | 06/11/2026 | Lot 3               | Tranchée |
 
 ---
 
@@ -63,6 +63,8 @@ Probo n'a pas d'inscription libre — c'est voulu, le produit se vend à des ét
 
 **Posée le** 06/11/2026, dans l'entrée de cadrage du lot 3.
 
+**Tranchée le** 11/11/2026 : **3 Go d'archive, 4 Go extraits**, sur un poids moyen posé à 1 Mo par document. Voir l'entrée du 11/11/2026 au journal.
+
 RG-07 nomme quatre plafonds : taille par fichier, nombre de fichiers, **taille totale décompressée**, et rapport de décompression. Les trois autres ont une valeur, annoncée à l'utilisateur avant le dépôt par la maquette `ImportDepot` — 20 Mo, 500 fichiers, 500 Mo d'archive — et le rapport vaut × 100 selon `ImportRefuse`. Le troisième n'a de valeur nulle part.
 
 **Ce qui est en jeu.** Il ne fait pas doublon avec le rapport : une archive de 400 Mo déjà peu compressible atteint 20 Go de contenu extrait avec un rapport de × 50, très en dessous du plafond, et sature quand même le disque. Le rapport attrape la bombe ; la taille totale attrape le volume honnête mais ingérable. L'un sans l'autre laisse un trou.
@@ -78,6 +80,8 @@ RG-07 nomme quatre plafonds : taille par fichier, nombre de fichiers, **taille t
 ## Q-05 · Le mécanisme d'avancement : SSE, WebSocket ou scrutation
 
 **Posée le** 06/11/2026, par la passe d'audit du lot 3.
+
+**Tranchée le** 11/11/2026 : **Server-Sent Events**, et une estimation de durée calculée dans le navigateur au rythme observé, sans aucune colonne. Voir l'entrée du 11/11/2026 au journal.
 
 Les maquettes `ImportEnCours` et `AnalyseEnCours` affichent une progression document par document, une estimation de durée, et précisent qu'on peut fermer l'écran sans interrompre le traitement. **Aucun livrable ne dit comment le navigateur l'apprend** : ni SSE, ni WebSocket, ni scrutation n'apparaissent nulle part, et le diagramme de déploiement ne porte qu'un `HTTP /api` entre le front et l'API. BullMQ est tranché depuis le 15/08/2026, mais c'est la file **serveur** — elle ne dit rien du chemin vers l'écran.
 
@@ -120,6 +124,8 @@ La maquette `Reconciliation` affiche « confiance 42 % — **sous le seuil** » 
 ## Q-08 · Le nommage des clés de stockage et le cloisonnement sur le volume
 
 **Posée le** 06/11/2026, par la passe d'audit.
+
+**Tranchée le** 11/11/2026 : **`{institutionId}/{campaignId}/{batchId}/{uuid}.{ext}`**, construite par le serveur, avec une garde de préfixe sur l'établissement de la session. Voir l'entrée du 11/11/2026 au journal.
 
 `document.storage_key` est obligatoire et `reference_profile.storage_key` existe, mais **aucun livrable ne dit comment une clé est construite** : ni schéma de nommage, ni arborescence, ni règle de cloisonnement entre établissements sur le volume. L'écart n°4 décrit à quoi la colonne sert, jamais comment elle est formée ; le plan de sécurisation ne traite que le chiffrement au repos.
 

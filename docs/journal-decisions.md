@@ -875,3 +875,50 @@ La colonne est donc ajoutée **au lot 4**, trois lots avant d'être affichée. C
 **Ce que ces deux décisions ont en commun.** Dans les deux cas, l'option paresseuse ne coûtait rien **au moment où on la prenait**, et tout plus tard : une chaîne libre se relit mal et une colonne tardive se remplit mal. Les deux auraient été prises au clavier sans que personne n'ait à les défendre.
 
 **Conséquences.** Trois colonnes sur le lot d'import, une sur le document, avec MCD, MLD, MPD, dictionnaire, écarts et migration **dans la séance** de l'implémentation — au lot 3 pour les trois premières, au lot 4 pour la quatrième.
+
+---
+
+## 2026-11-11 — Le lot 3 a ses trois réponses : stockage, plafonds, avancement
+
+**Contexte.** Le cadrage du 06/11/2026 a enregistré trois questions à échéance « lot 3 » et a dit lui-même que la première arrêterait le lot à sa première écriture sur disque. Elles sont tranchées ensemble, avant la migration, parce qu'aucune ne se décide bien au clavier : la première se grave dans les clés stockées en base, la deuxième dans les tests de RG-07, la troisième dans la forme des routes.
+
+### `Q-08` — Les clés de stockage portent l'établissement
+
+**Options.** (a) Une clé à plat, `{uuid}.{ext}`. (b) Une clé préfixée par l'établissement, `{institutionId}/{campaignId}/{batchId}/{uuid}.{ext}`.
+
+**Décision.** (b). La clé est **toujours construite par le serveur** ; le nom d'origine du fichier n'entre jamais dans un chemin — il vit dans `original_filename`, qui porte le chemin dans l'archive depuis l'entrée du 06/11/2026. Le service de stockage résout le chemin complet et refuse toute lecture ou écriture dont le résultat ne commence pas par `STORAGE_DIR/{institutionId de la session}/`.
+
+**Pourquoi.** Avec (a), deux établissements ne sont séparés que par le filtre sur `institution_id` : une requête fautive suffit à servir le fichier d'un autre client. Avec (b), la même faute se heurte à une seconde barrière, indépendante de la base. Le préfixe donne aussi gratuitement ce que (a) rendrait coûteux : supprimer, sauvegarder ou restaurer un établissement revient à traiter un dossier. Le nom d'origine est exclu parce qu'il est fourni par l'utilisateur — c'est précisément l'entrée que RG-07 traite comme hostile.
+
+**Conséquences.** Le service de stockage est le seul à toucher le volume, et sa garde de préfixe est testée avec une clé forgée qui pointe vers un autre établissement. Le plan de sécurisation gagne l'entrée correspondante sous A01 quand le code existe.
+
+### `Q-04` — 3 Go d'archive, 4 Go extraits
+
+**Options.** (a) 2 Go d'archive et 2 Go extraits. (b) 3 Go et 4 Go. (c) 5 Go et 8 Go.
+
+**Décision.** (b) : `INGESTION_MAX_ARCHIVE_SIZE_MB=3072` et `INGESTION_MAX_EXTRACTED_SIZE_MB=4096`. Les 20 Mo par fichier, les 4 000 fichiers et le rapport de × 100 sont inchangés.
+
+**Pourquoi.** Le poids moyen d'un document qu'aucun livrable n'énonçait est **posé à 1 Mo**, et c'est une hypothèse, dite comme telle : un CV ou une lettre en PDF pèse quelques centaines de kilo-octets, mais un relevé de notes scanné en pèse plusieurs. 4 000 fichiers à 1 Mo donnent 4 Go. Un PDF se compresse mal ; l'archive pèse donc à peu près ce qu'elle contient, et 3 Go couvrent les 3 500 documents du haut de la fourchette du persona. (a) aurait refusé le lot de Claire dès que ses documents seraient lourds, ce que l'entrée du 06/11/2026 sur la volumétrie a précisément écarté. (c) aurait laissé passer un volume que le disque visé ne justifie pas.
+
+**Conséquences.**
+
+- L'archive est **écrite en flux sur le disque, jamais chargée en mémoire** : à 3 Go, c'est une contrainte de l'implémentation, pas une optimisation.
+- Le volume du VPS doit offrir au moins **50 Go** : une dizaine de lots maximaux en rétention de 90 jours, plus la marge d'un lot en cours de décompression. C'est porté au diagramme de déploiement.
+- La maquette `ImportDepot` annonce 3 Go. La taille extraite n'y est pas affichée : un utilisateur ne peut pas la mesurer avant le dépôt, et l'annoncer ne l'aiderait à rien.
+- Si une campagne réelle mesure un poids moyen sensiblement différent, les deux valeurs bougent dans l'environnement, sans redéploiement — c'est ce pour quoi elles y sont.
+
+### `Q-05` — SSE, et une estimation calculée au rythme observé
+
+**Options.** (a) Scrutation périodique. (b) Server-Sent Events. (c) WebSocket.
+
+**Décision.** (b). Le navigateur ouvre un flux `text/event-stream` sur le lot ; le serveur y pousse la phase et les compteurs à chaque document traité. À l'ouverture, le flux commence par l'état complet du lot : fermer l'écran puis le rouvrir ne perd rien, comme les maquettes le promettent.
+
+**Pourquoi.** Le besoin est **unidirectionnel** — le serveur informe, le navigateur ne répond pas —, ce qui écarte (c) et le protocole qu'il faudrait maintenir des deux côtés. SSE reste du HTTP : la session voyage déjà dans un cookie `httpOnly` sur la même origine, que `EventSource` transmet sans rien ajouter, et la garde d'authentification s'applique telle quelle. (a) était plus simple à déployer, mais aurait interrogé la base toutes les deux secondes par écran ouvert pour un lot qui avance par à-coups.
+
+**L'estimation de durée** se calcule **dans le navigateur**, au rythme observé sur les derniers documents traités : temps écoulé rapporté au nombre de documents, multiplié par le nombre restant. Elle n'apparaît qu'après quelques événements, et c'est honnête : avant, il n'y a rien à mesurer. Cette définition ne demande **aucune colonne** — en particulier pas `duration_ms` ni les jetons, que l'écart n°6 justifie par le fait qu'ils ne participent à aucune règle. L'écart reste exact, et l'estimation reste sur les maquettes `ImportEnCours` et `AnalyseEnCours`.
+
+**Conséquences.**
+
+- **Le proxy du lot 7** doit laisser vivre une connexion sans données : délai d'inactivité relevé et mise en mémoire tampon désactivée sur la route du flux. Le serveur envoie un commentaire de maintien à intervalle régulier. C'est porté au diagramme de déploiement.
+- Le front gère la reconnexion d'`EventSource`, qui est native, et relit l'état complet à chaque reconnexion.
+- **US-18** reçoit son canal : la notification « le fichier est prêt » passera par ce même mécanisme au lot 7, comme l'entrée du 06/11/2026 le prévoyait.

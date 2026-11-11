@@ -73,18 +73,18 @@ JOB --> PG_CI : migrations + e2e
 ' ───────────────────────────── CIBLE, LOT 7 ─────────────────────────
 
 node "VPS Scaleway — Paris\n<<cible, lot 7>>" as VPS #FBFBFA {
-  node "Proxy inverse\nTLS, limitation de débit" as PROXY
+  node "Proxy inverse\nTLS, limitation de débit\nflux SSE sans tampon" as PROXY
   artifact "Front Angular\nfichiers statiques" as WEB_PROD
   artifact "API NestJS\n+ workers BullMQ" as API_PROD
   database "PostgreSQL" as PG_PROD
   database "Redis" as REDIS_PROD
-  artifact "Volume disque\ndocuments candidats" as DISQUE
+  artifact "Volume disque ≥ 50 Go\ndocuments candidats" as DISQUE
 }
 
 cloud "API Mistral\nhébergée en UE" as MISTRAL
 
 PROXY --> WEB_PROD
-PROXY --> API_PROD : /api
+PROXY --> API_PROD : /api\nflux SSE d'avancement
 API_PROD --> PG_PROD
 API_PROD --> REDIS_PROD
 API_PROD --> DISQUE
@@ -129,6 +129,13 @@ note bottom of DISQUE
   relève de l'hébergeur et est traité au lot 7 ;
   la migration vers un stockage objet est
   classée `S-03`.
+
+  **Un dossier par établissement** : la clé
+  `{institutionId}/{campaignId}/{batchId}/{uuid}`
+  est construite par le serveur, et toute
+  lecture hors du dossier de la session est
+  refusée (Q-08). 50 Go couvrent une dizaine
+  de lots maximaux de 4 Go en rétention (Q-04).
 end note
 
 @enduml
