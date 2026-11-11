@@ -27,6 +27,7 @@ Closes #
 - [ ] les règles de gestion du lot sont testées sous leur identifiant `RG-xx` ;
 - [ ] `npm run lint`, `npm test`, `npm run recette` et `npm run coherence` sont verts ;
 - [ ] les livrables de conception que le lot périme sont à jour — MCD compris si une migration a eu lieu ;
+- [ ] le cahier de recettes porte les recettes des user stories du lot ;
 - [ ] toute décision structurante est au journal, **à sa date** ;
 - [ ] tout arbitrage laissé en suspens est enregistré dans [`docs/questions-ouvertes.md`](../docs/questions-ouvertes.md).
 

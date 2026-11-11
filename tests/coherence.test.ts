@@ -543,6 +543,42 @@ export function variablesEnv(contenu: string): { ligne: number; nom: string }[] 
 }
 
 // ---------------------------------------------------------------------------
+// Les documents réels du jeu d'essai
+//
+// Ce sont des CV et des lettres de vraies personnes, prêtés sous consentement,
+// et le dépôt est public : un fichier commité est publié, et l'historique le
+// garde après sa suppression. `.gitignore` les écarte, mais une règle
+// d'ignorance se retire d'une ligne et se contourne d'un `git add -f`. Le
+// contrôle porte donc sur les deux : le chemin est ignoré, et rien n'y est
+// suivi. Voir l'entrée du 11/11/2026 au journal.
+// ---------------------------------------------------------------------------
+
+const JEU_ESSAI_REELS = 'tests/jeu-essai/reels/';
+
+/** Les chemins de l'index qui tombent sous le dossier des documents réels. */
+export function reelsSuivis(index: string[]): string[] {
+  return index.filter((chemin) => chemin.startsWith(JEU_ESSAI_REELS));
+}
+
+/**
+ * Le chemin des documents réels est-il ignoré par git ?
+ *
+ * La sonde est un fichier qui n'existe pas : `--no-index` juge la règle seule,
+ * sans dépendre de ce qui se trouve sur le disque. `check-ignore` sort en 0
+ * quand le chemin est ignoré, en 1 sinon.
+ */
+function reelsIgnores(): boolean {
+  try {
+    execFileSync('git', ['check-ignore', '-q', '--no-index', `${JEU_ESSAI_REELS}sonde.pdf`], {
+      cwd: racine,
+    });
+    return true;
+  } catch {
+    return false;
+  }
+}
+
+// ---------------------------------------------------------------------------
 
 describe('Le dossier de conception et le code se tiennent', () => {
   it('ne cite aucun identifiant qui ne soit déclaré quelque part', () => {
@@ -686,6 +722,28 @@ describe('Le dossier de conception et le code se tiennent', () => {
     // répéter n'en sont pas absentes : elles y sont déclarées une fois pour
     // toutes, et les réclamer table par table serait crier au loup.
     expect(ecartsDictionnaire(lire(SCHEMA), lire(DICTIONNAIRE))).toEqual([]);
+  });
+
+  it("ne versionne aucun document réel du jeu d'essai", () => {
+    // `--cached` seul : un fichier ignoré mais forcé dans l'index est
+    // précisément celui qu'on cherche, et `suivis` l'écarterait.
+    //
+    // `-z` parce que, sans lui, git met entre guillemets et échappe en octal
+    // tout chemin accentué : `"tests/jeu-essai/reels/H\303\251l\303\250ne.pdf"`
+    // ne commence plus par le préfixe, et le CV de Hélène passait. C'est le
+    // défaut que ce contrôle a produit le jour de son installation, vu en le
+    // faisant échouer exprès.
+    const index = execFileSync('git', ['ls-files', '--cached', '-z'], {
+      cwd: racine,
+      encoding: 'utf8',
+    })
+      .split('\0')
+      .filter(Boolean);
+
+    expect({ ignore: reelsIgnores(), suivis: reelsSuivis(index) }).toEqual({
+      ignore: true,
+      suivis: [],
+    });
   });
 
   it("nomme en anglais chaque variable d'environnement", () => {
@@ -959,6 +1017,18 @@ describe('Les détections attrapent ce qu elles annoncent', () => {
       { ligne: 3, nom: 'INGESTION_MAX_FILE_SIZE_MB' },
       { ligne: 4, nom: 'DATABASE_URL' },
     ]);
+  });
+
+  it("relève un document réel du jeu d'essai, et lui seul", () => {
+    expect(
+      reelsSuivis([
+        'tests/jeu-essai/reels/R-07.pdf',
+        'tests/jeu-essai/reels/correspondance.csv',
+        'tests/jeu-essai/synthetiques/S-03.pdf',
+        'tests/jeu-essai/annotations.csv',
+        'tests/jeu-essai/reels-anciens.md',
+      ]),
+    ).toEqual(['tests/jeu-essai/reels/R-07.pdf', 'tests/jeu-essai/reels/correspondance.csv']);
   });
 
   it('relève un nom de variable français, troisième angle mort de la règle', () => {

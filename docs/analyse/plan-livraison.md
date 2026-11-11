@@ -19,6 +19,17 @@ Il existe parce que l'ordre de réalisation n'est pas une préférence : il est 
 
 Soit **huit mois**, dont un dernier mois sans aucun ajout et une dernière semaine sans aucune écriture.
 
+### Les deux points de contrôle
+
+Fixés le 11/11/2026, pour que la décision de couper ne se prenne pas en février, sous pression — voir le journal de décisions.
+
+| Date           | Ce qui doit être vrai | Sinon                                                           |
+| -------------- | --------------------- | --------------------------------------------------------------- |
+| **18/01/2027** | Le lot 4 est fusionné | M-13 et M-15 sont coupés d'office                               |
+| **15/02/2027** | Le lot 5 est fusionné | Le lot 6 ne livre que les écrans dont la démonstration a besoin |
+
+**M-12 n'est jamais coupé.** La purge à 90 jours et le journal d'audit sont une obligation RGPD pour un produit qui traite des candidatures. Couper reste un changement de périmètre : il s'inscrit au journal à sa date.
+
 > **Correction du 02/11/2026.** Ce document déduisait jusqu'ici le gel d'une « soutenance visée à six mois », faute de date de session connue : il annonçait le 15 janvier. La date réelle était disponible, elle n'avait simplement jamais été versée au dossier. Le calendrier s'ancre désormais sur le rendu, et non sur une durée choisie. Voir le journal de décisions.
 
 > **État au 06/11/2026.** Les **lots 1 et 2 sont livrés** — authentification, cloisonnement et comptes d'un côté ; campagne, types de documents attendus, seuil, pondération et profil de référence de l'autre. Le lot 2 a soldé en passant la dette du lot 1 : le **lien d'invitation** existe, et un compte sans mot de passe l'admet désormais dans son état plutôt que de le masquer. Restent cinq lots et **environ 17 semaines avant le gel**, soit un peu plus de trois semaines par lot — ce qui tient, à condition que les lots 4 et 5, les plus lourds, ne débordent pas sur les autres.
@@ -41,20 +52,21 @@ Un lot est donc l'unité de livraison : une branche, une pull request, une fusio
 | **4** | Extraction, niveau 1 et réconciliation | M-04, M-05, M-17       | US-10, US-23, US-22 (document déposé)      | Le cœur du produit. La réconciliation s'intercale entre niveau 1 et niveau 2, elle ne peut pas être repoussée après                  |
 | **5** | Atypiques, niveau 2 et agrégation      | M-06, M-07, M-08, M-18 | US-11, US-12, US-13, US-24                 | RG-01 à RG-06 sont déjà écrites et testées dans `packages/shared` ; il reste à les câbler au pipeline                                |
 | **6** | Écrans de consultation                 | M-09, M-10             | US-14, US-15, US-16                        | Les maquettes sont la spécification. Rien à concevoir, tout à implémenter                                                            |
-| **7** | RGPD et exports                        | M-12, M-13, M-15       | US-17 à US-21                              | Isolables de la chaîne d'analyse, donc **coupables en dernier** si le calendrier dérape                                              |
+| **7** | RGPD et exports                        | M-12, M-13, M-15       | US-17 à US-21                              | Isolables de la chaîne d'analyse. Les exports sont **coupables** si le calendrier dérape ; M-12 ne l'est pas                         |
 
 **US-08 et US-09** ne figurent dans aucun lot : reportées hors périmètre v1 avec M-14, conservées pour la traçabilité de l'arbitrage.
 
 ## Ce que chaque lot doit produire
 
-Un lot n'est fini que lorsque les quatre sont vrais :
+Un lot n'est fini que lorsque les cinq sont vrais :
 
 1. Les critères d'acceptation de ses user stories passent.
 2. Les règles de gestion qu'il met en œuvre sont **testées sous leur identifiant** `RG-xx`, repris dans le nom du test.
 3. La CI est verte — formatage, lint, tests, build, validation du schéma Prisma.
 4. Les livrables de conception qu'il périme sont à jour **dans la même séance** : le MCD et le MPD suivent leur migration, le plan de sécurisation gagne son entrée OWASP.
+5. Le **cahier de recettes** porte les recettes de ses user stories, dérivées de leurs critères d'acceptation. Les lots 1 à 3, écrits avant cette règle du 11/11/2026, sont rattrapés.
 
-Le quatrième point est celui qu'on saute sous pression, et c'est celui qui produit un dossier reconstitué de mémoire au mois six.
+Les quatrième et cinquième points sont ceux qu'on saute sous pression, et ce sont eux qui produisent un dossier reconstitué de mémoire au dernier mois.
 
 ## Branches et pull requests
 

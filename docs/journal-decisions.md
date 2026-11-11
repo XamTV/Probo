@@ -968,3 +968,182 @@ La colonne est donc ajoutée **au lot 4**, trois lots avant d'être affichée. C
 **Pourquoi.** (a) déplaçait toute la suite de l'API sous un drapeau expérimental pour une seule dépendance, et ajoutait une couche de moteurs interchangeables dont le produit n'a pas l'usage. Le piège est celui que le cadre du projet nomme déjà — vérifier le format de module avant d'ajouter un paquet — et il a été vu par un test, pas par une lecture : la plage de pairs était exacte, c'est le format qui ne l'était pas.
 
 **Conséquences.** Une montée de version de ces deux paquets se fera ensemble, et après vérification de leur format. La CI gagne un service Redis : l'application ne démarre plus sans lui.
+
+---
+
+## 2026-11-11 — Le premier administrateur d'un établissement naît d'une commande, pas d'une inscription
+
+**Contexte.** `Q-03` : `POST /users` exige une session, qui exige un compte, et le seed refuse de s'exécuter en production. Un établissement client n'a donc aucune porte d'entrée — c'était la seule question ouverte qui bloquait un usage réel du produit. Elle est tranchée avant son échéance, parce que l'une des deux réponses changeait le périmètre, et le périmètre est cité partout.
+
+**Options.** (a) Un `M-xx` d'inscription ou d'onboarding, avec ses user stories, ses cas d'utilisation et ses maquettes. (b) Une commande d'administration lancée sur le serveur.
+
+**Décision.** (b). Une seule commande, lancée dans le conteneur de l'API : elle crée l'établissement **et** son premier administrateur, affiche le lien d'invitation du lot 2 — aucun mot de passe n'est saisi ni affiché —, refuse si l'adresse existe déjà, et inscrit l'opération au journal d'audit. Le seed de développement passe par la même logique, pour qu'un seul chemin crée un établissement.
+
+**Pourquoi.** Probo se vend à des établissements : en ouvrir un est un acte commercial, pas un parcours en libre-service. (a) aurait ajouté un écran public, sa protection contre les inscriptions abusives et un parcours de vérification, pour un événement qui arrive une fois par client. (b) réutilise le jeton d'invitation existant, et laisse au mot de passe le seul chemin qu'il a déjà : celui où l'utilisateur le choisit lui-même.
+
+**Conséquences.**
+
+- Aucun ajout de périmètre.
+- `AuditAction` gagne une valeur ; les documents qui citent l'énumération suivent dans la séance du code.
+- Le diagramme de déploiement et le plan de sécurisation portent la commande **quand elle existe** : qui peut la lancer — quiconque a un accès au serveur —, et où elle laisse sa trace.
+- Implémentation sur une branche dédiée, après la fusion du lot 3 : elle n'a rien à faire dans la pull request de l'import.
+
+---
+
+## 2026-11-11 — Un verdict rendu sans le modèle n'a pas de version de prompt
+
+**Contexte.** `Q-07` : `document_analysis.prompt_version` est obligatoire, et RG-03 veut qu'un document illisible soit marqué atypique sans aucun appel au modèle — verdict qui vit dans la même table. La question bloquait la première écriture d'un verdict au lot 4. Contrairement à `Q-01` et `Q-06`, elle ne demandait aucune mesure.
+
+**Options.** (a) Une valeur conventionnelle, `none` ou `rg-03`. (b) Une colonne nullable. (c) Sortir le verdict de RG-03 de `document_analysis`.
+
+**Décision.** (b), **tenue par une contrainte `CHECK`** : `prompt_version` est nulle si et seulement si `atypical_reason` vaut `UNREADABLE`.
+
+**Pourquoi.** (a) écrit qu'un prompt a servi alors qu'aucun n'a servi : la colonne existe pour expliquer un score (écart n°5), et elle mentirait sur le seul cas où il n'y a rien à expliquer. (c) touche le MCD pour un cas unique. Une nullabilité seule affaiblissait la traçabilité — un oubli d'écriture aurait ressemblé à un document illisible. La contrainte rend le null **informatif** : il dit qu'aucun appel n'a eu lieu, et c'est la base qui le garantit, pas la discipline du code.
+
+**Conséquences.** Migration au lot 4, avec MCD, MLD, MPD, dictionnaire et écarts dans la même séance. Prisma ne déclare pas de `CHECK` dans le schéma : la contrainte s'écrit dans le SQL de la migration, ce qui en fait un écart MPD à consigner. Elle se teste sous RG-03 — un verdict illisible porté avec une version, ou un verdict du modèle sans version, est refusé par la base.
+
+---
+
+## 2026-11-11 — Le jeu d'essai : du réel sous consentement hors du dépôt, du synthétique dedans
+
+**Contexte.** `docs/README.md` prévoyait « 40 documents réels annotés » dans `tests/jeu-essai/`. Deux faits rendaient ce plan impossible tel quel. Le dépôt `XamTV/Probo` est **public** : un CV réel versionné y serait publié, et l'historique git le garderait après sa suppression. Et ces documents partent chez Mistral : ce sont des données personnelles confiées à un sous-traitant, pour un usage que leurs auteurs doivent connaître. `Q-01` et `Q-06` attendent ce jeu d'essai, qui n'est pas constitué.
+
+**Options.** Pour la provenance : (a) des documents réels sous consentement écrit, (b) des documents synthétiques, (c) des documents anonymisés obtenus d'une école. Pour le stockage du réel : (a) hors de git, dans un dossier ignoré, (b) un dépôt privé séparé, (c) rendre `Probo` privé.
+
+**Décision.**
+
+- **Provenance : réel et synthétique.** Une vingtaine de documents réels, sous consentement écrit, pour ce que le synthétique ne sait pas imiter — classer un type, lire un nom. Une vingtaine de synthétiques, pour les atypiques fabriqués exprès : scan sans couche texte, portfolio rangé comme CV, homonymes.
+- **Le réel ne touche jamais git.** Il vit dans `tests/jeu-essai/reels/`, ignoré. Seuls les synthétiques et les annotations sont versionnés.
+- **Les annotations sont pseudonymisées.** Pour RG-09, la vérité terrain d'un document réel est **le nom de son auteur** : le fichier versionné ne porte qu'un pseudonyme et le type attendu, et la correspondance reste locale, avec les documents.
+- **Le consentement couvre** l'analyse par Mistral, les mesures, et la suppression au 15/04/2027. **Pas l'affichage** : la démonstration de soutenance n'utilise que des synthétiques.
+- **Les mesures sont rejouables** : un script d'évaluation dans `scripts/`, au lot 4, hors CI parce que chaque passage coûte des appels Mistral.
+- **Constitution pendant le lot 3**, avec une grille d'annotation écrite avant de lire la moindre sortie du modèle.
+
+**Pourquoi.** La troisième provenance dépendait d'un tiers sans calendrier. Le synthétique seul aurait mesuré le modèle sur des documents écrits pour lui ressembler. Rendre le dépôt privé aurait retiré au jury la vue sur la méthode — l'historique, les pull requests, la CI — pour protéger vingt fichiers qu'il suffit de ne pas versionner ; le dépôt séparé ajoutait une seconde chose à tenir pour le même résultat.
+
+**Conséquences.**
+
+- `.gitignore` écarte `tests/jeu-essai/reels/`, et `coherence.test.ts` échoue si le chemin cesse d'être ignoré, ou si un fichier y est suivi malgré tout : un `git add -f` passe la règle d'ignorance, pas le test. Éprouvé en le faisant échouer exprès, il a produit son défaut du jour : `git ls-files` échappe les chemins accentués entre guillemets, et un fichier forcé nommé avec un accent — le cas ordinaire d'un CV français — passait. Il lit désormais l'index avec `-z`.
+- `docs/securite/rgpd.md`, encore à produire, porte le consentement, la rétention appliquée par l'API Mistral et la date de suppression.
+- **Aucun document réel ne part chez Mistral avant que l'entraînement soit désactivé sur le compte.** L'avenant de traitement des données de Mistral l'autorise à entraîner ses modèles sur les données reçues « unless Customer is or has opted-out of training », et cet avenant prévaut sur les conditions générales, qui disent l'inverse. Le consentement ne peut pas promettre ce que le compte n'a pas réglé. Voir [`soutenance/preparation.md`](soutenance/preparation.md).
+- `Q-01` et `Q-06` reçoivent leur règle de décision avant la mesure : voir l'entrée suivante.
+
+---
+
+## 2026-11-11 — Les critères de `Q-01` et `Q-06` sont écrits avant la mesure
+
+**Contexte.** Les deux questions attendent des mesures sur le jeu d'essai. Un critère choisi après avoir vu les chiffres peut justifier n'importe quelle décision, et la mesure ne prouve alors plus rien.
+
+**Options.** (a) Écrire maintenant, au registre, la règle qui tranchera chacune. (b) Trancher au vu des résultats.
+
+**Décision.** (a).
+
+- **`Q-01`** : l'extraction d'identité greffée sur l'appel de niveau 1 est retenue si, sur l'ensemble du jeu d'essai, elle ne classe mal **pas plus d'un document de plus** qu'un niveau 1 seul, **et** si l'identité lue est fausse sur **au plus deux** documents réels. Sinon, un appel dédié.
+- **`Q-06`** : le seuil d'identité est le plus bas qui envoie à la réconciliation **toutes** les identités fausses du jeu d'essai, réelles et synthétiques. Il est indépendant de `confidence_threshold`, que RG-01 réserve à la classification du type ; sa forme — constante partagée ou réglage de campagne — se décide avec sa valeur.
+
+**Les critères se comptent en documents, pas en pourcentages.** Une première rédaction, le même jour, disait « pas plus de 2 points de perte » et « 90 % d'identités justes ». Sur une quarantaine de documents, un seul document mal classé pèse 2,5 points : le premier critère se serait déclenché sur une unique erreur, et le second habillait « deux erreurs sur vingt » d'une précision qu'il n'a pas. Écrire le nombre de documents dit exactement ce que l'effectif permet de conclure.
+
+**Pourquoi.** Les valeurs sont discutables ; leur antériorité ne l'est pas. Pour `Q-06`, le critère suit l'asymétrie que RG-09 a posée le 03/09/2026 : un arbitrage humain de trop coûte une minute, un regroupement faux corrompt deux scores en silence.
+
+**Conséquences.**
+
+- Une valeur ne bouge plus une fois la mesure lancée ; si elle doit bouger, c'est une nouvelle entrée, datée, qui dit pourquoi.
+- **Le jeu synthétique fabrique au moins cinq identités piégées** — homonymes, nom absent du texte, deux noms dans un même document. Une vingtaine de documents réels n'en contiendra qu'une ou deux, et un seuil calé sur un ou deux points ne mesure rien.
+- Les résultats sont présentés avec leur effectif, jamais seuls.
+
+---
+
+## 2026-11-11 — M-12 ne se coupe pas, et le calendrier a deux points de contrôle
+
+**Contexte.** Le plan de livraison faisait du lot 7 le premier coupé si le calendrier dérapait. Le lot 7 porte pourtant M-12 — purge à 90 jours et journal d'audit —, que le README présente comme acquis et que le RGPD impose à un produit qui traite des CV. Et aucune date ne disait quand couper : la décision aurait été prise en février, sous pression, au moment où elle coûte le plus.
+
+**Options.** (a) Garder le lot 7 coupable en bloc. (b) Le séparer : M-12 hors d'atteinte, les exports M-13 et M-15 en variable d'ajustement, avec des dates de bascule fixées maintenant.
+
+**Décision.** (b), avec deux points de contrôle :
+
+- **18/01/2027** — le lot 4 est fusionné. Sinon, M-13 et M-15 sont coupés d'office.
+- **15/02/2027** — le lot 5 est fusionné. Sinon, le lot 6 ne livre que les écrans dont la démonstration a besoin.
+
+**Pourquoi.** Couper la purge devant un jury attentif au RGPD, sur des candidatures, aurait été la pire économie possible : l'obligation et l'argument commercial tiennent dans la même ligne. Les exports, eux, laissent un produit complet — le classement se consulte à l'écran. Une date fixée en novembre se respecte ; une décision prise en février se négocie avec soi-même.
+
+**Conséquences.** `plan-livraison.md` porte les deux dates, et `perimetre.md` dit quels « doit être fait » tombent au premier point. Couper reste un changement de périmètre : il s'inscrit au journal à sa date, et M-13 et M-15 rejoignent alors la table des reports avec leur motif.
+
+---
+
+## 2026-11-11 — Le cahier de recettes grandit avec chaque lot
+
+**Contexte.** Le plan de tests et le cahier de recettes étaient « à produire », dans le mois de durcissement. Trois lots sont écrits, et aucune recette.
+
+**Options.** (a) Les écrire au gel, d'un bloc. (b) Chaque lot ajoute les recettes de ses user stories.
+
+**Décision.** (b). Le cahier se dérive des critères d'acceptation, et un lot n'est fini que lorsque ses recettes y sont. Les lots 1 à 3 sont rattrapés.
+
+**Pourquoi.** (a) est exactement le dossier reconstitué de mémoire que `docs/README.md` décrit comme l'échec type du titre : quatre mois après, les critères se relisent, les comportements ne se rappellent plus.
+
+**Conséquences.** La définition d'un lot fini gagne une condition, dans `plan-livraison.md`, `CLAUDE.md` et le gabarit de pull request. **Ce n'est qu'un rappel** : rien ne tombe en panne si la case reste vide. Le mécanisme — une user story livrée sans recette, relevée par `npm run coherence` — demande que le cahier existe et cite ses `US-xx` ; il s'écrira avec la première recette.
+
+---
+
+## 2026-11-11 — L'assistant est assumé devant le jury, et « l'humain décide » ne sort pas Probo du haut risque
+
+**Contexte.** Une séance de questions sur la soutenance a posé deux sujets que le dossier taisait. 58 des 59 premiers commits portent `Co-Authored-By: Claude`, ce qu'un `git log` montre à quiconque ouvre le dépôt. Et aucun livrable ne mentionnait le règlement européen sur l'IA, alors qu'il vise nommément l'admission dans l'enseignement.
+
+### L'assistant de code
+
+**Options.** (a) L'assumer, dans une section du dossier consacrée à la méthode. (b) N'en parler que si la question vient. (c) Le minimiser.
+
+**Décision.** (a). Le centre n'a pas de règle écrite sur l'usage de l'IA.
+
+**Pourquoi.** (b) et (c) ne résistent pas à un `git log`. (a) a un argument que le dépôt porte déjà : le hook qui retire à l'assistant le droit de commiter, le vérificateur de cohérence, et les entrées du 08/10 et du 02/11/2026 où l'assistant enfreint une règle et où un mécanisme la remplace. C'est une méthode de contrôle, et elle se montre.
+
+**Conséquences.** La contrepartie est que l'auteur explique et réécrit seul les quatre parties critiques — cloisonnement, authentification, RG-07, chaîne d'analyse. Chaque description de pull request est rédigée par l'auteur, et chaque lot a sa séance d'explication sans assistant avant la fusion ; les lots 1 et 3 sont rattrapés.
+
+### Le règlement européen sur l'IA
+
+**Ce qui a été vérifié**, sur un miroir du texte consolidé et non sur EUR-Lex. L'annexe III, point 3 a), vise les systèmes destinés à déterminer l'admission dans un établissement d'enseignement. L'article 6(3) écarte le haut risque pour une tâche préparatoire ou procédurale étroite, **sauf profilage**, qui le maintient toujours.
+
+**Décision.** Le dossier présente Probo comme **très probablement à haut risque**. La thèse « l'humain décide » est rattachée à ce qu'elle sert réellement — l'article 22 du RGPD et le contrôle humain —, et non présentée comme une sortie du haut risque.
+
+**Pourquoi.** La première intuition de la séance était qu'un classement qui ne décide rien échappait au régime. Le texte dit autrement dès qu'il y a profilage, et noter un CV au regard d'un profil recherché y ressemble fort. Défendre l'inverse devant un jury, c'est perdre sur une lecture qu'il peut faire en séance.
+
+**Conséquences.** [`soutenance/preparation.md`](soutenance/preparation.md) porte l'état des vérifications, la démonstration et le fil de la présentation. `securite/rgpd.md` développera l'analyse. La date d'application aux systèmes de l'annexe III — 2 décembre 2027 selon le texte consolidé lu — est à confirmer sur EUR-Lex avant d'être citée.
+
+---
+
+## 2026-11-11 — Le dépôt affirmait que les données ne quittaient jamais l'UE
+
+**Contexte.** Le README et le plan de sécurisation disaient que les données candidats ne quittaient jamais l'Union européenne, et que le choix de Mistral écartait le Cloud Act. Personne ne l'avait vérifié. La lecture des pages de Mistral, le 11/11/2026, donne trois faits.
+
+- **L'hébergement** est dans l'Union par défaut, mais l'API tourne en partie chez Microsoft en **Norvège**, qui est dans l'EEE et non dans l'UE.
+- **Le Cloud Act** : les hébergeurs de l'inférence — Microsoft, Google, CoreWeave — sont américains. Des données qu'ils hébergent en Europe y restent exposées.
+- **L'entraînement et la rétention** : un compte payant peut refuser l'entraînement par un réglage de confidentialité, sans que la valeur par défaut soit publiée. La rétention nulle existe pour les appels sans état, dont la complétion de texte, seul appel que Probo fait, sur demande justifiée, réservée aux comptes payants et accordée à la discrétion de Mistral. Aucune durée de rétention n'est publiée hors de ce régime.
+
+**Décision.** Corriger les deux affirmations fausses, dans le README et le plan de sécurisation, sans attendre : le dépôt ne revendique pas ce qui n'existe pas. Ne **pas** retoucher la contrainte de souveraineté du cahier des charges, qui est du cadrage et revient à l'auteur : elle est enregistrée sous `Q-09`, avec ses trois voies.
+
+**Conséquences.**
+
+- Le compte Mistral refuse l'entraînement **et** demande la rétention nulle avant l'envoi du premier document réel — le motif à donner est le traitement de candidatures, des données personnelles de tiers.
+- Le diagramme de déploiement dit « inférence dans l'EEE » au lieu d'« hébergée en UE ».
+- Le cahier des charges reste en l'état jusqu'à `Q-09`, et le registre dit pourquoi.
+
+> **Renvoi du 11/11/2026.** `Q-09` est tranchée le jour même, dans l'entrée suivante : le cahier des charges est reformulé.
+
+---
+
+## 2026-11-11 — La souveraineté se mesure à l'EEE, et le Cloud Act se documente au lieu de s'exclure
+
+**Contexte.** `Q-09` : la contrainte de souveraineté du cahier des charges excluait « les fournisseurs de modèles soumis au Cloud Act », et la liste des sous-traitants de Mistral montre une inférence en partie chez Microsoft, Google et CoreWeave.
+
+**Options.** (a) Reformuler la contrainte à ce que le choix tient réellement. (b) Servir un modèle Mistral à poids ouverts chez un hébergeur européen non soumis au Cloud Act, l'offre d'API génératives de Scaleway en premier lieu. (c) Auto-héberger un modèle.
+
+**Décision.** (a). Les données candidats restent dans l'EEE ; elles ne sont confiées qu'à des fournisseurs européens soumis au RGPD ; le compte du fournisseur refuse l'entraînement et demande la rétention nulle. L'exposition au Cloud Act est **réduite et documentée**, pas exclue.
+
+**Pourquoi.** (c) demande un serveur à GPU que ni le calendrier ni le budget ne prévoient. (b) tenait la contrainte d'origine, mais au prix d'une vérification des modèles réellement servis, d'un niveau 2 peut-être servi par un modèle plus petit, et d'un second fournisseur à évaluer — à dix-sept semaines du gel, avec les deux lots les plus lourds devant soi. (a) ne change rien au code et transforme une affirmation fausse en position défendable : un jury qui ouvre la page des sous-traitants trouve ce que le dossier dit déjà.
+
+**Ce que la reformulation coûte.** L'argument « le Cloud Act est écarté » disparaît du dossier. Il ne tenait pas : le perdre maintenant coûte moins que le voir réfuté en soutenance.
+
+**Conséquences.**
+
+- Le cahier des charges porte la contrainte reformulée, avec un renvoi daté qui cite l'ancienne.
+- Le README et le plan de sécurisation renvoient à cette décision au lieu de la question ouverte.
+- (b) reste la voie de sortie si un établissement client exigeait un jour l'exclusion du Cloud Act.

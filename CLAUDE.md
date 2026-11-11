@@ -106,7 +106,7 @@ Le découpage en lots, leur ordre et les dépendances qui l'imposent : [`docs/an
 
 **`main` reste toujours déployable.** Pas de `develop`, pas de GitFlow, pas de branche par commit.
 
-Un lot n'est fini que lorsque les critères d'acceptation passent, que ses règles de gestion sont testées sous leur identifiant `RG-xx`, que la CI est verte, que les livrables de conception qu'il périme sont à jour dans la même séance, et que **les issues de ses user stories sont fermées**.
+Un lot n'est fini que lorsque les critères d'acceptation passent, que ses règles de gestion sont testées sous leur identifiant `RG-xx`, que la CI est verte, que les livrables de conception qu'il périme sont à jour dans la même séance, que le cahier de recettes porte les recettes de ses user stories, et que **les issues de ses user stories sont fermées**.
 
 **Les issues se ferment par la PR, jamais à la main.** Le corps de la PR porte une ligne `Closes #n` par US livrée — c'est le gabarit [`.github/pull_request_template.md`](.github/pull_request_template.md) qui le rappelle. Sans cette ligne, l'issue survit à la fusion et l'onglet Issues affirme que rien n'a été livré : vingt-quatre ouvertes et zéro fermée, le 05/11/2026, alors que le lot 1 était en production depuis trois semaines.
 

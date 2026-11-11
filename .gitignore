@@ -22,6 +22,12 @@ credentials/
 # Stockage local des documents candidats (données personnelles)
 /storage/
 
+# Documents réels du jeu d'essai, et la correspondance pseudonyme ↔ nom : des
+# données personnelles, dans un dépôt public. Seuls les synthétiques et les
+# annotations pseudonymisées sont versionnés. coherence.test.ts échoue si ce
+# chemin cesse d'être ignoré, ou si un fichier y est suivi malgré tout.
+/tests/jeu-essai/reels/
+
 # Canvas de maquettes assemblé : 2 Mo d'éditeur embarqué, régénéré depuis
 # docs/maquettage/artboards/
 docs/maquettage/*.html

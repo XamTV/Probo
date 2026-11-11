@@ -60,7 +60,9 @@ Les règles métier sont énoncées dans [`regles-gestion.md`](regles-gestion.md
 
 ## Contraintes
 
-**Souveraineté des données.** Contrainte structurante, pas préférence. Elle exclut les fournisseurs de modèles soumis au Cloud Act et détermine le choix de Mistral AI, société française hébergeant en Europe.
+**Souveraineté des données.** Contrainte structurante, pas préférence. Les données candidats restent dans l'Espace économique européen, et ne sont confiées qu'à des fournisseurs européens soumis au RGPD, dont le compte refuse l'entraînement sur les données et demande la rétention nulle. Elle détermine le choix de Mistral AI, société française dont l'API est hébergée par défaut dans l'Union. L'exposition au Cloud Act n'est pas exclue — l'inférence de Mistral tourne en partie chez des hébergeurs américains — : elle est réduite et documentée, pas niée.
+
+> **Reformulée le 11/11/2026.** La contrainte excluait jusqu'ici « les fournisseurs de modèles soumis au Cloud Act », ce que le choix de Mistral ne tenait pas : sa liste de sous-traitants nomme Microsoft, Google et CoreWeave. Voir `Q-09` et le journal de décisions.
 
 **Ressources.** Un développeur, environ 277 heures de travail estimées, dont 70 consacrées au dossier professionnel et 35 à l'apprentissage. La marge est d'une vingtaine d'heures.
 

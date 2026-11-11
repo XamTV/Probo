@@ -155,7 +155,9 @@ Les choix sont arrêtés et justifiés au [journal des décisions](docs/journal-
 
 ### Choix de Mistral AI
 
-Mistral est une société française dont les serveurs sont hébergés en Europe. Les données candidats ne quittent jamais l'UE, ce qui élimine le risque lié au Cloud Act américain et simplifie la conformité RGPD pour les établissements clients.
+Mistral est une société française, soumise au RGPD, qui héberge par défaut les données de son API dans l'Union européenne. Les données candidats restent ainsi dans l'Espace économique européen, ce qui simplifie la conformité des établissements clients.
+
+**Ce que ce choix ne garantit pas.** L'inférence de Mistral tourne en partie chez des hébergeurs américains — Microsoft en Suède et en Norvège, Google aux Pays-Bas et en Belgique, CoreWeave dans l'EEE —, d'après sa liste de sous-traitants consultée le 11/11/2026. Des données hébergées en Europe par une société américaine restent exposées au Cloud Act : le risque est réduit, il n'est pas éliminé. La contrainte de souveraineté du [cahier des charges](docs/analyse/cahier-des-charges.md) a été reformulée en conséquence le 11/11/2026 (`Q-09`) : données dans l'EEE, fournisseur européen, entraînement refusé et rétention nulle demandée, exposition au Cloud Act documentée plutôt qu'exclue.
 
 Deux modèles sont utilisés : `mistral-small-latest` pour la classification du type (rapide, économique) et `mistral-large-latest` pour le scoring d'adéquation (précis, justifications de qualité).
 

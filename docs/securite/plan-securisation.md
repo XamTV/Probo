@@ -99,7 +99,11 @@ Signé en HS256 par un secret lu dans la configuration. Deux garde-fous au déma
 
 ### Données au repos et en transit
 
-Les données candidats ne quittent pas l'Union européenne : Mistral AI est hébergé en Europe, et le stockage est sur le VPS. Ce n'est pas qu'une préférence — c'est ce qui écarte le Cloud Act américain et simplifie la conformité des établissements clients.
+Les données candidats restent dans l'Espace économique européen : le stockage est sur le VPS, et Mistral AI héberge par défaut les données de son API dans l'Union européenne. Cela simplifie la conformité des établissements clients.
+
+**Ce que cette section affirmait à tort jusqu'au 11/11/2026.** Elle disait que ce choix écartait le Cloud Act américain. La liste des sous-traitants de Mistral montre que son inférence tourne en partie chez Microsoft, Google et CoreWeave, sociétés américaines : des données hébergées en Europe par elles restent exposées au Cloud Act. Le risque est réduit, pas écarté. La contrainte de souveraineté du cahier des charges a été reformulée en ce sens le même jour — voir `Q-09`.
+
+**Ce que le compte Mistral doit porter avant le premier document réel** : l'entraînement refusé dans les réglages de confidentialité, et la rétention nulle demandée au support.
 
 **Limite assumée.** Le volume de stockage n'est pas chiffré au repos. Le chiffrement de disque relève de l'hébergeur et sera traité au lot 7, avec le déploiement.
 

@@ -30,6 +30,8 @@ Ce document dit ce qui est dans le projet, ce qui n'y est pas, et ce qui n'y ser
 
 > **M-14 est vacant.** Il portait l'import depuis un dossier Google Drive, sorti du périmètre le 31/08/2026 — voir la table des reports ci-dessous. L'identifiant n'est pas réattribué : `M-15` reste `M-15`, sans quoi les user stories qui le citent désigneraient silencieusement une autre fonctionnalité.
 
+> **M-13 et M-15 tombent les premiers.** Si le lot 4 n'est pas fusionné le 18/01/2027, les deux exports sont coupés d'office et rejoignent la table des reports — voir les points de contrôle du [plan de livraison](plan-livraison.md). M-12, lui, n'est jamais coupé. Décision du 11/11/2026, au journal.
+
 > **M-18 est un ajout du 05/10/2026.** Les personas exigent que Claire puisse contredire l'outil ; rien dans le périmètre ne le permettait. Sa portée est volontairement minimale : confirmer ou requalifier depuis le détail du document, rien de plus. La relance en OCR et la requalification de masse restent hors périmètre.
 
 > **M-16 et M-17 sont des ajouts du 03/09/2026**, et non du cadrage initial. Ils comblent deux trous que le maquettage a révélés : le niveau 2 n'avait aucun référentiel de comparaison documenté, et le regroupement par candidat se fiait au nom de fichier alors que tout le produit repose sur le fait que les noms de fichiers mentent. Ce sont des « doit être fait » : sans eux, le cœur du produit ne tient pas. Voir le journal de décisions.

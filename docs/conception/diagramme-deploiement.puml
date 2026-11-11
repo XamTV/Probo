@@ -83,7 +83,7 @@ node "VPS Scaleway — Paris\n<<cible, lot 7>>" as VPS #FBFBFA {
   artifact "Volume disque ≥ 50 Go\ndocuments candidats" as DISQUE
 }
 
-cloud "API Mistral\nhébergée en UE" as MISTRAL
+cloud "API Mistral\npoint d'accès UE\ninférence dans l'EEE" as MISTRAL
 
 PROXY --> WEB_PROD
 PROXY --> API_PROD : /api\nflux SSE d'avancement

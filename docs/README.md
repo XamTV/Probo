@@ -14,34 +14,35 @@ Deux raisons de ne pas y revenir plus tôt. D'abord, chaque entité doit pouvoir
 
 ## État des livrables
 
-| Livrable                                     | État                                                                      |
-| -------------------------------------------- | ------------------------------------------------------------------------- |
-| `journal-decisions.md`                       | Écrit, tenu au fil de l'eau                                               |
-| `questions-ouvertes.md`                      | Écrit — Q-01 à Q-03, dont 1 tranchée et implémentée                       |
-| `analyse/cahier-des-charges.md`              | Écrit                                                                     |
-| `analyse/perimetre.md`                       | Écrit — MoSCoW, refus actés et reports datés                              |
-| `analyse/personas.md`                        | Écrit — Claire, Marc, Sofia                                               |
-| `analyse/user-stories.md`                    | Écrit — 24 US dont 2 reportées, 6 épopées                                 |
-| `analyse/regles-gestion.md`                  | Écrit — RG-01 à RG-10, dont 8 sous test                                   |
-| `analyse/cas-utilisation.md`                 | Écrit — 16 CU dont 1 reporté, 2 scénarios                                 |
-| `analyse/plan-livraison.md`                  | Écrit — 7 lots, ordre et dépendances                                      |
-| `maquettage/artboards/`                      | Écrit — 19 artboards, 16 CU, [canvas en ligne](maquettage/README.md)      |
-| `maquettage/charte-graphique.md`             | Écrit — extrait des artboards                                             |
-| `maquettage/accessibilite-rgaa.md`           | Écrit — 4 engagements, 5 points à vérifier                                |
-| `conception/diagramme-cas-utilisation.puml`  | Écrit — 14 CU, CU-11 exclu car reporté                                    |
-| `conception/mcd.puml`, `mld.md`, `mpd.puml`  | Écrit — reconstruits après les maquettes                                  |
-| `conception/ecarts-mcd-mpd.md`               | Écrit — 12 écarts, aucun signalé comme faiblesse                          |
-| `conception/dictionnaire-donnees.md`         | Écrit — 11 tables, dérivé de `schema.prisma`                              |
-| `conception/diagramme-classes.puml`          | Écrit — classes des lots 1 et 2, complété par chaque lot                  |
-| `conception/diagramme-sequence-analyse.puml` | À produire au lot 4 — meilleur atout de soutenance                        |
-| `conception/diagramme-deploiement.puml`      | Écrit — développement en place, production visée au lot 7                 |
-| `securite/plan-securisation.md`              | En cours — A01, A02, A03, A07 écrites ; les autres au lot qui les produit |
-| `securite/rgpd.md`                           | À produire                                                                |
-| `tests/plan-de-tests.md`                     | À produire                                                                |
-| `tests/cahier-de-recettes.md`                | À produire — dérivé des critères d'acceptation                            |
-| `tests/jeu-essai/`                           | À constituer — 40 documents réels annotés                                 |
-| `veille/methode-et-sources.md`               | À produire                                                                |
-| `veille/veille-anglophone.md`                | À produire                                                                |
+| Livrable                                     | État                                                                                          |
+| -------------------------------------------- | --------------------------------------------------------------------------------------------- |
+| `journal-decisions.md`                       | Écrit, tenu au fil de l'eau                                                                   |
+| `questions-ouvertes.md`                      | Écrit — Q-01 à Q-09, dont 7 tranchées ; Q-01 et Q-06 attendent la mesure                      |
+| `analyse/cahier-des-charges.md`              | Écrit                                                                                         |
+| `analyse/perimetre.md`                       | Écrit — MoSCoW, refus actés et reports datés                                                  |
+| `analyse/personas.md`                        | Écrit — Claire, Marc, Sofia                                                                   |
+| `analyse/user-stories.md`                    | Écrit — 24 US dont 2 reportées, 6 épopées                                                     |
+| `analyse/regles-gestion.md`                  | Écrit — RG-01 à RG-10, dont 8 sous test                                                       |
+| `analyse/cas-utilisation.md`                 | Écrit — 16 CU dont 1 reporté, 2 scénarios                                                     |
+| `analyse/plan-livraison.md`                  | Écrit — 7 lots, ordre et dépendances                                                          |
+| `maquettage/artboards/`                      | Écrit — 19 artboards, 16 CU, [canvas en ligne](maquettage/README.md)                          |
+| `maquettage/charte-graphique.md`             | Écrit — extrait des artboards                                                                 |
+| `maquettage/accessibilite-rgaa.md`           | Écrit — 4 engagements, 5 points à vérifier                                                    |
+| `conception/diagramme-cas-utilisation.puml`  | Écrit — 14 CU, CU-11 exclu car reporté                                                        |
+| `conception/mcd.puml`, `mld.md`, `mpd.puml`  | Écrit — reconstruits après les maquettes                                                      |
+| `conception/ecarts-mcd-mpd.md`               | Écrit — 12 écarts, aucun signalé comme faiblesse                                              |
+| `conception/dictionnaire-donnees.md`         | Écrit — 11 tables, dérivé de `schema.prisma`                                                  |
+| `conception/diagramme-classes.puml`          | Écrit — classes des lots 1 et 2, complété par chaque lot                                      |
+| `conception/diagramme-sequence-analyse.puml` | À produire au lot 4 — meilleur atout de soutenance                                            |
+| `conception/diagramme-deploiement.puml`      | Écrit — développement en place, production visée au lot 7                                     |
+| `securite/plan-securisation.md`              | En cours — A01, A02, A03, A07 écrites ; les autres au lot qui les produit                     |
+| `securite/rgpd.md`                           | À produire — dont AI Act (annexe III), article 22, consentement du jeu d'essai                |
+| `tests/plan-de-tests.md`                     | À produire                                                                                    |
+| `tests/cahier-de-recettes.md`                | À produire — grandit à chaque lot, lots 1 à 3 à rattraper                                     |
+| `tests/jeu-essai/`                           | À constituer pendant le lot 3 — ~20 réels hors dépôt, ~20 synthétiques                        |
+| `soutenance/preparation.md`                  | Écrit — assistant assumé, démonstration, fil, Mistral vérifié, AI Act à confirmer sur EUR-Lex |
+| `veille/methode-et-sources.md`               | À produire                                                                                    |
+| `veille/veille-anglophone.md`                | À produire                                                                                    |
 
 ## Ce qui tient ce dossier cohérent avec le code
 

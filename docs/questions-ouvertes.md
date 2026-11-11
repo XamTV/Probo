@@ -12,12 +12,13 @@ Les arbitrages identifiés mais pas encore rendus. Ce registre existe parce que 
 | ---- | ----------------------------------------------------------------- | ---------- | ------------------- | -------- |
 | Q-01 | L'extraction d'identité : appel dédié ou greffée sur le niveau 1  | 03/09/2026 | Lot 4               | Ouverte  |
 | Q-02 | Le jeton d'invitation : une table ou deux colonnes                | 05/10/2026 | Lot 2               | Tranchée |
-| Q-03 | Créer le premier administrateur d'un établissement en production  | 03/11/2026 | Avant mise en ligne | Ouverte  |
+| Q-03 | Créer le premier administrateur d'un établissement en production  | 03/11/2026 | Avant mise en ligne | Tranchée |
 | Q-04 | La valeur du plafond de taille totale décompressée                | 06/11/2026 | Lot 3               | Tranchée |
 | Q-05 | Le mécanisme d'avancement : SSE, WebSocket ou scrutation          | 06/11/2026 | Lot 3               | Tranchée |
 | Q-06 | Le seuil de confiance sur l'identité lue                          | 06/11/2026 | Lot 4               | Ouverte  |
-| Q-07 | `prompt_version` quand RG-03 interdit l'appel au modèle           | 06/11/2026 | Lot 4               | Ouverte  |
+| Q-07 | `prompt_version` quand RG-03 interdit l'appel au modèle           | 06/11/2026 | Lot 4               | Tranchée |
 | Q-08 | Le nommage des clés de stockage et le cloisonnement sur le volume | 06/11/2026 | Lot 3               | Tranchée |
+| Q-09 | La souveraineté face aux sous-traitants américains de Mistral     | 11/11/2026 | Lot 4               | Tranchée |
 
 ---
 
@@ -31,7 +32,9 @@ RG-09 impose de lire l'identité du candidat **dans le texte du document**, le n
 
 **Échéance.** Lot 4, à l'implémentation de la chaîne d'extraction. La décision demande des mesures sur le jeu d'essai, pas un raisonnement a priori.
 
-**Dépend de** `tests/jeu-essai/` — 40 documents réels annotés, encore à constituer.
+**Règle de décision, écrite le 11/11/2026 avant toute mesure.** L'extraction greffée est retenue si, sur l'ensemble du jeu d'essai, elle ne classe mal **pas plus d'un document de plus** qu'un niveau 1 seul, **et** si l'identité lue est fausse sur **au plus deux** documents réels. Sinon, un appel dédié. Les critères se comptent en documents : sur une quarantaine, un pourcentage promet une précision que l'effectif n'a pas. Voir l'entrée du 11/11/2026 au journal.
+
+**Dépend de** `tests/jeu-essai/` — une vingtaine de documents réels sous consentement, hors du dépôt, et une vingtaine de synthétiques, encore à constituer.
 
 ---
 
@@ -52,6 +55,10 @@ RG-09 impose de lire l'identité du candidat **dans le texte du document**, le n
 Probo n'a pas d'inscription libre — c'est voulu, le produit se vend à des établissements. Mais `POST /users` exige une session, qui exige un compte : **le premier administrateur d'un établissement client n'a aucune porte d'entrée**. Le seed ne règle que le poste de développement, et il refuse de s'exécuter en production.
 
 **Les deux voies.** Soit un `M-xx` d'inscription ou d'onboarding, qui est un ajout de périmètre et doit se justifier devant le jury comme tel. Soit une commande d'administration lancée sur le serveur, qui ne coûte rien au périmètre mais déplace le problème vers l'exploitation, et doit alors apparaître au diagramme de déploiement et au plan de sécurisation.
+
+**Tranchée le** 11/11/2026 : **une commande d'administration** lancée dans le conteneur de l'API, qui crée l'établissement et son premier administrateur, affiche le lien d'invitation, refuse un doublon et écrit au journal d'audit. Aucun ajout de périmètre. Voir l'entrée du 11/11/2026 au journal.
+
+**État d'avancement.** À implémenter sur une branche dédiée, après la fusion du lot 3.
 
 **Échéance.** Avant la mise en ligne, donc au plus tard au lot 7. Trancher plus tôt serait mieux : la réponse change le périmètre, et le périmètre est cité partout.
 
@@ -105,6 +112,8 @@ La maquette `Reconciliation` affiche « confiance 42 % — **sous le seuil** » 
 
 **Échéance.** Lot 4, à l'implémentation d'US-23. La valeur demande des mesures, pas un raisonnement a priori.
 
+**Règle de décision, écrite le 11/11/2026 avant toute mesure.** Le seuil est le plus bas qui envoie à la réconciliation **toutes** les identités fausses du jeu d'essai, réelles et synthétiques — le jeu synthétique en fabrique au moins cinq, faute de quoi le seuil serait calé sur un ou deux points. Il est indépendant de `confidence_threshold` ; sa forme — constante partagée ou réglage de campagne — se décide avec sa valeur. Voir l'entrée du 11/11/2026 au journal.
+
 **Dépend de** `tests/jeu-essai/` — encore à constituer, comme Q-01.
 
 ---
@@ -112,6 +121,8 @@ La maquette `Reconciliation` affiche « confiance 42 % — **sous le seuil** » 
 ## Q-07 · `prompt_version` quand RG-03 interdit l'appel au modèle
 
 **Posée le** 06/11/2026, par la passe d'audit.
+
+**Tranchée le** 11/11/2026 : **colonne nullable, tenue par une contrainte `CHECK`** — `prompt_version` est nulle si et seulement si `atypical_reason` vaut `UNREADABLE`. Migration au lot 4. Voir l'entrée du 11/11/2026 au journal.
 
 `document_analysis.prompt_version` est **obligatoire**, sans valeur par défaut. Or RG-03 veut qu'un document illisible soit marqué atypique « sans aucun appel au modèle » — et son verdict vit pourtant dans cette table. Aucun livrable, aucune constante partagée ne dit ce que vaut la colonne dans ce cas, et `Level1Result` ne porte pas de version de prompt.
 
@@ -134,3 +145,23 @@ La maquette `Reconciliation` affiche « confiance 42 % — **sous le seuil** » 
 **Ce qui la rend urgente.** Le lot 3 écrit les **premiers fichiers sur disque**. La convention sera inventée à l'écriture si elle n'est pas tranchée avant, et elle coûte cher à changer ensuite : les clés sont stockées en base et les fichiers déjà posés.
 
 **Échéance.** Lot 3, avant la première écriture sur le volume.
+
+---
+
+## Q-09 · La souveraineté face aux sous-traitants américains de Mistral
+
+**Posée le** 11/11/2026, en vérifiant ce que le README affirmait de Mistral.
+
+**Tranchée le** 11/11/2026 : **la contrainte est reformulée.** Données dans l'EEE, fournisseurs européens soumis au RGPD, entraînement refusé et rétention nulle demandée ; l'exposition au Cloud Act est réduite et documentée, pas exclue. Mistral reste le fournisseur, et rien ne change au code. Voir l'entrée du 11/11/2026 au journal.
+
+Le [cahier des charges](analyse/cahier-des-charges.md) fait de la souveraineté des données une **contrainte structurante** : elle « exclut les fournisseurs de modèles soumis au Cloud Act » et détermine le choix de Mistral. Or la liste des sous-traitants de Mistral, consultée le 11/11/2026 sur `trust.mistral.ai`, montre que son API tourne en partie chez **Microsoft** (Suède, Norvège), **Google** (Pays-Bas, Belgique) et **CoreWeave** (EEE) — trois sociétés américaines, soumises au Cloud Act quel que soit le lieu d'hébergement. Mistral lui-même n'y est pas soumis ; ses hébergeurs, si.
+
+**Ce qui est en jeu.** Une contrainte que le choix technique ne tient pas, citée dans le cahier des charges, le README et le plan de sécurisation. Un jury qui ouvre la page des sous-traitants le voit en une minute.
+
+**Les voies.**
+
+- **Reformuler la contrainte** : données hébergées dans l'EEE, par un fournisseur européen soumis au RGPD, avec une exposition au Cloud Act **réduite et documentée**, pas exclue. Rien ne change au code.
+- **Changer d'hébergeur d'inférence** : un modèle Mistral à poids ouverts servi par un hébergeur européen non soumis au Cloud Act — l'offre d'API génératives de Scaleway, déjà hébergeur du VPS, est la piste à vérifier, sur les modèles qu'elle sert réellement. La contrainte tient, mais le modèle du niveau 2 pourrait changer.
+- **Auto-héberger** un modèle à poids ouverts. La contrainte tient, au prix d'un serveur à GPU que ni le calendrier ni le budget ne prévoient.
+
+**Échéance.** Lot 4, avant d'écrire le client de l'API : la réponse décide à quel point d'accès il parle.
